@@ -1,0 +1,13 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "C/C++ Runner: Debug Session",
+      "type": "lldb",
+      "request": "launch",
+      "args": [],
+      "cwd": "/Users/dossouhillary/Downloads/STADE_FINAL/esp32/src",
+      "program": "/Users/dossouhillary/Downloads/STADE_FINAL/esp32/src/build/Debug/outDebug"
+    }
+  ]
+}
