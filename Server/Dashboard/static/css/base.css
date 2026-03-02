@@ -1,0 +1,56 @@
+/* ==============================================================
+   BASE – VARIABLES GLOBALES
+   --------------------------------------------------------------
+   Définition des couleurs, polices, tailles, rayons, ombres,
+   et espacements réutilisables dans tout le projet.
+   ============================================================== */
+
+:root
+{
+  /* ---------- Couleurs ---------- */
+  --c-black:          #1A1A1A;                   /* texte principal sombre */
+  --c-white:          #FFFFFF;                   /* blanc pur */
+  --c-gray:           #EDEDED;                   /* gris clair neutre */
+  --c-bg-dark:        #0A0A0F;                   /* fond très sombre */
+  --c-bg-panel:       #111118;                   /* panneau sombre */
+  --c-red:            #e03434;                   /* rouge vif */
+  --c-red-dark:       #a01f1f;                   /* rouge foncé */
+  --c-red-glow:       rgba(224, 52, 52, 0.18);   /* effet glow rouge */
+  --c-border:         rgba(255, 255, 255, 0.07); /* bordure très translucide */
+  --c-text:           #e8e8f0;                   /* texte clair sur fonds sombres */
+  --c-text-muted:     #5a5a72;                   /* texte secondaire / désactivé */
+
+  /* ---------- Polices ---------- */
+  --font-mono:        "Courier New", "Lucida Console", monospace;
+  --font-sans:        "Trebuchet MS", "Segoe UI", sans-serif;
+
+  /* ---------- Rayons et Ombres ---------- */
+  --s-radius-sm:      15px;
+  --s-radius-lg:      20px;
+  --s-shadow-sm:      0 4px 10px rgba(0, 0, 0, .2);
+  --s-shadow-md:      0 8px 15px rgba(0, 0, 0, .3);
+
+  /* ---------- Espacements (padding / margin) ---------- */
+  --sp-header-x:      100px;
+  --sp-header-y:      30px;
+  --sp-card-y:        50px;
+  --sp-btn-x:         20px;
+  --sp-btn-y:         10px;
+}
+
+/* ==============================================================
+   REINITIALISATION GLOBALE
+   --------------------------------------------------------------
+   Reset de base pour garantir un rendu cohérent sur tous les
+   navigateurs. Toutes les balises héritent de la couleur noire
+   par défaut (modifiable via les variables ci‑dessus).
+   ============================================================== */
+*, *::before, *::after
+{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  list-style: none;
+  text-decoration: none;
+  color: var(--c-black);
+}

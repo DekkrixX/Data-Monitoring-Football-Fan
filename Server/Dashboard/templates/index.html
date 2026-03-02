@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Dashboard</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+    </head>
+    <body>
+        <header>
+            <h1 class="title">Dashboard</h1>
+            <h2 class="subtitle">Visualisation des données des supporters en temps réel</h2>
+        </header>
+        <div id="grid">
+        </div>
+        <script src="{{ url_for('static', filename='lib/socket.io.min.js') }}"></script>
+        <script>
+            // Définition des variables dynamiques
+            const DEBUG = {{ debug }};
+        </script>
+        <script type="module" src="{{ url_for('static', filename='js/index.js') }}"></script>
+    </body>
+</html>

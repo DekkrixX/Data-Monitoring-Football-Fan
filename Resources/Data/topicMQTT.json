@@ -1,0 +1,14 @@
+[
+    {
+        "type": "heart_rate",
+        "topic": "monitoring/heart_rate/"
+    },
+    {
+        "type": "accelerometer_gyroscope",
+        "topic": "monitoring/accelerometer_gyroscope/"
+    },
+    {
+        "type": "default",
+        "topic": "monitoring/default/"
+    }
+]

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Supporter n°{{ id }}</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/supporter.css') }}">
+        <style>
+            :root 
+            {
+                --color: {{ color }};
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <h2>{{ name }}</h2>
+            <h1>Supporter n°{{ id }}</h1>
+            <a href="/" class="button">← Retour</a>
+        </header>
+        <div id="grid">
+            <div class="card">
+                <p id="heart-rate" class="value">-</p>
+                <p class="label">BPM</p>
+            </div>
+            <div class="card">
+                <p id="average" class="value">-</p>
+                <p class="label">Moyenne</p>
+            </div>
+            <div class="card">
+                <p id="minimum" class="value">-</p>
+                <p class="label">Minimum</p>
+            </div>
+            <div class="card">
+                <p id="maximum" class="value">-</p>
+                <p class="label">Maximum</p>
+            </div>
+        </div>
+        <div class="chart-container">
+            <canvas id="chart"></canvas>
+        </div>
+        <script src="{{ url_for('static', filename='lib/socket.io.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='lib/chart.umd.min.js') }}"></script>
+        <script>
+            // Définition des variables dynamiques
+            window.DEBUG = {{ debug }};
+            window.id = {{ id }};
+            window.name = "{{ name }}";
+            window.color = "{{ color }}";
+        </script>
+        <script type="module" src="{{ url_for('static', filename='js/supporter.js') }}"></script>
+    </body>
+</html>

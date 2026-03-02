@@ -1,0 +1,49 @@
+/**
+ * @file sensorType.hpp
+ * 
+ * @brief Déclaration des types de capteurs et de leur topic MQTT associé.
+ *
+ * Définit l'énumération SensorType ainsi que la fonction utilitaire getMQTTTopic() qui mappe chaque type vers son topic MQTT correspondant.
+ */
+
+#ifndef _SENSORTYPE_HPP_
+#define _SENSORTYPE_HPP_
+
+// ============================================================================
+//  Import des headers externes
+// ============================================================================
+
+#include <string>
+
+// ============================================================================
+//  Type de capteurs
+// ============================================================================
+
+/**
+ * @enum SensorType
+ * 
+ * @brief Catégories de capteurs supportés par le système.
+ */
+enum class SensorType 
+{
+    HEART_RATE,                 ///< Capteur de fréquence cardiaque.
+    ACCELEROMETER_GYROSCOPE,    ///< Capteur accéléromètre / gyroscope.
+    UNKNOW                      ///< Type inconnu ou non initialisé.
+};
+
+// ============================================================================
+//  Association du type au topic MQTT
+// ============================================================================
+
+/**
+ * @brief Retourne le topic MQTT correspondant à un type de capteur.
+ *
+ * @param type Type du capteur.
+ * 
+ * @return std::string Topic MQTT associé. Retourne "default" si le type est inconnu.
+ */
+std::string getMQTTTopic(SensorType type);
+
+
+
+#endif // _SENSORTYPE_HPP_

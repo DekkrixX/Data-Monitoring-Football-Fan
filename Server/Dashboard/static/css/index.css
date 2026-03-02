@@ -1,0 +1,86 @@
+/* ==============================================================
+   INDEX – STYLE GÉNÉRAL
+   ============================================================== */
+
+/* ---------- Fond de page ----------
+   Dégradé bleu‑gris. */
+body
+{
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+  min-height: 920px;
+}
+
+/* ---------- Titres ----------
+   Couleurs et alignement centraux. */
+.title
+{
+  color: var(--c-white);
+  font-size: 50px;
+  text-align: center;
+}
+.subtitle
+{
+  color: var(--c-gray);
+  font-size: 30px;
+  text-align: center;
+}
+
+
+/* ---------- Header ----------
+   Simple marge autour du header (pas de styles supplémentaires). */
+header
+{
+  margin: 10px;
+}
+
+/* ==============================================================
+   GRID PRINCIPALE
+   --------------------------------------------------------------
+   4 colonnes égales, espacement généreux. */
+#grid
+{
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  margin: 50px;
+  justify-content: space-between;
+  align-items: center;
+  justify-items: center;
+}
+
+/* ==============================================================
+   CARTES (éléments individuels de la grille)
+   --------------------------------------------------------------
+   Fond blanc, bordure grise, ombre, rayon, transition
+   au survol. */
+.card
+{
+  display: grid;
+  align-items: center;
+  background-color: var(--c-white);
+  border: 5px solid var(--c-gray);
+  padding: 20px;
+  width: 350px;
+  border-radius: var(--s-radius-lg);
+  margin-top: var(--sp-card-y);
+  cursor: pointer;
+  box-shadow: var(--s-shadow-sm);
+  transition: transform .3s ease, box-shadow .3s ease;
+}
+.card:hover
+{
+  transform: translateY(-5px);
+  box-shadow: var(--s-shadow-md);
+}
+
+/* ---------- Contenu de la carte ----------
+   Nom (gros) et identifiant (plus petit). */
+.name
+{
+  font-size: 50px;
+}
+.id
+{
+  color: var(--c-black);
+  font-size: 25px;
+  font-weight: bold;
+}

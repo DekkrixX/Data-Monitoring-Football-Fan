@@ -1,0 +1,88 @@
+##
+# @file topic.py
+#
+# @brief Gestion des topics MQTT et construction des points InfluxDB.
+#
+# Fournit getMQTTTopic() pour résoudre le topic MQTT d'un type de données, et buildPointInfluxDB() pour séparer les champs d'un message en tags et fields destinés à InfluxDB.
+##
+
+# =============================================================================
+#  Import des bibliothèques
+# =============================================================================
+
+import json
+
+from Server.Config.setting import Config
+
+# =============================================================================
+#  Résolution du topic MQTT
+# =============================================================================
+
+def getMQTTTopic(dataType, supporterId):
+    ##
+    # @brief Retourne le topic MQTT correspondant à un type de données et à un identifiant de supporter.
+    #
+    # @param dataType   Type de données (ex : "heart_rate").
+    # @param supporterId Identifiant numérique du supporter.
+    #
+    # @return str Topic MQTT résolu.
+    #
+    # @throws RuntimeError Si le fichier est absent, invalide ou si le type est inconnu.
+    ##
+
+    filePath = Config.PATH["data"] + "topicMQTT.json"
+
+    try:
+        if Config.DEBUG:
+            print(f"[Topic] Lecture du fichier de topics MQTT : '{filePath}'")
+
+        with open(filePath, "r") as file:
+            topicList = json.load(file)
+
+    except FileNotFoundError:
+        raise RuntimeError(f"[Topic] Fichier de topics MQTT introuvable : '{filePath}'")
+
+    except json.JSONDecodeError as e:
+        raise RuntimeError(f"[Topic] Fichier de topics MQTT invalide (JSON malformé) : '{filePath}'") from e
+
+    for item in topicList:
+        if item["type"] == dataType:
+            topic = item["topic"] + str(supporterId)
+
+            if Config.DEBUG:
+                print(f"[Topic] Topic MQTT résolu : '{topic}' (type='{dataType}', id={supporterId})")
+
+            return topic
+
+    raise RuntimeError(f"[Topic] Aucun topic MQTT défini pour le type de données '{dataType}'")
+
+
+# =============================================================================
+#  Construction du point InfluxDB
+# =============================================================================
+
+def buildPointInfluxDB(data):
+    ##
+    # @brief Sépare les champs d'un message en tags et fields pour InfluxDB.
+    #
+    # @param data Dictionnaire de données (modifié en place : "type" retiré).
+    #
+    # @return tuple (tags, fields) où tags et fields sont des dictionnaires.
+    ##
+
+    tags   = {}
+    fields = {}
+
+    # "type" est utilisé comme nom de mesure, pas comme tag ni field
+    data.pop("type", None)
+
+    ## @brief Clés identifiant le supporter, utilisées comme tags InfluxDB.
+    TAG_KEYS = {"supporter id", "name"}
+
+    for key, value in data.items():
+        if key in TAG_KEYS:
+            tags[key] = value
+        else:
+            fields[key] = value
+
+    return tags, fields

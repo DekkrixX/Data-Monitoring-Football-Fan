@@ -1,0 +1,70 @@
+/* ==============================================================
+   COMPARAISON – STYLE GÉNÉRAL
+   ============================================================== */
+
+/* ---------- Fond de page ----------
+   Utilise la variable de gris définie dans base.css */
+body
+{
+  background-color: var(--c-gray);
+}
+
+/* ==============================================================
+   HEADER
+   --------------------------------------------------------------
+   Disposition en grille avec trois colonnes : logo / titre /
+   actions. Les marges et paddings utilisent les variables
+   d’espacement globales.
+   ============================================================== */
+header
+{
+  background-color: var(--c-white);
+  display: grid;
+  grid-template-columns: 0.5fr 1fr 0.5fr;
+  justify-content: space-between;
+  align-items: center;
+  justify-items: center;
+  margin: var(--sp-header-y) var(--sp-header-x);
+  padding: var(--sp-btn-y) var(--sp-btn-x);
+  border-radius: var(--s-radius-sm);
+}
+
+
+/* ---------- Titre du header ----------
+   La couleur est injectée dynamiquement depuis le code Python. */
+header > h1
+{
+  font-size: 50px;
+  color: var(--color); /* injecté par le code Python */
+  grid-column: 2;
+  text-align: center;
+}
+
+
+/* ==============================================================
+   CONTENEUR DE GRAPHIQUE
+   ============================================================== */
+.chart-container 
+{
+  margin: var(--sp-header-y) var(--sp-header-x);
+  padding: var(--sp-btn-y) var(--sp-btn-x);
+  background-color: var(--c-white);
+  border-radius: var(--s-radius-sm);
+  height: 500px;
+}
+
+/* ==============================================================
+   BOUTON ACTIONNEL
+   --------------------------------------------------------------
+   Bouton stylisé avec les couleurs du thème sombre / clair.
+   ============================================================== */
+.button
+{
+  font-size: 25px;
+  font-weight: bold;
+  background-color: var(--color); /* injecté par le code Python */
+  color: var(--c-white);
+  border-radius: var(--s-radius-sm);
+  padding: var(--sp-btn-y) var(--sp-btn-x);
+  grid-column: 3; /* placé dans la troisième colonne du header */
+}

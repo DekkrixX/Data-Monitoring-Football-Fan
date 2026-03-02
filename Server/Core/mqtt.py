@@ -1,0 +1,318 @@
+##
+# @file mqtt.py
+#
+# @brief Déclaration et implémentation de la classe MQTTClientWrapper.
+#
+# Fournit une abstraction haut niveau du client paho-mqtt pour publier des messages et s'abonner à des topics sur un broker MQTT, avec gestion de l'état de connexion et réabonnement automatique après reconnexion.
+##
+
+
+# =============================================================================
+#  Import des bibliothèques
+# =============================================================================
+
+import paho.mqtt.client as mqtt
+
+from Server.Utils.state import ConnectionState
+from Server.Config.setting import Config
+from Server.Core.exception import ConnectionFailError, NotConnectionError
+
+
+# =============================================================================
+#  Client MQTT
+# =============================================================================
+
+class MQTTClientWrapper:
+    ##
+    # @class MQTTClientWrapper
+    #
+    # @brief Gestionnaire de connexion MQTT basé sur paho-mqtt.
+    ##
+
+# =============================================================================
+#  Constructeur
+# =============================================================================
+
+    def __init__(self, clientId, host, port, keepalive, qos=0,
+                 onMessageCallback=None, onConnectCallback=None,
+                 onDisconnectCallback=None, autoReconnect=True):
+        ##
+        # @brief Construit un gestionnaire MQTT avec les paramètres de connexion et les callbacks utilisateur optionnels.
+        #
+        # @param clientId             Identifiant unique du client MQTT.
+        # @param host                 Hôte du broker MQTT.
+        # @param port                 Port du broker MQTT.
+        # @param keepalive            Intervalle de keep-alive en secondes.
+        # @param qos                  Niveau de qualité de service (0, 1 ou 2).
+        # @param onMessageCallback    Appelé à chaque message reçu (message).
+        # @param onConnectCallback    Appelé à la connexion (client, userdata, flags, rc).
+        # @param onDisconnectCallback Appelé à la déconnexion (client, userdata, rc).
+        # @param autoReconnect        Réabonne automatiquement aux topics après reconnexion.
+        ##
+
+        self.clientId    = clientId  ##< @brief Identifiant unique du client MQTT.
+        self.host        = host      ##< @brief Hôte du broker MQTT.
+        self.port        = port      ##< @brief Port du broker MQTT.
+        self.keepalive   = keepalive ##< @brief Intervalle de keep-alive en secondes.
+        self.qos         = qos       ##< @brief Niveau de qualité de service (0, 1 ou 2).
+        self.autoReconnect = autoReconnect ##< @brief Active le réabonnement automatique après reconnexion.
+
+        self.userOnMessage    = onMessageCallback    ##< @brief Callback utilisateur appelé à la réception d'un message.
+        self.userOnConnect    = onConnectCallback    ##< @brief Callback utilisateur appelé à la connexion.
+        self.userOnDisconnect = onDisconnectCallback ##< @brief Callback utilisateur appelé à la déconnexion.
+
+        self.client           = None              ##< @brief Instance paho-mqtt, initialisée dans connect().
+        self.subscribedTopics = []                ##< @brief Liste des topics souscrits, mémorisés pour le réabonnement automatique.
+        self.state            = ConnectionState.DISCONNECTED ##< @brief État courant de la connexion.
+
+# =============================================================================
+#  Connexion
+# =============================================================================
+
+    def connect(self):
+        ##
+        # @brief Crée le client paho-mqtt et établit la connexion au broker.
+        #
+        # @throws ConnectionFailError Si la connexion au broker échoue.
+        ##
+
+        if Config.DEBUG:
+            print(f"[MQTT] Connexion au broker {self.host}:{self.port}")
+
+        self.state = ConnectionState.CONNECTING
+
+        try:
+            self.client = mqtt.Client(
+                mqtt.CallbackAPIVersion.VERSION2,
+                client_id=self.clientId,
+                clean_session=True
+            )
+
+            # Branchement des callbacks internes
+            self.client.on_connect    = self._onConnect
+            self.client.on_message    = self._onMessage
+            self.client.on_disconnect = self._onDisconnect
+
+            self.client.connect(self.host, self.port, self.keepalive)
+
+            self.state = ConnectionState.CONNECTED
+
+        except Exception as e:
+            self.state = ConnectionState.ERROR
+            raise ConnectionFailError("MQTT", self.host, self.port) from e
+
+# =============================================================================
+#  Callbacks internes
+# =============================================================================
+
+    def _onConnect(self, client, userdata, flags, rc, properties=None):
+        ##
+        # @brief Callback interne appelé par paho-mqtt lors de l'établissement de la connexion au broker.
+        #
+        # @param client     Instance paho-mqtt.
+        # @param userdata   Données utilisateur (non utilisé).
+        # @param flags       Flags de connexion.
+        # @param rc         Code de retour de connexion (0 = succès).
+        # @param properties Propriétés MQTT v5 (optionnel).
+        ##
+
+        if Config.DEBUG:
+            print(f"[MQTT] Connexion établie avec le broker (rc={rc})")
+
+        if rc == 0:
+            # Réabonnement automatique aux topics mémorisés après reconnexion
+            if self.autoReconnect and self.subscribedTopics:
+                for topic in self.subscribedTopics:
+                    self.client.subscribe(topic, qos=self.qos)
+                    if Config.DEBUG:
+                        print(f"[MQTT] Réabonnement automatique au topic '{topic}'")
+
+            if self.userOnConnect:
+                try:
+                    self.userOnConnect(client, userdata, flags, rc)
+                except Exception as e:
+                    print(f"[MQTT] Erreur dans le callback onConnect utilisateur : {e}")
+        else:
+            self.state = ConnectionState.ERROR
+            print(f"[MQTT] Échec de connexion au broker (rc={rc})")
+
+
+    def _onDisconnect(self, client, userdata, disconnect_flags, rc, properties=None):
+        ##
+        # @brief Callback interne appelé par paho-mqtt lors de la déconnexion du broker.
+        #
+        # @param client           Instance paho-mqtt.
+        # @param userdata         Données utilisateur (non utilisé).
+        # @param disconnect_flags Flags de déconnexion.
+        # @param rc               Code de retour (0 = déconnexion propre).
+        # @param properties       Propriétés MQTT v5 (optionnel).
+        ##
+
+        if Config.DEBUG:
+            print(f"[MQTT] Déconnexion du broker (rc={rc})")
+
+        if rc == 0:
+            self.state = ConnectionState.DISCONNECTED
+        else:
+            # Déconnexion inattendue : paho gère la reconnexion si loop_forever est actif
+            if self.autoReconnect:
+                self.state = ConnectionState.RECONNECTING
+                if Config.DEBUG:
+                    print("[MQTT] Déconnexion inattendue, reconnexion automatique en cours")
+
+        if self.userOnDisconnect:
+            try:
+                self.userOnDisconnect(client, userdata, rc)
+            except Exception as e:
+                print(f"[MQTT] Erreur dans le callback onDisconnect utilisateur : {e}")
+
+
+    def _onMessage(self, client, userdata, message):
+        ##
+        # @brief Callback interne appelé par paho-mqtt à la réception d'un message sur un topic souscrit.
+        #
+        # @param client   Instance paho-mqtt.
+        # @param userdata Données utilisateur (non utilisé).
+        # @param message  Message reçu (topic, payload, qos, retain).
+        ##
+
+        if Config.DEBUG:
+            print(f"[MQTT] Message reçu sur le topic '{message.topic}'")
+
+        if self.userOnMessage:
+            try:
+                self.userOnMessage(message)
+            except Exception as e:
+                print(f"[MQTT] Erreur dans le callback onMessage utilisateur : {e}")
+
+# =============================================================================
+#  Abonnement aux topics
+# =============================================================================
+
+    def subscribe(self, topics):
+        ##
+        # @brief Abonne le client à une liste de topics et les mémorise pour le réabonnement automatique après reconnexion.
+        #
+        # @param topics Liste de chaînes représentant les topics MQTT.
+        #
+        # @throws NotConnectionError Si le client n'est pas connecté.
+        # @throws RuntimeError       Si l'abonnement à un topic échoue.
+        ##
+
+        if not self.isConnected():
+            raise NotConnectionError("MQTT")
+
+        for topic in topics:
+            if Config.DEBUG:
+                print(f"[MQTT] Abonnement au topic '{topic}'")
+
+            result, _ = self.client.subscribe(topic, qos=self.qos)
+
+            if result == mqtt.MQTT_ERR_SUCCESS:
+                if topic not in self.subscribedTopics:
+                    self.subscribedTopics.append(topic)
+            else:
+                raise RuntimeError(f"[MQTT] Échec de l'abonnement au topic '{topic}' (code={result})")
+
+
+    def unsubscribe(self, topics):
+        ##
+        # @brief Désabonne le client des topics spécifiés et les retire de la liste mémorisée.
+        #
+        # @param topics Liste de chaînes représentant les topics MQTT.
+        #
+        # @throws NotConnectionError Si le client n'est pas connecté.
+        ##
+
+        if not self.isConnected():
+            raise NotConnectionError("MQTT")
+
+        for topic in topics:
+            if Config.DEBUG:
+                print(f"[MQTT] Désabonnement du topic '{topic}'")
+
+            self.client.unsubscribe(topic)
+
+            if topic in self.subscribedTopics:
+                self.subscribedTopics.remove(topic)
+
+# =============================================================================
+#  Publication
+# =============================================================================
+
+    def publish(self, topic, payload, retain=False):
+        ##
+        # @brief Publie un message sur le topic spécifié.
+        #
+        # @param topic   Topic MQTT cible.
+        # @param payload Contenu du message (chaîne JSON).
+        # @param retain  Si True, le broker conserve le dernier message publié.
+        #
+        # @return bool True si la publication a réussi, False sinon.
+        #
+        # @throws NotConnectionError Si le client n'est pas connecté.
+        # @throws RuntimeError       Si la publication échoue.
+        ##
+
+        if not self.isConnected():
+            raise NotConnectionError("MQTT")
+
+        try:
+            if Config.DEBUG:
+                print(f"[MQTT] Publication sur le topic '{topic}'")
+
+            result = self.client.publish(topic, payload, qos=self.qos, retain=retain)
+            return result.rc == mqtt.MQTT_ERR_SUCCESS
+
+        except Exception as e:
+            raise RuntimeError(f"[MQTT] Échec de la publication sur le topic '{topic}' : {e}") from e
+
+# =============================================================================
+#  Boucle réseau
+# =============================================================================
+
+    def start(self, blocking=True):
+        ##
+        # @brief Démarre la boucle réseau paho-mqtt.
+        #
+        # @param blocking True  : bloque le thread courant (loop_forever). False : tourne dans un thread séparé (loop_start).
+        #
+        # @throws NotConnectionError Si le client n'est pas connecté.
+        ##
+
+        if Config.DEBUG:
+            print(f"[MQTT] Démarrage de la boucle réseau (blocking={blocking})")
+
+        if not self.isConnected():
+            raise NotConnectionError("MQTT")
+
+        if blocking:
+            self.client.loop_forever()
+        else:
+            self.client.loop_start()
+
+
+    def stop(self):
+        ##
+        # @brief Arrête la boucle réseau et se déconnecte proprement du broker.
+        ##
+
+        if Config.DEBUG:
+            print("[MQTT] Arrêt de la boucle réseau et déconnexion")
+
+        if self.isConnected():
+            self.client.loop_stop()
+            self.client.disconnect()
+            self.state = ConnectionState.DISCONNECTED
+
+# =============================================================================
+#  État
+# =============================================================================
+
+    def isConnected(self):
+        ##
+        # @brief Indique si le client est actuellement connecté au broker.
+        #
+        # @return bool True si l'état est CONNECTED, False sinon.
+        ##
+        return self.state == ConnectionState.CONNECTED
