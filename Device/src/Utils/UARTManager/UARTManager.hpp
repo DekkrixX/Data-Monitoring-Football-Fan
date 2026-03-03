@@ -131,6 +131,9 @@ class UARTManager
          * @return int Nombre d'octets disponible dans le tampon de émission.
          */
         int availableForWrite();
+        /**
+         */
+        void reverseBuffer(uint8_t * buffer, size_t size);
 
 };
 

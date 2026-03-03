@@ -219,4 +219,23 @@ int UARTManager::availableForWrite()
 
 
 
+void UARTManager::reverseBuffer(uint8_t * buffer, size_t size)
+{
+    // Vérifie la validité de la taille du buffer
+    if (size == 0)
+        throw std::invalid_argument("[UART] reverseBuffer - Taille du buffer invalide: " + std::to_string(size));
+
+    // Inverse le buffer
+    for (size_t i=0; i < size / 2; i++)
+    {
+        uint8_t tmp = buffer[i];
+        buffer[i] = buffer[size - 1 - i];
+        buffer[size - i] = tmp;
+    }
+
+    return ;
+}
+
+
+
 #endif // _UARTMANAGER_CPP_
