@@ -11,9 +11,7 @@
  *   "t": "heart_rate",
  *   "n": "PolarH10",
  *   "id": <int>,
- *   "hr": [<int>],
- *   "bsl": <string>,
- *   "bl": <uint8_t>
+ *   "hr": [<int>]
  * }
  * @endcode
  */
@@ -89,8 +87,6 @@ class PolarH10: public HeartRate
         {
             int heartRateIndex = 0;                   ///< Taille courante du buffer de fréquence cardiaque
             int heartRate[NB_VALUE];             ///< Buffer de fréquence cardiaque en bpm.
-            std::string bodySensorLocation = ""; ///< Localisation du capteur ("" = non initialisé).
-            uint8_t batteryLevel = 255;          ///< Niveau de batterie en % (255 = non initialisé).
         };
         using PolarH10Data = struct PolarH10Data;
 

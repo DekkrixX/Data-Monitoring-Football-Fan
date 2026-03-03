@@ -1,5 +1,9 @@
 [
     {
+        "type": "system",
+        "topic": "monitoring/system/"
+    },
+    {
         "type": "heart_rate",
         "topic": "monitoring/heart_rate/"
     },

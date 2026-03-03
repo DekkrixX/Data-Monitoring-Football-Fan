@@ -28,6 +28,7 @@ enum class SensorType
 {
     HEART_RATE,                 ///< Capteur de fréquence cardiaque.
     ACCELEROMETER_GYROSCOPE,    ///< Capteur accéléromètre / gyroscope.
+    SYSTEM,                     ///< Type pour les messages d'information système
     UNKNOW                      ///< Type inconnu ou non initialisé.
 };
 

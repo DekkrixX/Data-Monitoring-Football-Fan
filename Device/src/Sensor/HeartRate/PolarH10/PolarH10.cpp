@@ -66,13 +66,13 @@ std::string PolarH10::formatData(PolarH10Data & data, int supporterId)
 {
     if (DEBUG)
     {
-        Serial.printf("[POLARH10] formatData - HR: ");
+        Serial.printf("[POLARH10] formatData - HR: [ ");
         Serial.flush();
         for (int i=0; i < NB_VALUE; i++){
             Serial.printf("%d ", data.heartRate[i]);
             Serial.flush();
         }
-        Serial.printf("bpm, localisation: %s, batterie: %u%%\n", data.bodySensorLocation.c_str(), data.batteryLevel);
+        Serial.printf("] bpm\n");
         Serial.flush();
     }
 
@@ -88,8 +88,6 @@ std::string PolarH10::formatData(PolarH10Data & data, int supporterId)
     JsonArray array = json["hr"].to<JsonArray>();
     for (int i=0; i < NB_VALUE; i++)
         array.add(data.heartRate[i]);
-    json["bsl"] = data.bodySensorLocation;
-    json["bl"] = data.batteryLevel;
 
     // Sérialisation en chaîne JSON + ajout d'un saut de ligne comme délimiteur de message
     serializeJson(json, jsonString);
@@ -261,18 +259,19 @@ void PolarH10::getData()
     }
 
     // Lecture du niveau de batterie: boucle jusqu'à obtenir une valeur valide (!= 255)
-    while (this->data.batteryLevel == 255 and this->isConnected())
+    uint8_t batteryLevel = 255;
+    while (batteryLevel == 255 and this->isConnected())
     {
         // La caractéristique Battery Level est un unique octet (valeur 0–100%)
         value = this->bleManager->getValue(UUID_BATTERY_SERVICE, UUID_BATTERY_LEVEL_CHARACTERISTIC);
         if (value.size() == 1)
         {
             const uint8_t * data = value.data();
-            this->data.batteryLevel = data[0];
+            batteryLevel = data[0];
 
             if (DEBUG)
             {
-                Serial.printf("[POLARH10] getData - Niveau de batterie: %u%%\n", this->data.batteryLevel);
+                Serial.printf("[POLARH10] getData - Niveau de batterie: %u%%\n", batteryLevel);
                 Serial.flush();
             }
         } 
@@ -285,7 +284,8 @@ void PolarH10::getData()
     }
 
     // Lecture de la localisation du capteur: boucle jusqu'à obtenir une valeur valide (!= "")
-    while (this->data.bodySensorLocation == "" and this->isConnected())
+    std::string bodySensorLocation = "";
+    while (bodySensorLocation == "" and this->isConnected())
     {
         // La caractéristique Body Sensor Location est un unique octet (enum 0–6)
         value = this->bleManager->getValue(UUID_HEARTRATE_SERVICE, UUID_HEARTRATE_BODYSENSORLOCATION_CHARACTERISTIC);
@@ -295,34 +295,34 @@ void PolarH10::getData()
             switch (data[0])
             {
                 case 0:
-                    this->data.bodySensorLocation = "Other";
+                    bodySensorLocation = "Other";
                     break;
                 case 1:
-                    this->data.bodySensorLocation = "Chest";
+                    bodySensorLocation = "Chest";
                     break;
                 case 2:
-                    this->data.bodySensorLocation = "Wrist";
+                    bodySensorLocation = "Wrist";
                     break;
                 case 3:
-                    this->data.bodySensorLocation = "Finger";
+                    bodySensorLocation = "Finger";
                     break;
                 case 4:
-                    this->data.bodySensorLocation = "Hand";
+                    bodySensorLocation = "Hand";
                     break;
                 case 5:
-                    this->data.bodySensorLocation = "Ear Lobe";
+                    bodySensorLocation = "Ear Lobe";
                     break;
                 case 6:
-                    this->data.bodySensorLocation = "Foot";
+                    bodySensorLocation = "Foot";
                     break;
                 default:
-                    this->data.bodySensorLocation = "Reserved";
+                    bodySensorLocation = "Reserved";
             }
 
             if (DEBUG)
             {
                 Serial.printf("[POLARH10] getData - Localisation: %s (code: %u)\n",
-                    this->data.bodySensorLocation.c_str(), data[0]);
+                    bodySensorLocation.c_str(), data[0]);
                 Serial.flush();
             }
         }
@@ -333,6 +333,21 @@ void PolarH10::getData()
         Serial.println("[POLARH10] getData - Lecture des caractéristiques statiques terminée");
         Serial.flush();
     }
+
+    std::string jsonString;
+    JsonDocument json;
+
+    json["t"] = getMQTTTopic(SensorType::SYSTEM);
+    json["n"] = PolarH10::name;
+    json["id"] = this->supporterId;
+    json["bsl"] = bodySensorLocation;
+    json["bl"] = batteryLevel;
+
+    // Sérialisation en chaîne JSON + ajout d'un saut de ligne comme délimiteur de message
+    serializeJson(json, jsonString);
+    jsonString += '\n';
+
+    Sensor::data = jsonString;
 
     return ;
 }
