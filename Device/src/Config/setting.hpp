@@ -48,7 +48,7 @@
 //  Paramètres du Duty Cycle
 // ============================================================================
 
-#define DUTY_CYCLE_TIME_FOR_SENSOR 4000 ///< @brief Interval de temps d'envoi des données pour que un capteur respecte le duty cycle
+#define DUTY_CYCLE_TIME_FOR_SENSOR 6000 ///< @brief Interval de temps d'envoi des données pour que un capteur respecte le duty cycle
 
 #if NB_SENSOR <= 0
 #error "Erreur de configuration: Le nombre de capteur est invalide"

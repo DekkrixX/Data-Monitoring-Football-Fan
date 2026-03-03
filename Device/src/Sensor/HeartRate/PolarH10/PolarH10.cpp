@@ -186,8 +186,6 @@ void PolarH10::update()
 
             if (DEBUG)
             {
-                Serial.printf("[POLARH10] update - Batterie: %u%%, localisation: %s\n", this->data.batteryLevel, this->data.bodySensorLocation.c_str());
-                Serial.flush();
                 Serial.println("[POLARH10] update - Souscription aux notifications Heart Rate active");
                 Serial.flush();
             }
