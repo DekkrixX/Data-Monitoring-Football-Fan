@@ -78,7 +78,7 @@ def main():
     mqttClient.start(blocking=False)
 
     try:
-        socketio.run(app, use_reloader=False)
+        socketio.run(app, host=Config.DASHBOARD_HOST, port=Config.DASHBOARD_PORT, use_reloader=False)
 
     except Exception as e:
         raise RuntimeError("[Dashboard] Erreur lors du démarrage du serveur SocketIO") from e
