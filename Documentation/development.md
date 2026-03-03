@@ -63,6 +63,13 @@ Documentation
 
 Pour l'ajout d'un topic MQTT utilisez le format suivant: monitoring/[type général du capteur]/[id du supporter]
 
+### Ajout d'un nouveau capteur
+
+Si un capteur implémente les mêmes caractéristiques que le nouveau capteur, alors créez un nouveau dossier dans le dossier général du capteur. Puis ajoutez le code de votre nouveau capteur dans le dossier que vous avez créé. Respectez les conventions pour la transmission de données et adaptez les paramètres pour l’utilisation de votre capteur.
+
+Sinon, créez un dossier général dans le dossier Sensor et codez une classe générale pour le type du capteur, puis ajoutez ce nouveau type au fichier sensorType dans le dossier Utils. Ensuite, créez un dossier avec le code de votre capteur dans le dossier général que vous avez créé. Adaptez les paramètres pour l’utilisation de votre capteur.
+Pour la partie serveur, il vous faudra modifier la fonction addData du fichier supporter.py et ajouter le type de donnée général du capteur dans le dossier Data. Enfin, adaptez le code du client et du serveur afin que les données soient utilisées.
+
 ### Documentation du projet
 
 Documentation du code du device:

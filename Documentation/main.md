@@ -46,6 +46,7 @@ Projet de Monitoring pour Supporters de Football
 │   │   └── architecture.png
 │   │
 │   └── Data
+│       ├── capteur.json
 │       ├── supporter.json
 │       └── topicMQTT.json
 │
@@ -134,6 +135,7 @@ Projet de Monitoring pour Supporters de Football
 │   │   │   │   ├── supporter.js
 │   │   │   │   ├── comparaison.js
 │   │   │   │   └── Utils
+│   │   │   │       ├── time.js
 │   │   │   │       └── board.js
 │   │   │   │
 │   │   │   └── lib                 // Fichiers de bibliothèque externe

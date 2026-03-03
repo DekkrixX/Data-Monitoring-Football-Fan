@@ -26,11 +26,11 @@ Description :
 
 ## Noeuds LoRa
 
-| Nom             | Adresse MAC       | Description physique             | ID supporter|
-|-----------------|-------------------|----------------------------------|-------------|
-| Meshtastic_9964 | 98:3D:AE:60:99:65 | Fils jaune, bleu, blanc, rouge   | 3           |
-| Meshtastic_8ec8 | 98:3D:AE:60:8E:C9 | Fils jaune, orange, noir, marron | 2           |
-| Meshtastic_4b98 | 98:3D:AE:61:4B:99 | Gateway                          | ∅           |
+| Nom             | Adresse MAC       | Description physique             |
+|-----------------|-------------------|----------------------------------|
+| Meshtastic 9964 | 98:3D:AE:60:99:65 | Fils jaune, bleu, blanc, rouge   |
+| Meshtastic 8ec8 | 98:3D:AE:60:8E:C9 | Fils jaune, orange, noir, marron |
+| Meshtastic 4b98 | 98:3D:AE:61:4B:99 | Gateway                          |
 
 Description :
 - Définition : petits appareils radio utilisant la technologie LoRa pour créer un réseau maillé décentralisé sans infrastructure (pas de réseau mobile/Wi-Fi).
