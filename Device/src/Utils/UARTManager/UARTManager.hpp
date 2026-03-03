@@ -132,6 +132,10 @@ class UARTManager
          */
         int availableForWrite();
         /**
+         * @brief Renverse le buffer. Modifie le buffer passé en paramètre.
+         * 
+         * @param uint8_t * Buffer de données
+         * @param size_t Taille du buffer
          */
         void reverseBuffer(uint8_t * buffer, size_t size);
 
