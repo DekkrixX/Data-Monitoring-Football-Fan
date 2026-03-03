@@ -73,10 +73,10 @@ class Supporter:
         # @param data Dictionnaire contenant au minimum les clés "type" et la valeur associée.
         ##
 
-        dataType = data.get("type")
+        dataType = data.get("t")
 
         if dataType == "heart_rate":
-            self.heartRate.addData(data["heart rate"])
+            self.heartRate.addData(data["hr"])
         else:
             # Type inconnu : logué mais non bloquant
             from Server.Config.setting import Config

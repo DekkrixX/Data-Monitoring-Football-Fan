@@ -110,7 +110,7 @@ def _onMqttMessage(message):
     if Config.DEBUG:
         print(f"[Dashboard] Données décodées : {data}")
 
-    supporterId = data["supporter id"]
+    supporterId = data["id"]
 
     if not _supporterExists(supporterId):
         _createSupporter(supporterId)
@@ -190,7 +190,7 @@ def _addSupporterData(data):
     # @param data Dictionnaire de données reçu depuis le broker MQTT.
     ##
 
-    supporterId = data["supporter id"]
+    supporterId = data["id"]
     name        = getNameOfSupporter(supporterId)
     color       = getColorOfSupporter(supporterId)
 
@@ -198,7 +198,7 @@ def _addSupporterData(data):
         if supporter.getId() == supporterId:
             supporter.addData(data)
 
-            payload = createDataForClient(supporter.getId(), name, color, data["heart rate"])
+            payload = createDataForClient(supporter.getId(), name, color, data["hr"])
             payload.update({
                 "average": supporter.heartRate.getAverage(),
                 "minimum": supporter.heartRate.getMinimum(),

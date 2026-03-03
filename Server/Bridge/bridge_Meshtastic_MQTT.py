@@ -114,7 +114,7 @@ def _onReceive(packet, interface):
             print("[Bridge Meshtastic-MQTT] Champ 'text' absent ou non-JSON, paquet ignoré")
         return
 
-    dataType = data.get("type")
+    dataType = data.get("t")
     topic    = getMQTTTopic(dataType, data.get("id"))
 
     if not mqttClient.publish(topic, json.dumps(data)):

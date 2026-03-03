@@ -135,7 +135,7 @@ def _onMessage(message):
     # buildPointInfluxDB() retire "type" du dict et sépare tags et fields
     tags, fields = buildPointInfluxDB(data.copy())
 
-    influxdbClient.send(data["type"], fields, tags)
+    influxdbClient.send(data["t"], fields, tags)
 
 
 # =============================================================================

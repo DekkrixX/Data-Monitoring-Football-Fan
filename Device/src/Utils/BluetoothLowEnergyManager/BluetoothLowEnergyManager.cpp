@@ -21,10 +21,10 @@
 
 BluetoothLowEnergyManager::BluetoothLowEnergyManager(const std::string & macAddress):
 macAddress(macAddress),
+deviceFound(false),
 scan(nullptr),
 client(nullptr),
 device(nullptr),
-deviceFound(false),
 scanCallbacks(nullptr),
 clientCallbacks(nullptr)
 {}

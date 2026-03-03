@@ -98,11 +98,13 @@ class HeartRateData:
         # @param heartRate Fréquence cardiaque en bpm (entier).
         ##
 
-        self._history.append(heartRate)
-        self._total += heartRate
+        for hr in heartRate:
+            if hr != 0:
+                self._history.append(hr)
+                self._total += hr
 
-        if self._minimum is None or heartRate < self._minimum:
-            self._minimum = heartRate
+                if self._minimum is None or hr < self._minimum:
+                    self._minimum = hr
 
-        if self._maximum is None or heartRate > self._maximum:
-            self._maximum = heartRate
+                if self._maximum is None or hr > self._maximum:
+                    self._maximum = hr

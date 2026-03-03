@@ -34,6 +34,7 @@
 
 Sensor * sensor = nullptr; ///< @brief Pointeur vers le capteur actif. Initialisé dans setup().
 UARTManager * uartManager = nullptr; ///< @brief Pointeur vers le gestionnaire UART externe. Initialisé dans setup().
+unsigned long lastSendMs = 0; ///< @brief Temps du dernier envoi de données
 
 // ============================================================================
 //  Fonction setup
@@ -95,56 +96,65 @@ void loop()
     // Mise à jour du capteur
     sensor->update();
 
-    // Vérifie la connexion du capteur
-    if (sensor->isConnected())
+    // Mise à jour du temps
+    unsigned long now = millis();
+
+    // Si l’intervalle de temps est écoulé, on prépare et on envoie la trame
+    if (now - lastSendMs >= DUTY_CYCLE_TIME)
     {
-        // Récupération des données
-        std::string dataString = sensor->getSensorData();
-        size_t size = dataString.length();
+        lastSendMs = now; 
 
-        if (size != 0)
+        // Vérifie la connexion du capteur
+        if (sensor->isConnected())
         {
-            // Formatage des données: conversion std::string -> buffer uint8_t
-            uint8_t * data = new uint8_t[size];
-            memcpy(data, dataString.c_str(), size);
+            // Récupération des données
+            std::string dataString = sensor->getSensorData();
+            size_t size = dataString.length();
 
-            // Envoi des données via UART externe
-            size_t written = uartManager->writeBuffer(data, size);
-
-            if (written == size)
+            if (size != 0)
             {
-                if (DEBUG)
+                // Formatage des données: conversion std::string -> buffer uint8_t
+                uint8_t * data = new uint8_t[size];
+                memcpy(data, dataString.c_str(), size);
+
+                // Envoi des données via UART externe
+                size_t written = uartManager->writeBuffer(data, size);
+
+                if (written == size)
                 {
-                    Serial.printf("[LOOP] Trame envoyée via UART (%u octets): %s", size, dataString.c_str());
-                    Serial.flush();
+                    if (DEBUG)
+                    {
+                        Serial.printf("[LOOP] Trame envoyée via UART (%u octets): %s", size, dataString.c_str());
+                        Serial.flush();
+                    }
                 }
+                else
+                {
+                    if (DEBUG)
+                    {
+                        Serial.printf("[LOOP] AVERTISSEMENT - Envoi UART incomplet: %u/%u octets écrits\n", written, size);
+                        Serial.flush();
+                    }
+                }
+
+                delete [] data;
             }
             else
             {
                 if (DEBUG)
                 {
-                    Serial.printf("[LOOP] AVERTISSEMENT - Envoi UART incomplet: %u/%u octets écrits\n", written, size);
+                    Serial.println("[LOOP] Capteur connecté mais aucune donnée disponible, attente de la prochaine notification");
                     Serial.flush();
                 }
             }
-
-            delete [] data;
         }
         else
         {
             if (DEBUG)
             {
-                Serial.println("[LOOP] Capteur connecté mais aucune donnée disponible, attente de la prochaine notification");
+                Serial.printf("[LOOP] Capteur '%s' non connecté, en attente\n", sensor->getSensorName().c_str());
                 Serial.flush();
             }
-        }
-    }
-    else
-    {
-        if (DEBUG)
-        {
-            Serial.printf("[LOOP] Capteur '%s' non connecté, en attente...\n", sensor->getSensorName().c_str());
-            Serial.flush();
         }
     }
 

@@ -11,6 +11,7 @@
 // ============================================================================
 
 import { createChart } from "./Utils/board.js";
+import { subtractSeconds } from "./Utils/time.js";
 
 // ============================================================================
 //  Initialisation
@@ -128,18 +129,26 @@ function _fillGraphic(chart, name, heartRate)
         return;
     }
 
-    // Heure courante formatée HH:MM:SS comme label de l'axe X
-    const now       = new Date();
-    const timestamp = now.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+    const now = new Date();
 
-    if (window.DEBUG)
-        console.log(`[Comparison] _fillGraphic - Ajout du point HR=${heartRate} bpm pour '${name}' à t=${timestamp}`);
+    for (let i=heartRate.length - 1; i >= 0; i--)
+    {
+        if (heartRate[i] != 0)
+        {
+            // Heure de la mesure formatée HH:MM:SS comme label de l'axe X
+            const time = new Date(subtractSeconds(now, i));
+            const timestamp = time.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
 
-    chart.data.datasets[index].data.push({ x: timestamp, y: heartRate });
+            if (window.DEBUG)
+                console.log(`[Comparison] _fillGraphic - Ajout du point HR=${heartRate[i]} bpm pour '${name}' à t=${timestamp}`);
 
-    // Limite l'historique affiché à 100 points
-    if (chart.data.datasets[index].data.length > 100)
-        chart.data.datasets[index].data.shift();
+            chart.data.datasets[index].data.push({ x: timestamp, y: heartRate[i] });
+
+            // Limite l'historique affiché à 100 points
+            if (chart.data.datasets[index].data.length > 100)
+                chart.data.datasets[index].data.shift();
+        }
+    }
 
     // Mise à jour sans animation pour un rendu temps réel fluide
     chart.update("none");

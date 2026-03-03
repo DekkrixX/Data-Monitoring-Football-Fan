@@ -13,11 +13,15 @@
 //  ID du supporter
 // ============================================================================
 
+// À MODIFIER
 #define SUPPORTER_ID 1 ///< @brief Identifiant numérique unique du porteur du capteur.
 
 // ============================================================================
 //  Paramètres des capteurs
 // ============================================================================
+
+// À MODIFIER
+#define NB_SENSOR 1 ///< @brief Nombre de capteurs total du système.
 
 /**
  * @defgroup Capteur Sélection du capteur actif
@@ -39,6 +43,18 @@
 
 #define DEBUG               1 ///< @brief Activation des messages de debug sur le port série (Serial).
 #define BAUDRATE_DEBUG 112500 ///< @brief Vitesse de communication UART en bauds.
+
+// ============================================================================
+//  Paramètres du Duty Cycle
+// ============================================================================
+
+#define DUTY_CYCLE_TIME_FOR_SENSOR 4000 ///< @brief Interval de temps d'envoi des données pour que un capteur respecte le duty cycle
+
+#if NB_SENSOR <= 0
+#error "Erreur de configuration: Le nombre de capteur est invalide"
+#else
+#define DUTY_CYCLE_TIME (DUTY_CYCLE_TIME_FOR_SENSOR * NB_SENSOR) ///< @brief Interval de temps d'envoi des données pour respecter le duty cycle
+#endif
 
 // ============================================================================
 //  Paramètres UART

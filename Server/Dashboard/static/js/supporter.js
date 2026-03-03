@@ -11,6 +11,7 @@
 // ============================================================================
 
 import { createChart } from "./Utils/board.js";
+import { subtractSeconds } from "./Utils/time.js";
 
 // ============================================================================
 //  Initialisation
@@ -158,7 +159,7 @@ function _displayData(heartRate, average, minimum, maximum)
     if (window.DEBUG)
         console.log(`[Supporter] _displayData - HR=${heartRate} bpm, avg=${average}, min=${minimum}, max=${maximum}`);
 
-    document.getElementById("heart-rate").textContent = heartRate;
+    document.getElementById("heart-rate").textContent = heartRate[heartRate.length - 1];
     document.getElementById("average").textContent    = average;
     document.getElementById("minimum").textContent    = minimum;
     document.getElementById("maximum").textContent    = maximum;
@@ -172,21 +173,29 @@ function _displayData(heartRate, average, minimum, maximum)
  */
 function _fillGraphic(chart, heartRate)
 {
-    // Heure courante formatée HH:MM:SS comme label de l'axe X
-    const now       = new Date();
-    const timestamp = now.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+    const now = new Date();
 
-    if (window.DEBUG)
-        console.log(`[Supporter] _fillGraphic - Ajout du point HR=${heartRate} bpm à t=${timestamp}`);
-
-    chart.data.labels.push(timestamp);
-    chart.data.datasets[0].data.push(heartRate);
-
-    // Limite l'historique affiché à 100 points
-    if (chart.data.labels.length > 100)
+    for (let i=heartRate.length - 1; i >= 0; i--)
     {
-        chart.data.labels.shift();
-        chart.data.datasets[0].data.shift();
+        if (heartRate[i] != 0)
+        { 
+            // Heure de la mesure formatée HH:MM:SS comme label de l'axe X
+            const time = new Date(subtractSeconds(now, i));
+            const timestamp = time.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+
+            if (window.DEBUG)
+                console.log(`[Supporter] _fillGraphic - Ajout du point HR=${heartRate[i]} bpm à t=${timestamp}`);
+
+            chart.data.labels.push(timestamp);
+            chart.data.datasets[0].data.push(heartRate[i]);
+
+            // Limite l'historique affiché à 100 points
+            if (chart.data.labels.length > 100)
+            {
+                chart.data.labels.shift();
+                chart.data.datasets[0].data.shift();
+            }
+        }
     }
 
     // Mise à jour sans animation pour un rendu temps réel fluide

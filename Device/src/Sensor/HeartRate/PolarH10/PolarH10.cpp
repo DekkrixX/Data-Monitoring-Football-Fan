@@ -66,7 +66,13 @@ std::string PolarH10::formatData(PolarH10Data & data, int supporterId)
 {
     if (DEBUG)
     {
-        Serial.printf("[POLARH10] formatData - HR: %d bpm, localisation: %s, batterie: %u%%\n", data.heartRate, data.bodySensorLocation.c_str(), data.batteryLevel);
+        Serial.printf("[POLARH10] formatData - HR: ");
+        Serial.flush();
+        for (int i=0; i < NB_VALUE; i++){
+            Serial.printf("%d ", data.heartRate[i]);
+            Serial.flush();
+        }
+        Serial.printf("bpm, localisation: %s, batterie: %u%%\n", data.bodySensorLocation.c_str(), data.batteryLevel);
         Serial.flush();
     }
 
@@ -76,12 +82,14 @@ std::string PolarH10::formatData(PolarH10Data & data, int supporterId)
     std::lock_guard<std::mutex> lock(dataMutex);
 
     // Construction de l'objet JSON avec les données du capteur
-    json["type"] = getMQTTTopic(SensorType::HEART_RATE);
-    json["name"] = PolarH10::name;
-    json["supporter id"] = supporterId;
-    json["heart rate"] = data.heartRate;
-    json["body sensor location"] = data.bodySensorLocation;
-    json["battery level"] = data.batteryLevel;
+    json["t"] = getMQTTTopic(SensorType::HEART_RATE);
+    json["n"] = PolarH10::name;
+    json["id"] = supporterId;
+    JsonArray array = json["hr"].to<JsonArray>();
+    for (int i=0; i < NB_VALUE; i++)
+        array.add(data.heartRate[i]);
+    json["bsl"] = data.bodySensorLocation;
+    json["bl"] = data.batteryLevel;
 
     // Sérialisation en chaîne JSON + ajout d'un saut de ligne comme délimiteur de message
     serializeJson(json, jsonString);
@@ -155,7 +163,7 @@ void PolarH10::update()
     // Vérifie que le capteur est connecté
     if (this->bleManager->isConnected())
     {
-        if (Sensor::state != CONNECTED)
+        if (Sensor::state != ConnectionState::CONNECTED)
         {
             Sensor::state = ConnectionState::CONNECTED;
 
@@ -253,7 +261,7 @@ void PolarH10::getData()
     }
 
     // Lecture du niveau de batterie: boucle jusqu'à obtenir une valeur valide (!= 255)
-    while (this->data.batteryLevel == 255 and this->isConnected)
+    while (this->data.batteryLevel == 255 and this->isConnected())
     {
         // La caractéristique Battery Level est un unique octet (valeur 0–100%)
         value = this->bleManager->getValue(UUID_BATTERY_SERVICE, UUID_BATTERY_LEVEL_CHARACTERISTIC);
@@ -277,7 +285,7 @@ void PolarH10::getData()
     }
 
     // Lecture de la localisation du capteur: boucle jusqu'à obtenir une valeur valide (!= "")
-    while (this->data.bodySensorLocation == "" and this>isConnected)
+    while (this->data.bodySensorLocation == "" and this->isConnected())
     {
         // La caractéristique Body Sensor Location est un unique octet (enum 0–6)
         value = this->bleManager->getValue(UUID_HEARTRATE_SERVICE, UUID_HEARTRATE_BODYSENSORLOCATION_CHARACTERISTIC);
@@ -350,25 +358,32 @@ void PolarH10::notify(NimBLERemoteCharacteristic * characteristic, uint8_t * dat
             if (data[0] & 0x01)
             {
                 // Fréquence cardiaque encodée sur 16 bits
-                this->data.heartRate = static_cast<int>( data[1] | (data[2] << 8) );
+                this->data.heartRate[this->data.heartRateIndex] = static_cast<int>( data[1] | (data[2] << 8) );
 
                 if (DEBUG)
                 {
-                    Serial.printf("[POLARH10] notify - Fréquence cardiaque (UINT16): %d bpm\n", this->data.heartRate);
+                    Serial.printf("[POLARH10] notify - Fréquence cardiaque (UINT16): %d bpm\n", this->data.heartRate[this->data.heartRateIndex]);
                     Serial.flush();
                 }
+
+                this->data.heartRateIndex++;
             }
             else
             {
                 // Fréquence cardiaque encodée sur 8 bits
-                this->data.heartRate = static_cast<int>(data[1]);
+                this->data.heartRate[this->data.heartRateIndex] = static_cast<int>(data[1]);
 
                 if (DEBUG)
                 {
-                    Serial.printf("[POLARH10] notify - Fréquence cardiaque (UINT8): %d bpm\n", this->data.heartRate);
+                    Serial.printf("[POLARH10] notify - Fréquence cardiaque (UINT8): %d bpm\n", this->data.heartRate[this->data.heartRateIndex]);
                     Serial.flush();
                 }
+
+                this->data.heartRateIndex++;
             }
+            // Reset du buffer si besoin
+            if (this->data.heartRateIndex >= NB_VALUE)
+                this->data.heartRateIndex = 0;
         }
         else
         {

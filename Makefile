@@ -123,7 +123,7 @@ stop:
 	@echo "Arrêt de Grafana"
 	@docker stop grafana
 	@docker rm grafana
-	@docker volume rm influxdb-storage
+	@docker volume rm grafana-storage
 	@echo "Arrêt de Docker"
 	@systemctl stop docker
 

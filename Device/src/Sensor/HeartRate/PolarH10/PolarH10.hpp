@@ -8,12 +8,12 @@
  * Format JSON produit:
  * @code{.json}
  * {
- *   "type": "heart_rate",
- *   "name": "PolarH10",
- *   "supporter id": <int>,
- *   "heart rate": <int>,
- *   "body sensor location": <string>,
- *   "battery level": <uint8_t>
+ *   "t": "heart_rate",
+ *   "n": "PolarH10",
+ *   "id": <int>,
+ *   "hr": [<int>],
+ *   "bsl": <string>,
+ *   "bl": <uint8_t>
  * }
  * @endcode
  */
@@ -37,6 +37,7 @@
 // ============================================================================
 
 #include "../HeartRate.hpp"
+#include "../../../Config/setting.hpp"
 #include "../../../Utils/sensorType.hpp"
 #include "../../../Utils/state.hpp"
 #include "../../../Utils/UARTManager/UARTManager.hpp"
@@ -61,6 +62,9 @@
  * @}
  */
 
+#define NB_VALUE_FOR_SENSOR (DUTY_CYCLE_TIME_FOR_SENSOR / 1000) ///< @brief Nombre de valeur du buffer pour un capteur
+#define NB_VALUE (NB_VALUE_FOR_SENSOR * NB_SENSOR) ///< @brief Nombre de valeur du buffer en fonction du nombre total de capteur
+
 
 
 /**
@@ -83,7 +87,8 @@ class PolarH10: public HeartRate
          */
         struct PolarH10Data
         {
-            int heartRate = -1;                  ///< Fréquence cardiaque en bpm (-1 = non initialisé).
+            int heartRateIndex = 0;                   ///< Taille courante du buffer de fréquence cardiaque
+            int heartRate[NB_VALUE];             ///< Buffer de fréquence cardiaque en bpm.
             std::string bodySensorLocation = ""; ///< Localisation du capteur ("" = non initialisé).
             uint8_t batteryLevel = 255;          ///< Niveau de batterie en % (255 = non initialisé).
         };

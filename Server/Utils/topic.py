@@ -74,10 +74,10 @@ def buildPointInfluxDB(data):
     fields = {}
 
     # "type" est utilisé comme nom de mesure, pas comme tag ni field
-    data.pop("type", None)
+    data.pop("t", None)
 
     ## @brief Clés identifiant le supporter, utilisées comme tags InfluxDB.
-    TAG_KEYS = {"supporter id", "name"}
+    TAG_KEYS = {"id", "n"}
 
     for key, value in data.items():
         if key in TAG_KEYS:
