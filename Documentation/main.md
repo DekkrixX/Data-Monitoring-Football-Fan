@@ -154,6 +154,30 @@ Projet de Monitoring pour Supporters de Football
 │   │
 │   └── Doxyfile                // Fichier de configuration de Doxygen
 │
+├── Tests
+│   ├── Software
+│   ├── Hardware
+│   └── Distance
+│       ├── Flash
+│       │   ├── device.sh
+│       │   └── meshtastic.sh
+│       │
+│       ├── Device
+│       │   ├── src
+│       │   │   ├── Config
+│       │   │   │   └── setting.hpp
+│       │   │   │
+│       │   │   ├── Utils
+│       │   │   │   └── UARTManager
+│       │   │   │       ├── UARTManager.cpp
+│       │   │   │       └── UARTManager.hpp
+│       │   │   │
+│       │   │   └── main.cpp
+│       │   │
+│       │   └── platformio.ini  // Fichier de configuration de PlatformIO
+│       │
+│       └── log.py
+│
 ├── .Flash                      // Fichier de configuration des cartes
 │   ├── device.sh
 │   ├── meshtastic.sh

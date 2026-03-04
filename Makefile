@@ -13,8 +13,13 @@ DOCFILES = $(DOCPATH)/main.md $(DOCPATH)/architecture.md $(DOCPATH)/equipment.md
 
 # Dossier des scripts de flash
 DFLASH = .Flash
+DFLASH_TEST = Tests/Distance/Flash
 # Script flash à exécuter
-FLASH_SCRIPT = $(DFLASH)/$(TARGET).sh
+ifeq ($(TEST), 1)
+	FLASH_SCRIPT = $(DFLASH_TEST)/$(TARGET).sh
+else
+	FLASH_SCRIPT = $(DFLASH)/$(TARGET).sh
+endif
 
 # Définition des variables d'environnement
 include .env
@@ -34,7 +39,7 @@ _CYAN = \033[1;36m
 _WHITE = \033[1;37m
 
 # Fichiers générés
-GEN_FILES = $(DOCNAME).md Device/.pio Device/doc Server/**/__pycache__ Server/doc
+GEN_FILES = $(DOCNAME).md Device/.pio Device/doc Server/**/__pycache__ Server/doc Tests/Distance/Device/.pio Tests/Distance/__pycache__
 
 
 .PHONY: server doc load run stop install remove clean help
@@ -43,7 +48,10 @@ GEN_FILES = $(DOCNAME).md Device/.pio Device/doc Server/**/__pycache__ Server/do
 ################################################################################
 #	Mise en route des serveurs												   #
 ################################################################################
-server:
+server: 
+ifeq ($(TEST), 1)
+	@gnome-terminal -- bash -c ".venv/server-env/bin/python3 -m Tests.Distance.log"
+else
 	@gnome-terminal -- bash -c ".venv/server-env/bin/python3 -m Server.Bridge.bridge_Meshtastic_MQTT"
 	@gnome-terminal -- bash -c ".venv/server-env/bin/python3 -m Server.Bridge.bridge_MQTT_InfluxDB"
 	@gnome-terminal -- bash -c ".venv/server-env/bin/python3 -m Server.Dashboard.app"
@@ -51,6 +59,7 @@ server:
 	@echo "   - Dashboard : http://localhost:$(DASHBOARD_PORT)"
 	@echo "   - Grafana   : http://localhost:$(GRAFANA_PORT)"
 	@echo "   - InfluxDB  : http://localhost:$(INFLUXDB_PORT)"
+endif
 
 ################################################################################
 #	Création de la documentation                                               #
