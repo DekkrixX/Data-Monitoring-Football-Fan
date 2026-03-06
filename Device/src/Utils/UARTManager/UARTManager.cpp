@@ -16,6 +16,12 @@
 #include "./UARTManager.hpp"
 
 // ============================================================================
+//  Variable static
+// ============================================================================
+
+Logger * UARTManager::logger = nullptr;
+
+// ============================================================================
 //  Constructeur
 // ============================================================================
 
@@ -23,7 +29,9 @@ UARTManager::UARTManager(int rxPin, int txPin, uint32_t baudRate):
 rxPin(rxPin),
 txPin(txPin),
 baudRate(baudRate)
-{}
+{
+    UARTManager::logger = new Logger("UARTManager", true);
+}
 
 // ============================================================================
 //  Destructeur
@@ -32,6 +40,7 @@ baudRate(baudRate)
 UARTManager::~UARTManager()
 {
     this->end();
+    delete UARTManager::logger;
 };
 
 // ============================================================================
@@ -40,11 +49,9 @@ UARTManager::~UARTManager()
 
 void UARTManager::begin()
 {
-    if (DEBUG)
-    {
-        Serial.printf("[UART] begin - Ouverture du port série externe (RX: %d, TX: %d, baud: %u)\n", this->rxPin, this->txPin, this->baudRate);
-        Serial.flush();
-    }
+    char str[LOGGER_MAX_MESSAGE_SIZE];
+    snprintf(str, sizeof(str), "[UART] begin - Ouverture du port série externe (RX: %d, TX: %d, baud: %u)\n", this->rxPin, this->txPin, this->baudRate);
+    UARTManager::logger->info(str);
 
     // Initialisation du port série UART externe avec le format 8N1 (8 bits de données, pas de parité, 1 bit de stop)
     this->externalSerial.begin(this->baudRate, SERIAL_8N1, this->rxPin, this->txPin);
@@ -53,11 +60,7 @@ void UARTManager::begin()
     while (not this->externalSerial)
         ;
 
-    if (DEBUG)
-    {
-        Serial.println("[UART] begin - Port série externe prêt");
-        Serial.flush();
-    }
+    UARTManager::logger->info("[UART] begin - Port série externe prêt");
 
     return ;
 }
@@ -66,21 +69,13 @@ void UARTManager::begin()
 
 void UARTManager::end()
 {
-    if (DEBUG)
-    {
-        Serial.println("[UART] end - Fermeture du port série externe");
-        Serial.flush();
-    }
+    UARTManager::logger->info("[UART] end - Fermeture du port série externe");
 
     // Fermeture du port série uniquement s'il est ouvert
     if (this->externalSerial)
         this->externalSerial.end();
 
-    if (DEBUG)
-    {
-        Serial.println("[UART] end - Port série externe fermé");
-        Serial.flush();
-    }
+    UARTManager::logger->info("[UART] end - Port série externe fermé");
 
     return ;
 }
@@ -92,22 +87,17 @@ size_t UARTManager::writeByte(uint8_t data)
     // Vérifie qu'au moins un octet peut être écrit dans le tampon d'émission
     if (this->availableForWrite() < 1)
     {
-        if (DEBUG)
-        {
-            Serial.println("[UART] writeByte - Tampon d'émission plein, octet abandonné");
-            Serial.flush();
-        }
+        UARTManager::logger->warning("[UART] writeByte - Tampon d'émission plein, octet abandonné");
+
         return 0;
     }
 
     size_t size = this->externalSerial.write(data);
     this->externalSerial.flush(); // Vide le tampon matériel pour garantir l'émission immédiate
 
-    if (DEBUG)
-    {
-        Serial.printf("[UART] writeByte - Octet 0x%02X envoyé\n", data);
-        Serial.flush();
-    }
+    char str[LOGGER_MAX_MESSAGE_SIZE];
+    snprintf(str, sizeof(str), "[UART] writeByte - Octet 0x%02X envoyé\n", data);
+    UARTManager::logger->info(str);
 
     return size;
 }
@@ -119,21 +109,16 @@ int UARTManager::readByte()
     // Vérifie qu'au moins un octet est disponible en réception
     if (this->availableForRead() < 1)
     {
-        if (DEBUG)
-        {
-            Serial.println("[UART] readByte - Aucun octet disponible en réception");
-            Serial.flush();
-        }
+        UARTManager::logger->warning("[UART] readByte - Aucun octet disponible en réception");
+
         return -1;
     }
 
     int value = this->externalSerial.read();
 
-    if (DEBUG)
-    {
-        Serial.printf("[UART] readByte - Octet lu: 0x%02X\n", value);
-        Serial.flush();
-    }
+    char str[LOGGER_MAX_MESSAGE_SIZE];
+    snprintf(str, sizeof(str), "[UART] readByte - Octet lu: 0x%02X\n", value);
+    UARTManager::logger->info(str);
 
     return value;
 }
@@ -144,29 +129,30 @@ size_t UARTManager::writeBuffer(const uint8_t * buffer, size_t size)
 {
     // Vérifie la validité de la taille du buffer
     if (size == 0)
-        throw std::invalid_argument("[UART] writeBuffer - Taille du buffer invalide: " + std::to_string(size));
+    {
+        std::string str = "[UART] writeBuffer - Taille du buffer invalide: " + std::to_string(size);
+        UARTManager::logger->error(str.c_str());
+        throw std::invalid_argument(str.c_str());
+    }
 
     // Vérifie que le tampon d'émission peut absorber l'intégralité du buffer
     int available = this->availableForWrite();
 
     if ((size_t) available < size)
     {
-        if (DEBUG)
-        {
-            Serial.printf("[UART] writeBuffer - Tampon d'émission insuffisant: %d octets disponibles, %u demandés\n", available, size);
-            Serial.flush();
-        }
+        char str[LOGGER_MAX_MESSAGE_SIZE];
+        snprintf(str, sizeof(str), "[UART] writeBuffer - Tampon d'émission insuffisant: %d octets disponibles, %u demandés\n", available, size);
+        UARTManager::logger->warning(str);
+
         return 0;
     }
 
     size_t written = this->externalSerial.write(buffer, size);
     this->externalSerial.flush(); // Vide le tampon matériel pour garantir l'émission immédiate
 
-    if (DEBUG)
-    {
-        Serial.printf("[UART] writeBuffer - %u/%u octets envoyés\n", written, size);
-        Serial.flush();
-    }
+    char str[LOGGER_MAX_MESSAGE_SIZE];
+    snprintf(str, sizeof(str), "[UART] writeBuffer - %u/%u octets envoyés\n", written, size);
+    UARTManager::logger->info(str);
 
     return written;
 }
@@ -177,28 +163,29 @@ size_t UARTManager::readBuffer(uint8_t * buffer, size_t size)
 {
     // Vérifie la validité de la taille du buffer
     if (size == 0)
-        throw std::invalid_argument("[UART] readBuffer - Taille du buffer invalide: " + std::to_string(size));
+    {
+        std::string str = "[UART] readBuffer - Taille du buffer invalide: " + std::to_string(size);
+        UARTManager::logger->error(str.c_str());
+        throw std::invalid_argument(str.c_str());
+    }
 
     // Vérifie que suffisamment d'octets sont disponibles en réception
     int available = this->availableForRead();
 
     if ((size_t) available < size)
     {
-        if (DEBUG)
-        {
-            Serial.printf("[UART] readBuffer - Données insuffisantes en réception: %d octets disponibles, %u demandés\n", available, size);
-            Serial.flush();
-        }
+        char str[LOGGER_MAX_MESSAGE_SIZE];
+        snprintf(str, sizeof(str), "[UART] readBuffer - Données insuffisantes en réception: %d octets disponibles, %u demandés\n", available, size);
+        UARTManager::logger->warning(str);
+
         return 0;
     }
 
     size_t read = this->externalSerial.read(buffer, size);
 
-    if (DEBUG)
-    {
-        Serial.printf("[UART] readBuffer - %u/%u octets lus\n", read, size);
-        Serial.flush();
-    }
+    char str[LOGGER_MAX_MESSAGE_SIZE];
+    snprintf(str, sizeof(str), "[UART] readBuffer - %u/%u octets lus\n", read, size);
+    UARTManager::logger->info(str);
 
     return read;
 }
@@ -223,14 +210,18 @@ void UARTManager::reverseBuffer(uint8_t * buffer, size_t size)
 {
     // Vérifie la validité de la taille du buffer
     if (size == 0)
-        throw std::invalid_argument("[UART] reverseBuffer - Taille du buffer invalide: " + std::to_string(size));
+    {
+        std::string str = "[UART] reverseBuffer - Taille du buffer invalide: " + std::to_string(size);
+        UARTManager::logger->error(str.c_str());
+        throw std::invalid_argument(str.c_str());
+    }
 
     // Inverse le buffer
     for (size_t i=0; i < size / 2; i++)
     {
         uint8_t tmp = buffer[i];
         buffer[i] = buffer[size - 1 - i];
-        buffer[size - i] = tmp;
+        buffer[size - 1 - i] = tmp;
     }
 
     return ;

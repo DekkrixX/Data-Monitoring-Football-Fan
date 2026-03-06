@@ -88,7 +88,7 @@ class Config:
     SECRET_KEY      = os.getenv("SECRET_KEY",      None)  ##< Clé secrète Flask.
     DASHBOARD_HOST  = os.getenv("DASHBOARD_HOST",  None)  ##< Hôte d'écoute du dashboard.
     DASHBOARD_PORT  = int(os.getenv("DASHBOARD_PORT", 0)) ##< Port d'écoute du dashboard.
-    MAX_DATA_POINTS = 100                                  ##< Nombre maximal de points conservés en mémoire par supporter.
+    MAX_DATA_POINTS = 100                                 ##< Nombre maximal de points conservés en mémoire par supporter.
 
 # =============================================================================
 #  MQTT

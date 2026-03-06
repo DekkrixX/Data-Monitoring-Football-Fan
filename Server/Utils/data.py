@@ -14,7 +14,13 @@
 import json
 
 from Server.Config.setting import Config
+from Server.Utils.logger import Logger
 
+# =============================================================================
+#  Création du logger
+# =============================================================================
+
+logger = Logger("Serveur/Data")
 
 # =============================================================================
 #  Lecture du fichier supporter.json
@@ -32,17 +38,20 @@ def _loadSupporterFile():
     filePath = Config.PATH["data"] + "supporter.json"
 
     try:
-        if Config.DEBUG:
-            print(f"[Data] Lecture du fichier supporters : '{filePath}'")
+        logger.info(f"[Data] Lecture du fichier supporters : '{filePath}'")
 
         with open(filePath, "r") as file:
             return json.load(file)
 
     except FileNotFoundError:
-        raise RuntimeError(f"[Data] Fichier supporters introuvable : '{filePath}'")
+        message = f"[Data] Fichier supporters introuvable : '{filePath}'"
+        logger.error(message)
+        raise RuntimeError(message)
 
     except json.JSONDecodeError as e:
-        raise RuntimeError(f"[Data] Fichier supporters invalide (JSON malformé) : '{filePath}'") from e
+        message = f"[Data] Fichier supporters invalide (JSON malformé) : '{filePath}'"
+        logger.error(message)
+        raise RuntimeError(message) from e
 
 
 def _getSupporterField(supporterId, field):
@@ -63,7 +72,9 @@ def _getSupporterField(supporterId, field):
         if item["id"] == supporterId:
             return item[field]
 
-    raise RuntimeError(f"[Data] Aucun supporter trouvé avec l'id '{supporterId}'")
+    message = f"[Data] Aucun supporter trouvé avec l'id '{supporterId}'"
+    logger.error(message)
+    raise RuntimeError(message)
 
 
 # =============================================================================

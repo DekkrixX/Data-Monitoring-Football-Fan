@@ -15,7 +15,13 @@ from flask import render_template
 
 from Server.Config.setting import Config
 from Server.Utils.data import getColorOfSupporter
+from Server.Utils.logger import Logger
 
+# =============================================================================
+#  Création du logger
+# =============================================================================
+
+logger = Logger("Serveur/Routes")
 
 # =============================================================================
 #  Enregistrement des routes
@@ -29,8 +35,7 @@ def registerRoutes(app, supporterList):
     # @param supporterList Liste partagée des objets Supporter actifs.
     ##
 
-    if Config.DEBUG:
-        print("[Routes] Enregistrement des routes et gestionnaires d'erreurs")
+    logger.info("[Routes] Enregistrement des routes et gestionnaires d'erreurs")
 
 # ==========================================================================
 #  Pages principales

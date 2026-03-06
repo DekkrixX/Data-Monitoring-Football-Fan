@@ -18,7 +18,13 @@ from influxdb_client.client.exceptions import InfluxDBError
 from Server.Utils.state import ConnectionState
 from Server.Core.exception import ConnectionFailError, ConnectionRefuseError, NotConnectionError
 from Server.Config.setting import Config
+from Server.Utils.logger import Logger
 
+# =============================================================================
+#  Création du logger
+# =============================================================================
+
+logger = Logger("Serveur/InfluxDB")
 
 # =============================================================================
 #  Client InfluxDB
@@ -76,8 +82,7 @@ class InfluxDBClientWrapper:
         # @throws ConnectionFailError Si la connexion ou le health check échoue.
         ##
 
-        if Config.DEBUG:
-            print(f"[InfluxDB] Connexion à {self.url}")
+        logger.info(f"[InfluxDB] Connexion à {self.url}")
 
         self.state = ConnectionState.CONNECTING
 
@@ -100,6 +105,7 @@ class InfluxDBClientWrapper:
 
         except (InfluxDBError, Exception) as e:
             self.state = ConnectionState.ERROR
+            logger.error(f"Échec de connexion à 'InfluxDB' [{self.host}:{self.port}]");
             raise ConnectionFailError("InfluxDB", self.host, self.port) from e
 
 
@@ -111,20 +117,21 @@ class InfluxDBClientWrapper:
         # @throws ConnectionFailError   Si la requête health check échoue.
         ##
 
-        if Config.DEBUG:
-            print("[InfluxDB] Vérification de l'état du serveur (health check)")
+        logger.info("[InfluxDB] Vérification de l'état du serveur (health check)")
 
         try:
             health = self.client.health()
 
             if health.status != "pass":
+                logger.error(f"Connexion refusée par 'InfluxDB' [{self.host}:{self.port}]")
                 raise ConnectionRefuseError("InfluxDB", self.host, self.port)
 
             if Config.DEBUG:
-                print(f"[InfluxDB] Health check OK (status='{health.status}')")
+                logger.info(f"[InfluxDB] Health check OK (status='{health.status}')")
 
         except InfluxDBError as e:
             self.state = ConnectionState.ERROR
+            logger.error(f"Échec de connexion à 'InfluxDB' [{self.host}:{self.port}]")
             raise ConnectionFailError("InfluxDB", self.host, self.port) from e
 
 # =============================================================================
@@ -145,6 +152,7 @@ class InfluxDBClientWrapper:
         ##
 
         if not self.isConnected():
+            logger.error()
             raise NotConnectionError("InfluxDB")
 
         point = Point(measurement)
@@ -159,13 +167,12 @@ class InfluxDBClientWrapper:
         if timestamp:
             point.time(timestamp, WritePrecision.NS)
 
-        if Config.DEBUG:
-            print(f"[InfluxDB] Écriture du point '{measurement}'")
-            if tags:
-                for key, value in tags.items():
-                    print(f"   tag   | {key} = {value}")
-            for key, value in fields.items():
-                print(f"   field | {key} = {value}")
+        logger.info(f"[InfluxDB] Écriture du point '{measurement}'")
+        if tags:
+            for key, value in tags.items():
+                logger.info(f"   tag   | {key} = {value}")
+        for key, value in fields.items():
+            logger.info(f"   field | {key} = {value}")
 
         self.writeApi.write(bucket=self.bucket, record=point)
 
@@ -178,8 +185,7 @@ class InfluxDBClientWrapper:
         # @brief Ferme l'API d'écriture et la connexion InfluxDB proprement.
         ##
 
-        if Config.DEBUG:
-            print("[InfluxDB] Fermeture de la connexion")
+        logger.info("[InfluxDB] Fermeture de la connexion")
 
         if not self.isConnected():
             return
@@ -190,8 +196,7 @@ class InfluxDBClientWrapper:
         self.client.close()
         self.state = ConnectionState.DISCONNECTED
 
-        if Config.DEBUG:
-            print("[InfluxDB] Connexion fermée proprement")
+        logger.info("[InfluxDB] Connexion fermée proprement")
 
 # =============================================================================
 #  État

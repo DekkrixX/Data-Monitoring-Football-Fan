@@ -63,7 +63,7 @@ def _onMqttMessage(message):
 
     data = json.loads(message.payload.decode())
 
-    timestamp = datetime.now().strftime("%H:%M:%S");
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     print(f"[{timestamp}] Message reçu: {data['m']}")
 
 # =============================================================================

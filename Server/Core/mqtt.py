@@ -16,7 +16,13 @@ import paho.mqtt.client as mqtt
 from Server.Utils.state import ConnectionState
 from Server.Config.setting import Config
 from Server.Core.exception import ConnectionFailError, NotConnectionError
+from Server.Utils.logger import Logger
 
+# =============================================================================
+#  Création du logger
+# =============================================================================
+
+logger = Logger("Serveur/MQTT")
 
 # =============================================================================
 #  Client MQTT
@@ -76,8 +82,7 @@ class MQTTClientWrapper:
         # @throws ConnectionFailError Si la connexion au broker échoue.
         ##
 
-        if Config.DEBUG:
-            print(f"[MQTT] Connexion au broker {self.host}:{self.port}")
+        logger.info(f"[MQTT] Connexion au broker {self.host}:{self.port}")
 
         self.state = ConnectionState.CONNECTING
 
@@ -99,6 +104,7 @@ class MQTTClientWrapper:
 
         except Exception as e:
             self.state = ConnectionState.ERROR
+            logger.error(f"Échec de connexion à 'MQTT' [{self.host}:{self.port}]")
             raise ConnectionFailError("MQTT", self.host, self.port) from e
 
 # =============================================================================
@@ -116,25 +122,23 @@ class MQTTClientWrapper:
         # @param properties Propriétés MQTT v5 (optionnel).
         ##
 
-        if Config.DEBUG:
-            print(f"[MQTT] Connexion établie avec le broker (rc={rc})")
+        logger.info(f"[MQTT] Connexion établie avec le broker (rc={rc})")
 
         if rc == 0:
             # Réabonnement automatique aux topics mémorisés après reconnexion
             if self.autoReconnect and self.subscribedTopics:
                 for topic in self.subscribedTopics:
                     self.client.subscribe(topic, qos=self.qos)
-                    if Config.DEBUG:
-                        print(f"[MQTT] Réabonnement automatique au topic '{topic}'")
+                    logger.info(f"[MQTT] Réabonnement automatique au topic '{topic}'")
 
             if self.userOnConnect:
                 try:
                     self.userOnConnect(client, userdata, flags, rc)
                 except Exception as e:
-                    print(f"[MQTT] Erreur dans le callback onConnect utilisateur : {e}")
+                    logger.warning(f"[MQTT] Erreur dans le callback onConnect utilisateur : {e}")
         else:
             self.state = ConnectionState.ERROR
-            print(f"[MQTT] Échec de connexion au broker (rc={rc})")
+            logger.info(f"[MQTT] Échec de connexion au broker (rc={rc})")
 
 
     def _onDisconnect(self, client, userdata, disconnect_flags, rc, properties=None):
@@ -148,8 +152,7 @@ class MQTTClientWrapper:
         # @param properties       Propriétés MQTT v5 (optionnel).
         ##
 
-        if Config.DEBUG:
-            print(f"[MQTT] Déconnexion du broker (rc={rc})")
+        logger.info(f"[MQTT] Déconnexion du broker (rc={rc})")
 
         if rc == 0:
             self.state = ConnectionState.DISCONNECTED
@@ -157,14 +160,13 @@ class MQTTClientWrapper:
             # Déconnexion inattendue : paho gère la reconnexion si loop_forever est actif
             if self.autoReconnect:
                 self.state = ConnectionState.RECONNECTING
-                if Config.DEBUG:
-                    print("[MQTT] Déconnexion inattendue, reconnexion automatique en cours")
+                logger.info("[MQTT] Déconnexion inattendue, reconnexion automatique en cours")
 
         if self.userOnDisconnect:
             try:
                 self.userOnDisconnect(client, userdata, rc)
             except Exception as e:
-                print(f"[MQTT] Erreur dans le callback onDisconnect utilisateur : {e}")
+                logger.warning(f"[MQTT] Erreur dans le callback onDisconnect utilisateur : {e}")
 
 
     def _onMessage(self, client, userdata, message):
@@ -176,14 +178,13 @@ class MQTTClientWrapper:
         # @param message  Message reçu (topic, payload, qos, retain).
         ##
 
-        if Config.DEBUG:
-            print(f"[MQTT] Message reçu sur le topic '{message.topic}'")
+        logger.info(f"[MQTT] Message reçu sur le topic '{message.topic}'")
 
         if self.userOnMessage:
             try:
                 self.userOnMessage(message)
             except Exception as e:
-                print(f"[MQTT] Erreur dans le callback onMessage utilisateur : {e}")
+                logger.warning(f"[MQTT] Erreur dans le callback onMessage utilisateur : {e}")
 
 # =============================================================================
 #  Abonnement aux topics
@@ -200,11 +201,11 @@ class MQTTClientWrapper:
         ##
 
         if not self.isConnected():
+            logger.error("Opération impossible : la connexion à 'MQTT' n'est pas établie")
             raise NotConnectionError("MQTT")
 
         for topic in topics:
-            if Config.DEBUG:
-                print(f"[MQTT] Abonnement au topic '{topic}'")
+            logger.info(f"[MQTT] Abonnement au topic '{topic}'")
 
             result, _ = self.client.subscribe(topic, qos=self.qos)
 
@@ -212,7 +213,9 @@ class MQTTClientWrapper:
                 if topic not in self.subscribedTopics:
                     self.subscribedTopics.append(topic)
             else:
-                raise RuntimeError(f"[MQTT] Échec de l'abonnement au topic '{topic}' (code={result})")
+                message = f"[MQTT] Échec de l'abonnement au topic '{topic}' (code={result})"
+                logger.error(message);
+                raise RuntimeError(message)
 
 
     def unsubscribe(self, topics):
@@ -225,11 +228,11 @@ class MQTTClientWrapper:
         ##
 
         if not self.isConnected():
+            logger.error("Opération impossible : la connexion à 'MQTT' n'est pas établie")
             raise NotConnectionError("MQTT")
 
         for topic in topics:
-            if Config.DEBUG:
-                print(f"[MQTT] Désabonnement du topic '{topic}'")
+            logger.info(f"[MQTT] Désabonnement du topic '{topic}'")
 
             self.client.unsubscribe(topic)
 
@@ -255,17 +258,19 @@ class MQTTClientWrapper:
         ##
 
         if not self.isConnected():
+            logger.error("Opération impossible : la connexion à 'MQTT' n'est pas établie")
             raise NotConnectionError("MQTT")
 
         try:
-            if Config.DEBUG:
-                print(f"[MQTT] Publication sur le topic '{topic}'")
+            logger.info(f"[MQTT] Publication sur le topic '{topic}'")
 
             result = self.client.publish(topic, payload, qos=self.qos, retain=retain)
             return result.rc == mqtt.MQTT_ERR_SUCCESS
 
         except Exception as e:
-            raise RuntimeError(f"[MQTT] Échec de la publication sur le topic '{topic}' : {e}") from e
+            message = f"[MQTT] Échec de la publication sur le topic '{topic}' : {e}"
+            logger.error(message)
+            raise RuntimeError(message) from e
 
 # =============================================================================
 #  Boucle réseau
@@ -280,10 +285,10 @@ class MQTTClientWrapper:
         # @throws NotConnectionError Si le client n'est pas connecté.
         ##
 
-        if Config.DEBUG:
-            print(f"[MQTT] Démarrage de la boucle réseau (blocking={blocking})")
+        logger.info(f"[MQTT] Démarrage de la boucle réseau (blocking={blocking})")
 
         if not self.isConnected():
+            logger.error("Opération impossible : la connexion à 'MQTT' n'est pas établie")
             raise NotConnectionError("MQTT")
 
         if blocking:
@@ -297,8 +302,7 @@ class MQTTClientWrapper:
         # @brief Arrête la boucle réseau et se déconnecte proprement du broker.
         ##
 
-        if Config.DEBUG:
-            print("[MQTT] Arrêt de la boucle réseau et déconnexion")
+        logger.info("[MQTT] Arrêt de la boucle réseau et déconnexion")
 
         if self.isConnected():
             self.client.loop_stop()

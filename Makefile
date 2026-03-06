@@ -39,7 +39,7 @@ _CYAN = \033[1;36m
 _WHITE = \033[1;37m
 
 # Fichiers générés
-GEN_FILES = $(DOCNAME).md Device/.pio Device/doc Server/**/__pycache__ Server/doc Tests/Distance/Device/.pio Tests/Distance/__pycache__
+GEN_FILES = $(DOCNAME).md Device/.pio Device/data Device/doc Server/**/__pycache__ Server/doc Tests/Distance/Device/.pio Tests/Distance/__pycache__
 
 
 .PHONY: server doc load run stop install remove clean help

@@ -88,9 +88,7 @@ class NotConnectionError(Exception):
         #
         # @param name Nom du service.
         ##
-        super().__init__(
-            f"Opération impossible : la connexion à '{name}' n'est pas établie"
-        )
+        super().__init__(f"Opération impossible : la connexion à '{name}' n'est pas établie")
 
 
 # =============================================================================

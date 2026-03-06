@@ -6,6 +6,7 @@
 #   Build PlatformIO                                                          #
 ###############################################################################
 Device/.pio
+Device/data
 Tests/Distance/Device/.pio
 ###############################################################################
 #   Environnement virtuel Python                                              #

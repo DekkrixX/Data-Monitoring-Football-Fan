@@ -18,7 +18,13 @@ from Server.Core.meshtastic import MeshtasticClientWrapper
 from Server.Core.mqtt import MQTTClientWrapper
 from Server.Utils.display import printBanner
 from Server.Utils.topic import getMQTTTopic
+from Server.Utils.logger import Logger
 
+# =============================================================================
+#  Création du logger
+# =============================================================================
+
+logger = Logger("Serveur/Bridge_Meshtastic-MQTT")
 
 # =============================================================================
 #  Variable globale
@@ -76,8 +82,7 @@ def main():
         meshtasticClient.waitForever()
 
     except KeyboardInterrupt:
-        if Config.DEBUG:
-            print("\n[Bridge Meshtastic-MQTT] Arrêt demandé par l'utilisateur (Ctrl+C)")
+        logger.info("\n[Bridge Meshtastic-MQTT] Arrêt demandé par l'utilisateur (Ctrl+C)")
 
         meshtasticClient.close()
         mqttClient.stop()
@@ -97,29 +102,25 @@ def _onReceive(packet, interface):
 
     global mqttClient
 
-    if Config.DEBUG:
-        print(f"[Bridge Meshtastic-MQTT] Paquet brut reçu : {packet}")
+    logger.info(f"[Bridge Meshtastic-MQTT] Paquet brut reçu : {packet}")
 
     # Seuls les paquets décodés avec un champ texte nous intéressent
     if "decoded" not in packet:
-        if Config.DEBUG:
-            print("[Bridge Meshtastic-MQTT] Paquet sans champ 'decoded' ignoré")
+        logger.warning("[Bridge Meshtastic-MQTT] Paquet sans champ 'decoded' ignoré")
         return
 
     try:
         data = json.loads(packet["decoded"].get("text", ""))
 
     except (json.JSONDecodeError, TypeError):
-        if Config.DEBUG:
-            print("[Bridge Meshtastic-MQTT] Champ 'text' absent ou non-JSON, paquet ignoré")
+        logger.warning("[Bridge Meshtastic-MQTT] Champ 'text' absent ou non-JSON, paquet ignoré")
         return
 
     dataType = data.get("t")
     topic    = getMQTTTopic(dataType, data.get("id"))
 
     if not mqttClient.publish(topic, json.dumps(data)):
-        if Config.DEBUG:
-            print(f"[Bridge Meshtastic-MQTT] Échec de la publication sur le topic '{topic}'")
+        logger.warning(f"[Bridge Meshtastic-MQTT] Échec de la publication sur le topic '{topic}'")
 
 
 # =============================================================================

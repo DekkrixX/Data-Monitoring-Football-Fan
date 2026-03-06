@@ -22,7 +22,13 @@ from Server.Utils.data import createDataForClient, getNameOfSupporter, getColorO
 from Server.Core.mqtt import MQTTClientWrapper
 from Server.Dashboard.routes import registerRoutes
 from Server.Dashboard.socketioHandlers import registerSocketioHandlers
+from Server.Utils.logger import Logger
 
+# =============================================================================
+#  Création du logger
+# =============================================================================
+
+logger = Logger("Serveur/App")
 
 # =============================================================================
 #  Variables globales
@@ -81,7 +87,9 @@ def main():
         socketio.run(app, host=Config.DASHBOARD_HOST, port=Config.DASHBOARD_PORT, use_reloader=False)
 
     except Exception as e:
-        raise RuntimeError("[Dashboard] Erreur lors du démarrage du serveur SocketIO") from e
+        message = "[Dashboard] Erreur lors du démarrage du serveur SocketIO"
+        logger.error(message)
+        raise RuntimeError(message) from e
 
     finally:
         # Notification de fermeture aux clients web avant l'arrêt
@@ -102,13 +110,11 @@ def _onMqttMessage(message):
     # @param message Message paho-mqtt reçu (topic, payload, qos, retain).
     ##
 
-    if Config.DEBUG:
-        print(f"[Dashboard] Message MQTT brut reçu : {message}")
+    logger.info(f"[Dashboard] Message MQTT brut reçu : {message}")
 
     data = json.loads(message.payload.decode())
 
-    if Config.DEBUG:
-        print(f"[Dashboard] Données décodées : {data}")
+    logger.info(f"[Dashboard] Données décodées : {data}")
 
     supporterId = data["id"]
 
@@ -129,8 +135,7 @@ def _createFlaskApp():
     # @return Flask Instance Flask configurée.
     ##
 
-    if Config.DEBUG:
-        print("[Dashboard] Création de l'application Flask")
+    logger.info("[Dashboard] Création de l'application Flask")
 
     app = Flask(__name__)
     app.config["SECRET_KEY"]            = Config.SECRET_KEY
@@ -170,8 +175,7 @@ def _createSupporter(supporterId):
 
     global socketio
 
-    if Config.DEBUG:
-        print(f"[Dashboard] Nouveau supporter détecté (id={supporterId})")
+    logger.info(f"[Dashboard] Nouveau supporter détecté (id={supporterId})")
 
     name  = getNameOfSupporter(supporterId)
     color = getColorOfSupporter(supporterId)
@@ -208,8 +212,7 @@ def _addSupporterData(data):
             socketio.emit("newSupporterData", payload)
             return
 
-    if Config.DEBUG:
-        print(f"[Dashboard] Données reçues pour un supporter inconnu (id={supporterId}), message ignoré")
+    logger.warning(f"[Dashboard] Données reçues pour un supporter inconnu (id={supporterId}), message ignoré")
 
 
 # =============================================================================

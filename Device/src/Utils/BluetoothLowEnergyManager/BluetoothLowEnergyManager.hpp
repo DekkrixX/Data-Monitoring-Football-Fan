@@ -26,6 +26,7 @@
 // ============================================================================
 
 #include "../../Config/setting.hpp"
+#include "../Logger/Logger.hpp"
 
 // ============================================================================
 //  Variable externe
@@ -46,6 +47,13 @@ class BluetoothLowEnergyManager
 
     class ScanCallbacks;
     class ClientCallbacks;
+
+// ============================================================================
+//  Attribut static
+// ============================================================================
+
+    protected:
+        static Logger * logger;///< @brief Logger qui écrit les logs dans un fichier
 
 // ============================================================================
 //  Attribut

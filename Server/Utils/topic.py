@@ -13,6 +13,13 @@
 import json
 
 from Server.Config.setting import Config
+from Server.Utils.logger import Logger
+
+# =============================================================================
+#  Création du logger
+# =============================================================================
+
+logger = Logger("Serveur/Topic")
 
 # =============================================================================
 #  Résolution du topic MQTT
@@ -33,28 +40,32 @@ def getMQTTTopic(dataType, supporterId):
     filePath = Config.PATH["data"] + "topicMQTT.json"
 
     try:
-        if Config.DEBUG:
-            print(f"[Topic] Lecture du fichier de topics MQTT : '{filePath}'")
+        logger.info(f"[Topic] Lecture du fichier de topics MQTT : '{filePath}'")
 
         with open(filePath, "r") as file:
             topicList = json.load(file)
 
     except FileNotFoundError:
-        raise RuntimeError(f"[Topic] Fichier de topics MQTT introuvable : '{filePath}'")
+        message = f"[Topic] Fichier de topics MQTT introuvable : '{filePath}'"
+        logger.error(message)
+        raise RuntimeError(message)
 
     except json.JSONDecodeError as e:
-        raise RuntimeError(f"[Topic] Fichier de topics MQTT invalide (JSON malformé) : '{filePath}'") from e
+        message = f"[Topic] Fichier de topics MQTT invalide (JSON malformé) : '{filePath}'"
+        logger.error(message)
+        raise RuntimeError(message) from e
 
     for item in topicList:
         if item["type"] == dataType:
             topic = item["topic"] + str(supporterId)
 
-            if Config.DEBUG:
-                print(f"[Topic] Topic MQTT résolu : '{topic}' (type='{dataType}', id={supporterId})")
+            logger.info(f"[Topic] Topic MQTT résolu : '{topic}' (type='{dataType}', id={supporterId})")
 
             return topic
 
-    raise RuntimeError(f"[Topic] Aucun topic MQTT défini pour le type de données '{dataType}'")
+    message = f"[Topic] Aucun topic MQTT défini pour le type de données '{dataType}'"
+    logger.error(message)
+    raise RuntimeError(message)
 
 
 # =============================================================================

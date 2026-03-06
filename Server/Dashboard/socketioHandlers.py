@@ -15,6 +15,13 @@ from flask_socketio import emit
 
 from Server.Config.setting import Config
 from Server.Utils.data import createDataForClient, getNameOfSupporter, getColorOfSupporter
+from Server.Utils.logger import Logger
+
+# =============================================================================
+#  Création du logger
+# =============================================================================
+
+logger = Logger("Serveur/SocketIO")
 
 # =============================================================================
 #  Enregistrement des gestionnaires SocketIO
@@ -38,8 +45,7 @@ def registerSocketioHandlers(socketio, supporterList):
         # @brief Envoie la liste de tous les supporters actifs au client.
         ##
 
-        if Config.DEBUG:
-            print("[SocketIO] Réception de 'getSupporter'")
+        logger.info("[SocketIO] Réception de 'getSupporter'")
 
         payload = [{"id": s.supporterId, "name": s.name, "color": getColorOfSupporter(s.supporterId)} for s in supporterList]
         socketio.emit("getSupporterResponse", payload)
@@ -57,8 +63,7 @@ def registerSocketioHandlers(socketio, supporterList):
         # @param supporterId Identifiant du supporter demandé.
         ##
 
-        if Config.DEBUG:
-            print(f"[SocketIO] Réception de 'getSupporterData' pour le supporter id={supporterId}")
+        logger.info(f"[SocketIO] Réception de 'getSupporterData' pour le supporter id={supporterId}")
 
         name  = getNameOfSupporter(supporterId)
         color = getColorOfSupporter(supporterId)
@@ -74,8 +79,7 @@ def registerSocketioHandlers(socketio, supporterList):
                 socketio.emit("getSupporterDataResponse", payload)
                 return
 
-        if Config.DEBUG:
-            print(f"[SocketIO] Aucun supporter trouvé avec l'id={supporterId}")
+        logger.warning(f"[SocketIO] Aucun supporter trouvé avec l'id={supporterId}")
 
 # =============================================================================
 #  Données de tous les supporters
@@ -87,8 +91,7 @@ def registerSocketioHandlers(socketio, supporterList):
         # @brief Envoie la liste des dernières fréquences cardiaques de tous les supporters actifs.
         ##
 
-        if Config.DEBUG:
-            print("[SocketIO] Réception de 'getSupporterDataAll'")
+        logger.info("[SocketIO] Réception de 'getSupporterDataAll'")
 
         payload = []
         for supporter in supporterList:

@@ -11,7 +11,15 @@
 #  Import des bibliothèques
 # =============================================================================
 
+from Server.Config.setting import Config
 from Server.Core.Supporter.Data.heartRate import HeartRateData
+from Server.Utils.logger import Logger
+
+# =============================================================================
+#  Création du logger
+# =============================================================================
+
+logger = Logger("Serveur/Supporter")
 
 # =============================================================================
 #  Supporter
@@ -79,6 +87,4 @@ class Supporter:
             self.heartRate.addData(data["hr"])
         else:
             # Type inconnu : logué mais non bloquant
-            from Server.Config.setting import Config
-            if Config.DEBUG:
-                print(f"[Supporter] Type de données inconnu ignoré : '{dataType}'")
+            logger.warning(f"[Supporter] Type de données inconnu ignoré : '{dataType}'")

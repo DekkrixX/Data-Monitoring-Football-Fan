@@ -42,7 +42,7 @@
 // ============================================================================
 
 #define DEBUG               1 ///< @brief Activation des messages de debug sur le port série (Serial).
-#define BAUDRATE_DEBUG 112500 ///< @brief Vitesse de communication UART en bauds.
+#define BAUDRATE_DEBUG 115200 ///< @brief Vitesse de communication UART en bauds.
 
 // ============================================================================
 //  Paramètres du Duty Cycle
@@ -62,7 +62,20 @@
 
 #define RX_PIN       44 ///< @brief Broche RX de l'UART externe (Serial1).
 #define TX_PIN       43 ///< @brief Broche TX de l'UART externe (Serial1).
-#define BAUDRATE 112500 ///< @brief Vitesse de communication UART en bauds.
+#define BAUDRATE 115200 ///< @brief Vitesse de communication UART en bauds.
+
+// ============================================================================
+//  Paramètres de logs
+// ============================================================================
+
+#define NB_LOGGER                 4 ///< @brief Nombre de logger présent sur la carte
+#define LOGGER_MAX_MESSAGE_SIZE 256 ///< @brief Taille maximale d'un message de log en caractères.
+
+#if NB_SENSOR <= 0
+#error "Erreur de configuration: Le nombre de logger est invalide"
+#else
+#define LOGGER_MAX_FILE_SIZE (((1024 * 1024) * 6) / NB_LOGGER) ///< @brief Taille maximale d'un fichier de log en octets.
+#endif
 
 
 

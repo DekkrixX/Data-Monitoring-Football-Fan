@@ -40,6 +40,7 @@
 #include "../../../Utils/state.hpp"
 #include "../../../Utils/UARTManager/UARTManager.hpp"
 #include "../../../Utils/BluetoothLowEnergyManager/BluetoothLowEnergyManager.hpp"
+#include "../../../Utils/Logger/Logger.hpp"
 
 // ============================================================================
 //  UUID des services et caractéristiques GATT utilisés
@@ -96,6 +97,8 @@ class PolarH10: public HeartRate
 
     public:
         static const std::string name; ///< @brief Nom du capteur.
+    private:
+        static Logger * logger;    ///< @brief Logger qui écrit les logs dans un fichier
 
 // ============================================================================
 //  Attribut

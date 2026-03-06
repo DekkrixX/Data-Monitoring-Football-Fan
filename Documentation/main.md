@@ -55,6 +55,10 @@ Projet de Monitoring pour Supporters de Football
 ├── Device                      // Code source du dispositif embarqué
 │   ├── src
 │   │   ├── Config
+│   │   │   ├── Log
+│   │   │   │   ├── Log.cpp
+│   │   │   │   └── Log.hpp
+│   │   │   │
 │   │   │   ├── initSensor.hpp
 │   │   │   └── setting.hpp
 │   │   │
@@ -83,6 +87,10 @@ Projet de Monitoring pour Supporters de Football
 │   │   │   │   ├── BluetoothLowEnergyManager.cpp
 │   │   │   │   └── BluetoothLowEnergyManager.hpp
 │   │   │   │
+│   │   │   ├── Logger
+│   │   │   │   ├── Logger.cpp
+│   │   │   │   └── Logger.hpp
+│   │   │   │
 │   │   │   ├── UARTManager
 │   │   │   │   ├── UARTManager.cpp
 │   │   │   │   └── UARTManager.hpp
@@ -94,6 +102,7 @@ Projet de Monitoring pour Supporters de Football
 │   │   └── main.cpp
 │   │
 │   ├── platformio.ini          // Fichier de configuration de PlatformIO
+│   ├── partition.csv           // Fichier de configuration de la partition de la carte ESP32
 │   └── Doxyfile                // Fichier de configuration de Doxygen
 │
 ├── Server
@@ -149,6 +158,7 @@ Projet de Monitoring pour Supporters de Football
 │   ├── Utils
 │   │   ├── data.py
 │   │   ├── display.py
+│   │   ├── logger.py
 │   │   ├── topic.py
 │   │   └── state.py
 │   │
@@ -183,7 +193,11 @@ Projet de Monitoring pour Supporters de Football
 │   ├── meshtastic.sh
 │   └── firmware-seeed-xiao-s3-2.7.15.567b8ea.bin
 │
-├── .env                        // Fichier des variables d'environnement
+├── .env                        // Fichier de variables d'environnement
+├── .env.encrypted              // Fichier de variables d'environnement chiffré
+├── envcrypt.sh                 // Script de chiffrement de fichier
+├── logviewer.sh                // Script de visualisation de log
+├── readSerialLog.sh            // Script de récupération des logs des cartes ESP32
 ├── Makefile                    // Fichier de build automatique
 ├── user_manual.md              // Manuel utilisateur
 └── README.md                   // Fichier principal d'information

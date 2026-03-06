@@ -12,6 +12,7 @@
 
 #include <string>
 #include <Arduino.h>
+#include <LittleFS.h>
 
 // ============================================================================
 //  Import des headers internes
@@ -21,6 +22,8 @@
 #include "./Utils/UARTManager/UARTManager.hpp"
 #include "./Config/setting.hpp"
 #include "./Config/initSensor.hpp"
+#include "./Utils/Logger/Logger.hpp"
+#include "./Config/Log/Log.hpp"
 
 // ============================================================================
 //  Import des capteurs
@@ -35,6 +38,7 @@
 Sensor * sensor = nullptr; ///< @brief Pointeur vers le capteur actif. Initialisé dans setup().
 UARTManager * uartManager = nullptr; ///< @brief Pointeur vers le gestionnaire UART externe. Initialisé dans setup().
 unsigned long lastSendMs = 0; ///< @brief Temps du dernier envoi de données
+Logger * logger = nullptr; ///< @brief Logger qui écrit les logs dans un fichier
 
 // ============================================================================
 //  Fonction setup
@@ -48,12 +52,19 @@ unsigned long lastSendMs = 0; ///< @brief Temps du dernier envoi de données
 void setup()
 {
     Serial.begin(BAUDRATE_DEBUG);
+    if (not LittleFS.begin(true))
+        throw std::runtime_error("Le système de fichier LittleFS n'est pas monté");
 
-    if (DEBUG)
-    {
-        Serial.println("[SETUP] Démarrage du firmware");
-        Serial.flush();
-    }
+    psramInit(); // Initialisation de la PSRAM requis avant toute instanciation de Logger
+
+    logger = new Logger("Main", true);
+
+    // Temps de délais pour script de récupération de log
+    delay(5000);
+    // Export automatique des logs au boot
+    dumpLogsOnBoot();
+
+    logger->info("[SETUP] Démarrage du firmware");
 
     // Création d'une interface UART
     uartManager = new UARTManager(RX_PIN, TX_PIN, BAUDRATE);
@@ -64,20 +75,14 @@ void setup()
     // Initialisation du capteur
     sensor = new SENSOR(SUPPORTER_ID);
 
-    if (DEBUG)
-    {
-        Serial.printf("[SETUP] Capteur instancié: %s (supporter id: %d)\n", sensor->getSensorName().c_str(), SUPPORTER_ID);
-        Serial.flush();
-    }
+    char str[LOGGER_MAX_MESSAGE_SIZE];
+    snprintf(str, sizeof(str), "[SETUP] Capteur instancié: %s (supporter id: %d)\n", sensor->getSensorName().c_str(), SUPPORTER_ID); 
+    logger->info(str);
 
     // Démarrage du capteur
     sensor->begin();
 
-    if (DEBUG)
-    {
-        Serial.println("[SETUP] Initialisation terminée, entrée dans la boucle principale");
-        Serial.flush();
-    }
+    logger->info("[SETUP] Initialisation terminée, entrée dans la boucle principale");
 
     return ;
 }
@@ -122,39 +127,27 @@ void loop()
 
                 if (written == size)
                 {
-                    if (DEBUG)
-                    {
-                        Serial.printf("[LOOP] Trame envoyée via UART (%u octets): %s", size, dataString.c_str());
-                        Serial.flush();
-                    }
+                    char str[LOGGER_MAX_MESSAGE_SIZE];
+                    snprintf(str, sizeof(str), "[LOOP] Trame envoyée via UART (%u octets): %s", size, dataString.c_str());
+                    logger->info(str);
                 }
                 else
                 {
-                    if (DEBUG)
-                    {
-                        Serial.printf("[LOOP] AVERTISSEMENT - Envoi UART incomplet: %u/%u octets écrits\n", written, size);
-                        Serial.flush();
-                    }
+                    char str[LOGGER_MAX_MESSAGE_SIZE];
+                    snprintf(str, sizeof(str), "[LOOP] AVERTISSEMENT - Envoi UART incomplet: %u/%u octets écrits\n", written, size);
+                    logger->info(str);
                 }
 
                 delete [] data;
             }
             else
-            {
-                if (DEBUG)
-                {
-                    Serial.println("[LOOP] Capteur connecté mais aucune donnée disponible, attente de la prochaine notification");
-                    Serial.flush();
-                }
-            }
+                logger->info("[LOOP] Capteur connecté mais aucune donnée disponible, attente de la prochaine notification");
         }
         else
         {
-            if (DEBUG)
-            {
-                Serial.printf("[LOOP] Capteur '%s' non connecté, en attente\n", sensor->getSensorName().c_str());
-                Serial.flush();
-            }
+            char str[LOGGER_MAX_MESSAGE_SIZE];
+            snprintf(str, sizeof(str), "[LOOP] Capteur '%s' non connecté, en attente\n", sensor->getSensorName().c_str());
+            logger->info(str);
         }
     }
 

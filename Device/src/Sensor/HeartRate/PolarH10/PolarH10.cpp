@@ -26,6 +26,7 @@ std::mutex dataMutex; ///< @brief Mutex global protégeant les accès concurrent
 // ============================================================================
 
 const std::string PolarH10::name = "PolarH10";
+Logger * PolarH10::logger = nullptr;
 
 // ============================================================================
 //  Constructeur
@@ -38,11 +39,11 @@ isSubscribed(false),
 isNotify(false),
 bleManager(nullptr)
 {
-    if (DEBUG)
-    {
-        Serial.printf("[POLARH10] Instanciation pour le supporter. id: %d, adresse MAC cible: %s\n", supporterId, MAC_ADDRESS);
-        Serial.flush();
-    }
+    PolarH10::logger = new Logger("PolarH10", true);
+
+    char str[LOGGER_MAX_MESSAGE_SIZE];
+    snprintf(str, sizeof(str), "[POLARH10] Instanciation pour le supporter. id: %d, adresse MAC cible: %s\n", supporterId, MAC_ADDRESS);
+    PolarH10::logger->info(str);
 
     // Instanciation du gestionnaire Bluetooth Low Energy avec l'adresse MAC configurée dans setting.hpp
     this->bleManager = new BluetoothLowEnergyManager(MAC_ADDRESS);
@@ -56,6 +57,7 @@ PolarH10::~PolarH10()
 {
     this->end();
     delete this->bleManager;
+    delete PolarH10::logger;
 }
 
 // ============================================================================
@@ -64,22 +66,19 @@ PolarH10::~PolarH10()
 
 std::string PolarH10::formatData(PolarH10Data & data, int supporterId)
 {
-    if (DEBUG)
+    char str[LOGGER_MAX_MESSAGE_SIZE];
+    snprintf(str, sizeof(str), "[POLARH10] formatData - HR: [ ");
+    for (int i=0; i < NB_VALUE; i++)
     {
-        Serial.printf("[POLARH10] formatData - HR: [ ");
-        Serial.flush();
-        for (int i=0; i < NB_VALUE; i++){
-            Serial.printf("%d ", data.heartRate[i]);
-            Serial.flush();
-        }
-        Serial.printf("] bpm\n");
-        Serial.flush();
+        char val[5];
+        snprintf(val, sizeof(val), "%d ", data.heartRate[i]);
+        strcat(str, val);
     }
+    strcat(str, "] bpm\n");
+    PolarH10::logger->info(str);
 
     std::string jsonString;
     JsonDocument json;
-
-    std::lock_guard<std::mutex> lock(dataMutex);
 
     // Construction de l'objet JSON avec les données du capteur
     json["t"] = getMQTTTopic(SensorType::HEART_RATE);
@@ -102,11 +101,7 @@ std::string PolarH10::formatData(PolarH10Data & data, int supporterId)
 
 void PolarH10::begin()
 {
-    if (DEBUG)
-    {
-        Serial.println("[POLARH10] begin - Démarrage du capteur");
-        Serial.flush();
-    }
+    PolarH10::logger->info("[POLARH10] begin - Démarrage du capteur");
 
     // Démarrage de la pile Bluetooth Low Energy et du scan
     this->bleManager->begin();
@@ -114,11 +109,7 @@ void PolarH10::begin()
     // État transitoire: en attente de connexion
     Sensor::state = ConnectionState::CONNECTING;
 
-    if (DEBUG)
-    {
-        Serial.println("[POLARH10] begin - État: CONNECTING, en attente du périphérique Bluetooth Low Energy");
-        Serial.flush();
-    }
+    PolarH10::logger->info("[POLARH10] begin - État: CONNECTING, en attente du périphérique Bluetooth Low Energy");
 
     return ;
 }
@@ -127,20 +118,12 @@ void PolarH10::begin()
 
 void PolarH10::end()
 {
-    if (DEBUG)
-    {
-        Serial.println("[POLARH10] end - Arrêt du capteur");
-        Serial.flush();
-    }
+    PolarH10::logger->info("[POLARH10] end - Arrêt du capteur");
 
     // Fermeture de l'interface Bluetooth Low Energy
     this->bleManager->end();
 
-    if (DEBUG)
-    {
-        Serial.println("[POLARH10] end - Capteur arrêté");
-        Serial.flush();
-    }
+    PolarH10::logger->info("[POLARH10] end - Capteur arrêté");
 
     return ;
 }
@@ -149,11 +132,7 @@ void PolarH10::end()
 
 void PolarH10::update()
 {
-    if (DEBUG)
-    {
-        Serial.println("[POLARH10] update - Mise à jour du capteur");
-        Serial.flush();
-    }
+    PolarH10::logger->info("[POLARH10] update - Mise à jour du capteur");
 
     // Délègue la gestion Bluetooth Low Energy au gestionnaire
     this->bleManager->update();
@@ -165,30 +144,18 @@ void PolarH10::update()
         {
             Sensor::state = ConnectionState::CONNECTED;
 
-            if (DEBUG)
-            {
-                Serial.println("[POLARH10] update - État: CONNECTED");
-                Serial.flush();
-            }
+            PolarH10::logger->info("[POLARH10] update - État: CONNECTED");
         }
 
         // Première connexion: lecture des métadonnées et souscription aux notifications
         if (not this->isSubscribed)
         {
-            if (DEBUG)
-            {
-                Serial.println("[POLARH10] update - Première connexion: lecture des métadonnées statiques");
-                Serial.flush();
-            }
+            PolarH10::logger->info("[POLARH10] update - Première connexion: lecture des métadonnées statiques");
 
             // Lecture bloquante du niveau de batterie et de la localisation du capteur
             this->getData();
 
-            if (DEBUG)
-            {
-                Serial.println("[POLARH10] update - Souscription aux notifications Heart Rate active");
-                Serial.flush();
-            }
+            PolarH10::logger->info("[POLARH10] update - Souscription aux notifications Heart Rate active");
 
             // Souscription aux notifications Heart Rate Measurement
             this->bleManager->subscribe(UUID_HEARTRATE_SERVICE, UUID_HEARTRATE_MEASUREMENT_CHARACTERISTIC);
@@ -199,26 +166,25 @@ void PolarH10::update()
         if (this->isNotify)
         {
             // Formatage des données
-            std::string format = PolarH10::formatData(this->data, this->supporterId);
+            std::string format;
+            
+            {
+                std::lock_guard<std::mutex> lock(dataMutex);
+
+                format = PolarH10::formatData(this->data, this->supporterId);
+                
+                // Réinitialisation du drapeau pour la prochaine notification
+                this->isNotify = false;
+            }
+
             Sensor::data = format;
 
-            if (DEBUG)
-            {
-                Serial.printf("[POLARH10] update - Nouvelle mesure sérialisée: %s", format.c_str());
-                Serial.flush();
-            }
-
-            // Réinitialisation du drapeau pour la prochaine notification
-            this->isNotify = false;
+            char str[LOGGER_MAX_MESSAGE_SIZE];
+            snprintf(str, sizeof(str), "[POLARH10] update - Nouvelle mesure sérialisée: %s", format.c_str()); 
+            PolarH10::logger->info(str);
         }
         else
-        {
-            if (DEBUG)
-            {
-                Serial.println("[POLARH10] update - Aucune nouvelle notification depuis le dernier cycle");
-                Serial.flush();
-            }
-        }
+            PolarH10::logger->info("[POLARH10] update - Aucune nouvelle notification depuis le dernier cycle");
     }
     else
     {
@@ -226,11 +192,7 @@ void PolarH10::update()
         Sensor::state = ConnectionState::DISCONNECTED;
         this->isSubscribed = false;
 
-        if (DEBUG)
-        {
-            Serial.println("[POLARH10] update - État: DISCONNECTED");
-            Serial.flush();
-        }
+        PolarH10::logger->info("[POLARH10] update - État: DISCONNECTED");
     }
 
     return ;
@@ -240,21 +202,13 @@ void PolarH10::update()
 
 void PolarH10::getData()
 {
-    if (DEBUG)
-    {
-        Serial.println("[POLARH10] getData - Lecture des caractéristiques statiques");
-        Serial.flush();
-    }
+    PolarH10::logger->info("[POLARH10] getData - Lecture des caractéristiques statiques");
 
     NimBLEAttValue value;
 
     std::lock_guard<std::mutex> lock(dataMutex);
 
-    if (DEBUG)
-    {
-        Serial.println("[POLARH10] getData - Lecture du niveau de batterie");
-        Serial.flush();
-    }
+    PolarH10::logger->info("[POLARH10] getData - Lecture du niveau de batterie");
 
     // Lecture du niveau de batterie: boucle jusqu'à obtenir une valeur valide (!= 255)
     uint8_t batteryLevel = 255;
@@ -267,19 +221,13 @@ void PolarH10::getData()
             const uint8_t * data = value.data();
             batteryLevel = data[0];
 
-            if (DEBUG)
-            {
-                Serial.printf("[POLARH10] getData - Niveau de batterie: %u%%\n", batteryLevel);
-                Serial.flush();
-            }
+            char str[LOGGER_MAX_MESSAGE_SIZE];
+            snprintf(str, sizeof(str), "[POLARH10] getData - Niveau de batterie: %u%%\n", batteryLevel);
+            PolarH10::logger->info(str);
         } 
     }
 
-    if (DEBUG)
-    {
-        Serial.println("[POLARH10] getData - Lecture de la localisation du capteur");
-        Serial.flush();
-    }
+    PolarH10::logger->info("[POLARH10] getData - Lecture de la localisation du capteur");
 
     // Lecture de la localisation du capteur: boucle jusqu'à obtenir une valeur valide (!= "")
     std::string bodySensorLocation = "";
@@ -317,20 +265,14 @@ void PolarH10::getData()
                     bodySensorLocation = "Reserved";
             }
 
-            if (DEBUG)
-            {
-                Serial.printf("[POLARH10] getData - Localisation: %s (code: %u)\n",
+            char str[LOGGER_MAX_MESSAGE_SIZE];
+            snprintf(str, sizeof(str), "[POLARH10] getData - Localisation: %s (code: %u)\n",
                     bodySensorLocation.c_str(), data[0]);
-                Serial.flush();
-            }
+            PolarH10::logger->info(str);
         }
     }
 
-    if (DEBUG)
-    {
-        Serial.println("[POLARH10] getData - Lecture des caractéristiques statiques terminée");
-        Serial.flush();
-    }
+    PolarH10::logger->info("[POLARH10] getData - Lecture des caractéristiques statiques terminée");
 
     std::string jsonString;
     JsonDocument json;
@@ -373,11 +315,9 @@ void PolarH10::notify(NimBLERemoteCharacteristic * characteristic, uint8_t * dat
                 // Fréquence cardiaque encodée sur 16 bits
                 this->data.heartRate[this->data.heartRateIndex] = static_cast<int>( data[1] | (data[2] << 8) );
 
-                if (DEBUG)
-                {
-                    Serial.printf("[POLARH10] notify - Fréquence cardiaque (UINT16): %d bpm\n", this->data.heartRate[this->data.heartRateIndex]);
-                    Serial.flush();
-                }
+                char str[LOGGER_MAX_MESSAGE_SIZE];
+                snprintf(str, sizeof(str), "[POLARH10] notify - Fréquence cardiaque (UINT16): %d bpm\n", this->data.heartRate[this->data.heartRateIndex]);
+                PolarH10::logger->info(str);
 
                 this->data.heartRateIndex++;
             }
@@ -386,11 +326,9 @@ void PolarH10::notify(NimBLERemoteCharacteristic * characteristic, uint8_t * dat
                 // Fréquence cardiaque encodée sur 8 bits
                 this->data.heartRate[this->data.heartRateIndex] = static_cast<int>(data[1]);
 
-                if (DEBUG)
-                {
-                    Serial.printf("[POLARH10] notify - Fréquence cardiaque (UINT8): %d bpm\n", this->data.heartRate[this->data.heartRateIndex]);
-                    Serial.flush();
-                }
+                char str[LOGGER_MAX_MESSAGE_SIZE];
+                snprintf(str, sizeof(str), "[POLARH10] notify - Fréquence cardiaque (UINT8): %d bpm\n", this->data.heartRate[this->data.heartRateIndex]);
+                PolarH10::logger->info(str);
 
                 this->data.heartRateIndex++;
             }
@@ -400,25 +338,20 @@ void PolarH10::notify(NimBLERemoteCharacteristic * characteristic, uint8_t * dat
         }
         else
         {
-            if (DEBUG)
-            {
-                Serial.printf("[POLARH10] notify - Trame HeartRate trop courte (%u octet), ignorée\n", length);
-                Serial.flush();
-            }
+            char str[LOGGER_MAX_MESSAGE_SIZE];
+            snprintf(str, sizeof(str), "[POLARH10] notify - Trame HeartRate trop courte (%u octet), ignorée\n", length);
+            PolarH10::logger->warning(str);
         }
     }
     else
     {
-        if (DEBUG)
-        {
-            Serial.printf("[POLARH10] notify - Notification ignorée: UUID %s non reconnu\n",
-                characteristic->getUUID().toString().c_str());
-            Serial.flush();
-        }
+        char str[LOGGER_MAX_MESSAGE_SIZE];
+        snprintf(str, sizeof(str), "[POLARH10] notify - Notification ignorée: UUID %s non reconnu\n", characteristic->getUUID().toString().c_str());
+        PolarH10::logger->warning(str);
     }
 
     // Signale une nouvelle donnée disponible uniquement si la valeur est cohérente
-    if (this->data.heartRate != 0)
+    if (this->data.heartRateIndex > 0)
         this->isNotify = true;
 
     return ;

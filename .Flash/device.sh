@@ -39,6 +39,11 @@ then
     then
         # Si l'utilisateur réponds 'OUI'
         echo "";
+        # Éfface la mémoire flash
+        .venv/platformio-env/bin/pio run -t erase --upload-port $port --project-dir Device;
+        # Montage du système de fichier LittleFS
+        mkdir -p Device/data;
+        .venv/platformio-env/bin/pio run -t uploadfs --upload-port $port --project-dir Device;
         # Flash de la carte
         .venv/platformio-env/bin/pio run -t upload --upload-port $port --project-dir Device;
     else

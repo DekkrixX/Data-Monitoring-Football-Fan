@@ -18,7 +18,13 @@ from Server.Core.mqtt import MQTTClientWrapper
 from Server.Core.influxdb import InfluxDBClientWrapper
 from Server.Utils.display import printBanner
 from Server.Utils.topic import buildPointInfluxDB
+from Server.Utils.logger import Logger
 
+# =============================================================================
+#  Création du logger
+# =============================================================================
+
+logger = Logger("Serveur/Bridge_MQTT-InfluxDB")
 
 # =============================================================================
 #  Variables globales
@@ -85,8 +91,7 @@ def main():
         mqttClient.start(blocking=True)
 
     except KeyboardInterrupt:
-        if Config.DEBUG:
-            print("\n[Bridge MQTT-InfluxDB] Arrêt demandé par l'utilisateur (Ctrl+C)")
+        logger.info("[Bridge MQTT-InfluxDB] Arrêt demandé par l'utilisateur (Ctrl+C)")
 
         mqttClient.stop()
         influxdbClient.close()
@@ -112,7 +117,9 @@ def _onConnect(client, userdata, flags, rc):
 
     if rc != 0:
         mqttClient.stop()
-        raise RuntimeError(f"[Bridge MQTT-InfluxDB] Connexion au broker MQTT refusée (rc={rc})")
+        message = f"[Bridge MQTT-InfluxDB] Connexion au broker MQTT refusée (rc={rc})"
+        logger.error(message)
+        raise RuntimeError(message)
 
 
 def _onMessage(message):
@@ -124,13 +131,11 @@ def _onMessage(message):
 
     global influxdbClient
 
-    if Config.DEBUG:
-        print(f"[Bridge MQTT-InfluxDB] Message brut reçu : {message}")
+    logger.info(f"[Bridge MQTT-InfluxDB] Message brut reçu : {message}")
 
     data = json.loads(message.payload.decode())
 
-    if Config.DEBUG:
-        print(f"[Bridge MQTT-InfluxDB] Données décodées : {data}")
+    logger.info(f"[Bridge MQTT-InfluxDB] Données décodées : {data}")
 
     # buildPointInfluxDB() retire "type" du dict et sépare tags et fields
     tags, fields = buildPointInfluxDB(data.copy())
