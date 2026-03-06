@@ -1,5 +1,5 @@
 # =============================================================================
-# envcrypt.sh — Chiffrement/déchiffrement de fichiers d'environnement via SOPS
+# envcrypt.sh - Chiffrement/déchiffrement de fichiers d'environnement via SOPS
 #
 # Dépendances : sops (https://github.com/getsops/sops)
 # Usage       : voir la fonction usage() ci-dessous ou lancer avec --help
