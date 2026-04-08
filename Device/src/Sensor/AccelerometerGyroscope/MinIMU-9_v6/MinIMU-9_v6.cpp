@@ -54,7 +54,7 @@ MinIMU_9_v6::~MinIMU_9_v6()
 std::string MinIMU_9_v6::formatData(MinIMU_9_v6Data & data)
 {
     char str[LOGGER_MAX_MESSAGE_SIZE];
-    snprintf(str, sizeof(str), "[MinIMU-9] formatData - Accelerometre: [ ");
+    snprintf(str, sizeof(str), "[MinIMU-9 V6] formatData - Accelerometre: [ ");
     for (int i=0; i < 3; i++)
     {
         char val[6];

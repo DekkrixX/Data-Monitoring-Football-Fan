@@ -23,6 +23,8 @@
 // À MODIFIER
 #define NB_SENSOR 1 ///< @brief Nombre de capteurs total du système.
 
+#define ACQUISITION_TIME 500///< @brief Temps de délais entre les acquisitions du capteur (en miliseconde).
+
 /**
  * @defgroup Capteur Sélection du capteur actif
  * @{
