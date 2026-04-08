@@ -88,8 +88,6 @@ class MinIMU_9_v6: public AccelerometerGyroscope
             int accelerometer[3] = {-1, -1, -1}; ///< @brief Données de l'accéléromètre.
             int gyroscope[3]     = {-1, -1, -1}; ///< @brief Données du gyroscope.
             int magnetometer[3]  = {-1, -1, -1}; ///< @brief Données du magnétomètre.
-
-            int verticalAccelerationVector[4] = {-1, -1, -1, -1}; ///< @brief Vecteur accélération vertical.
         };
         using MinIMU_9_v6Data = struct MinIMU_9_v6Data;
 
