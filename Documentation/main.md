@@ -64,9 +64,9 @@ Projet de Monitoring pour Supporters de Football
 │   │   │
 │   │   ├── Sensor
 │   │   │   ├── AccelerometerGyroscope
-│   │   │   │   ├── GY521MPU6050
-│   │   │   │   │   ├── GY521MPU6050.cpp
-│   │   │   │   │   └── GY521MPU6050.hpp
+│   │   │   │   ├── MinIMU-9_v6
+│   │   │   │   │   ├── MinIMU-9_v6.cpp
+│   │   │   │   │   └── MinIMU-9_v6.hpp
 │   │   │   │   │
 │   │   │   │   ├── AccelerometerGyroscope.cpp
 │   │   │   │   └── AccelerometerGyroscope.hpp
