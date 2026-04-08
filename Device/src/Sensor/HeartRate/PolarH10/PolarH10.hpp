@@ -86,8 +86,8 @@ class PolarH10: public HeartRate
          */
         struct PolarH10Data
         {
-            int heartRateIndex = 0;                   ///< Taille courante du buffer de fréquence cardiaque
-            int heartRate[NB_VALUE];             ///< Buffer de fréquence cardiaque en bpm.
+            int heartRateIndex = 0;  ///< Taille courante du buffer de fréquence cardiaque.
+            int heartRate[NB_VALUE]; ///< Buffer de fréquence cardiaque en bpm.
         };
         using PolarH10Data = struct PolarH10Data;
 
@@ -98,7 +98,7 @@ class PolarH10: public HeartRate
     public:
         static const std::string name; ///< @brief Nom du capteur.
     private:
-        static Logger * logger;    ///< @brief Logger qui écrit les logs dans un fichier
+        static Logger * logger; ///< @brief Logger qui écrit les logs dans un fichier.
 
 // ============================================================================
 //  Attribut

@@ -6,6 +6,9 @@
 |----------|-------------------|
 | 6315682D | C7:6F:37:F6:01:36 |
 | 63028A2F | CF:5C:1E:1B:04:CE |
+| 65AB7621 | FE:02:9D:9F:22:1F |
+| 65C1312C | DA:DC:91:B1:19:19 |
+| 6302862B |                   |
 
 Description :
 - Capteur cardiaque pectoral ECG, très haute précision

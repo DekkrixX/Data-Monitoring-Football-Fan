@@ -27,6 +27,9 @@
 #ifdef POLARH10
 #define SENSOR PolarH10 ///< @brief Alias vers la classe concrète PolarH10, résolu à la compilation.
 #endif // POLARH10
+#ifdef MINIMU_9_V6
+#define SENSOR MinIMU_9_v6 ///< @brief Alias vers la classe concrète MinIMU_9_v6, résolu à la compilation.
+#endif // MINIMU_9_V6
 
 // ============================================================================
 //  Vérification de l'initialisation d'un capteur
@@ -36,7 +39,9 @@
 #error "Erreur de configuration: Aucun capteur n'est initialisé"
 #endif // SENSOR
 
-#if POLARH10 != 1
+#if POLARH10
+  + MINIMU_9_V6 
+ != 1
 #error "Erreur de configuration: Plusieurs capteurs sont définis"
 #endif
 

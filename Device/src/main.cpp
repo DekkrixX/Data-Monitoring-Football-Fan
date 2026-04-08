@@ -30,6 +30,7 @@
 // ============================================================================
 
 #include "./Sensor/HeartRate/PolarH10/PolarH10.hpp"
+#include "./Sensor/AccelerometerGyroscope/MinIMU-9_v6/MinIMU-9_v6.hpp"
 
 // ============================================================================
 //  Variable globale

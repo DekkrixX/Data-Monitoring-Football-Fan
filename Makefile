@@ -149,6 +149,7 @@ install:
 	@echo "Package: Docker"
 	@curl -fsSL https://get.docker.com -o get-docker.sh
 	@sudo sh ./get-docker.sh
+	@rm get-docker.sh
 	@echo "Package: Python3"
 	@sudo apt install -y python3
 	@echo "Création des environnements virtuels python"

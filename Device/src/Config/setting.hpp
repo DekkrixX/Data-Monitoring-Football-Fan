@@ -14,7 +14,7 @@
 // ============================================================================
 
 // À MODIFIER
-#define SUPPORTER_ID 1 ///< @brief Identifiant numérique unique du porteur du capteur.
+#define SUPPORTER_ID 0 ///< @brief Identifiant numérique unique du porteur du capteur (0 = Pas de supporter).
 
 // ============================================================================
 //  Paramètres des capteurs
@@ -30,8 +30,10 @@
 
 // Définir exactement UNE de ces macros pour activer le capteur correspondant.
 
-#define POLARH10 1 ///< @brief Active le capteur Polar H10.
+//#define POLARH10 1 ///< @brief Active le capteur Polar H10.
 #define MAC_ADDRESS "c7:6f:37:f6:01:36" ///< @brief Adresse MAC Bluetooth Low Energy du Polar H10 cible (format "xx:xx:xx:xx:xx:xx").
+
+#define MINIMU_9_V6 1 ///< @brief Active le capteur MinIMU-9 v6.
 
 /**
  * @}
@@ -65,13 +67,20 @@
 #define BAUDRATE 115200 ///< @brief Vitesse de communication UART en bauds.
 
 // ============================================================================
+//  Paramètres I2C
+// ============================================================================
+
+#define SDA_PIN 5 ///< @brief Broche SDA de la carte ESP32
+#define SCL_PIN 6 ///< @brief Broche SCL de la carte ESP32
+
+// ============================================================================
 //  Paramètres de logs
 // ============================================================================
 
 #define NB_LOGGER                 4 ///< @brief Nombre de logger présent sur la carte
 #define LOGGER_MAX_MESSAGE_SIZE 256 ///< @brief Taille maximale d'un message de log en caractères.
 
-#if NB_SENSOR <= 0
+#if NB_LOGGER <= 0
 #error "Erreur de configuration: Le nombre de logger est invalide"
 #else
 #define LOGGER_MAX_FILE_SIZE (((1024 * 1024) * 6) / NB_LOGGER) ///< @brief Taille maximale d'un fichier de log en octets.
