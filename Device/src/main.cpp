@@ -65,7 +65,9 @@ void setup()
     // Export automatique des logs au boot
     dumpLogsOnBoot();
 
-    logger->info("[SETUP] Démarrage du firmware");
+#if DEBUG == 1
+    logger->info(Logger::logString("[SETUP] Démarrage du firmware\n"));
+#endif
 
     // Création d'une interface UART
     uartManager = new UARTManager(RX_PIN, TX_PIN, BAUDRATE);
@@ -76,14 +78,16 @@ void setup()
     // Initialisation du capteur
     sensor = new SENSOR(SUPPORTER_ID);
 
-    char str[LOGGER_MAX_MESSAGE_SIZE];
-    snprintf(str, sizeof(str), "[SETUP] Capteur instancié: %s (supporter id: %d)\n", sensor->getSensorName().c_str(), SUPPORTER_ID); 
-    logger->info(str);
+#if DEBUG == 1
+    logger->info(Logger::logString("[SETUP] Capteur instancié: %s (supporter id: %d)\n", sensor->getSensorName().c_str(), SUPPORTER_ID));
+#endif
 
     // Démarrage du capteur
     sensor->begin();
 
-    logger->info("[SETUP] Initialisation terminée, entrée dans la boucle principale");
+#if DEBUG == 1
+    logger->info(Logger::logString("[SETUP] Initialisation terminée, entrée dans la boucle principale\n"));
+#endif
 
     return ;
 }
@@ -126,30 +130,28 @@ void loop()
                 // Envoi des données via UART externe
                 size_t written = uartManager->writeBuffer(data, size);
 
+#if DEBUG == 1
                 if (written == size)
                 {
-                    char str[LOGGER_MAX_MESSAGE_SIZE];
-                    snprintf(str, sizeof(str), "[LOOP] Trame envoyée via UART (%u octets): %s", size, dataString.c_str());
-                    logger->info(str);
+                    logger->info(Logger::logString("[LOOP] Trame envoyée via UART (%u octets): %s", size, dataString.c_str()));
                 }
                 else
                 {
-                    char str[LOGGER_MAX_MESSAGE_SIZE];
-                    snprintf(str, sizeof(str), "[LOOP] AVERTISSEMENT - Envoi UART incomplet: %u/%u octets écrits\n", written, size);
-                    logger->info(str);
+                    logger->info(Logger::logString("[LOOP] AVERTISSEMENT - Envoi UART incomplet: %u/%u octets écrits\n", written, size));
                 }
+#endif
 
                 delete [] data;
             }
+#if DEBUG == 1
             else
-                logger->info("[LOOP] Capteur connecté mais aucune donnée disponible, attente de la prochaine notification");
+                logger->info(Logger::logString("[LOOP] Capteur connecté mais aucune donnée disponible, attente de la prochaine notification\n"));
+#endif
         }
+#if DEBUG == 1
         else
-        {
-            char str[LOGGER_MAX_MESSAGE_SIZE];
-            snprintf(str, sizeof(str), "[LOOP] Capteur '%s' non connecté, en attente\n", sensor->getSensorName().c_str());
-            logger->info(str);
-        }
+            logger->info(Logger::logString("[LOOP] Capteur '%s' non connecté, en attente\n", sensor->getSensorName().c_str()));
+#endif
     }
 
     // Délai entre chaque acquisition

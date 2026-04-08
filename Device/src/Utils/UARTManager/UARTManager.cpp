@@ -49,9 +49,9 @@ UARTManager::~UARTManager()
 
 void UARTManager::begin()
 {
-    char str[LOGGER_MAX_MESSAGE_SIZE];
-    snprintf(str, sizeof(str), "[UART] begin - Ouverture du port série externe (RX: %d, TX: %d, baud: %u)\n", this->rxPin, this->txPin, this->baudRate);
-    UARTManager::logger->info(str);
+#if DEBUG == 1
+    UARTManager::logger->info(Logger::logString("[UART] begin - Ouverture du port série externe (RX: %d, TX: %d, baud: %u)\n", this->rxPin, this->txPin, this->baudRate));
+#endif
 
     // Initialisation du port série UART externe avec le format 8N1 (8 bits de données, pas de parité, 1 bit de stop)
     this->externalSerial.begin(this->baudRate, SERIAL_8N1, this->rxPin, this->txPin);
@@ -60,7 +60,9 @@ void UARTManager::begin()
     while (not this->externalSerial)
         ;
 
-    UARTManager::logger->info("[UART] begin - Port série externe prêt");
+#if DEBUG == 1
+    UARTManager::logger->info(Logger::logString("[UART] begin - Port série externe prêt\n"));
+#endif
 
     return ;
 }
@@ -69,13 +71,17 @@ void UARTManager::begin()
 
 void UARTManager::end()
 {
-    UARTManager::logger->info("[UART] end - Fermeture du port série externe");
+#if DEBUG == 1
+    UARTManager::logger->info(Logger::logString("[UART] end - Fermeture du port série externe\n"));
+#endif
 
     // Fermeture du port série uniquement s'il est ouvert
     if (this->externalSerial)
         this->externalSerial.end();
 
-    UARTManager::logger->info("[UART] end - Port série externe fermé");
+#if DEBUG == 1
+    UARTManager::logger->info(Logger::logString("[UART] end - Port série externe fermé\n"));
+#endif
 
     return ;
 }
@@ -87,7 +93,9 @@ size_t UARTManager::writeByte(uint8_t data)
     // Vérifie qu'au moins un octet peut être écrit dans le tampon d'émission
     if (this->availableForWrite() < 1)
     {
-        UARTManager::logger->warning("[UART] writeByte - Tampon d'émission plein, octet abandonné");
+#if DEBUG == 1
+        UARTManager::logger->warning(Logger::logString("[UART] writeByte - Tampon d'émission plein, octet abandonné\n"));
+#endif
 
         return 0;
     }
@@ -95,9 +103,9 @@ size_t UARTManager::writeByte(uint8_t data)
     size_t size = this->externalSerial.write(data);
     this->externalSerial.flush(); // Vide le tampon matériel pour garantir l'émission immédiate
 
-    char str[LOGGER_MAX_MESSAGE_SIZE];
-    snprintf(str, sizeof(str), "[UART] writeByte - Octet 0x%02X envoyé\n", data);
-    UARTManager::logger->info(str);
+#if DEBUG == 1
+    UARTManager::logger->info(Logger::logString("[UART] writeByte - Octet 0x%02X envoyé\n", data));
+#endif
 
     return size;
 }
@@ -109,16 +117,18 @@ int UARTManager::readByte()
     // Vérifie qu'au moins un octet est disponible en réception
     if (this->availableForRead() < 1)
     {
-        UARTManager::logger->warning("[UART] readByte - Aucun octet disponible en réception");
+#if DEBUG == 1
+        UARTManager::logger->warning(Logger::logString("[UART] readByte - Aucun octet disponible en réception\n"));
+#endif
 
         return -1;
     }
 
     int value = this->externalSerial.read();
 
-    char str[LOGGER_MAX_MESSAGE_SIZE];
-    snprintf(str, sizeof(str), "[UART] readByte - Octet lu: 0x%02X\n", value);
-    UARTManager::logger->info(str);
+#if DEBUG == 1
+    UARTManager::logger->info(Logger::logString("[UART] readByte - Octet lu: 0x%02X\n", value));
+#endif
 
     return value;
 }
@@ -130,9 +140,11 @@ size_t UARTManager::writeBuffer(const uint8_t * buffer, size_t size)
     // Vérifie la validité de la taille du buffer
     if (size == 0)
     {
-        std::string str = "[UART] writeBuffer - Taille du buffer invalide: " + std::to_string(size);
-        UARTManager::logger->error(str.c_str());
-        throw std::invalid_argument(str.c_str());
+        std::string str = Logger::logString("[UART] writeBuffer - Taille du buffer invalide: %d\n", std::to_string(size));
+#if DEBUG == 1
+        UARTManager::logger->error(str);
+#endif
+        throw std::invalid_argument(str);
     }
 
     // Vérifie que le tampon d'émission peut absorber l'intégralité du buffer
@@ -140,9 +152,9 @@ size_t UARTManager::writeBuffer(const uint8_t * buffer, size_t size)
 
     if ((size_t) available < size)
     {
-        char str[LOGGER_MAX_MESSAGE_SIZE];
-        snprintf(str, sizeof(str), "[UART] writeBuffer - Tampon d'émission insuffisant: %d octets disponibles, %u demandés\n", available, size);
-        UARTManager::logger->warning(str);
+#if DEBUG == 1
+        UARTManager::logger->warning(Logger::logString("[UART] writeBuffer - Tampon d'émission insuffisant: %d octets disponibles, %u demandés\n", available, size));
+#endif
 
         return 0;
     }
@@ -150,9 +162,9 @@ size_t UARTManager::writeBuffer(const uint8_t * buffer, size_t size)
     size_t written = this->externalSerial.write(buffer, size);
     this->externalSerial.flush(); // Vide le tampon matériel pour garantir l'émission immédiate
 
-    char str[LOGGER_MAX_MESSAGE_SIZE];
-    snprintf(str, sizeof(str), "[UART] writeBuffer - %u/%u octets envoyés\n", written, size);
-    UARTManager::logger->info(str);
+#if DEBUG == 1
+    UARTManager::logger->info(Logger::logString("[UART] writeBuffer - %u/%u octets envoyés\n", written, size));
+#endif
 
     return written;
 }
@@ -164,9 +176,11 @@ size_t UARTManager::readBuffer(uint8_t * buffer, size_t size)
     // Vérifie la validité de la taille du buffer
     if (size == 0)
     {
-        std::string str = "[UART] readBuffer - Taille du buffer invalide: " + std::to_string(size);
-        UARTManager::logger->error(str.c_str());
-        throw std::invalid_argument(str.c_str());
+        std::string str = Logger::logString("[UART] readBuffer - Taille du buffer invalide: %d\n", std::to_string(size));
+#if DEBUG == 1
+        UARTManager::logger->error(str);
+#endif
+        throw std::invalid_argument(str);
     }
 
     // Vérifie que suffisamment d'octets sont disponibles en réception
@@ -174,18 +188,18 @@ size_t UARTManager::readBuffer(uint8_t * buffer, size_t size)
 
     if ((size_t) available < size)
     {
-        char str[LOGGER_MAX_MESSAGE_SIZE];
-        snprintf(str, sizeof(str), "[UART] readBuffer - Données insuffisantes en réception: %d octets disponibles, %u demandés\n", available, size);
-        UARTManager::logger->warning(str);
+#if DEBUG == 1
+        UARTManager::logger->warning(Logger::logString("[UART] readBuffer - Données insuffisantes en réception: %d octets disponibles, %u demandés\n", available, size));
+#endif
 
         return 0;
     }
 
     size_t read = this->externalSerial.read(buffer, size);
 
-    char str[LOGGER_MAX_MESSAGE_SIZE];
-    snprintf(str, sizeof(str), "[UART] readBuffer - %u/%u octets lus\n", read, size);
-    UARTManager::logger->info(str);
+#if DEBUG == 1
+    UARTManager::logger->info(Logger::logString("[UART] readBuffer - %u/%u octets lus\n", read, size));
+#endif
 
     return read;
 }
@@ -211,9 +225,11 @@ void UARTManager::reverseBuffer(uint8_t * buffer, size_t size)
     // Vérifie la validité de la taille du buffer
     if (size == 0)
     {
-        std::string str = "[UART] reverseBuffer - Taille du buffer invalide: " + std::to_string(size);
-        UARTManager::logger->error(str.c_str());
-        throw std::invalid_argument(str.c_str());
+        std::string str = Logger::logString("[UART] reverseBuffer - Taille du buffer invalide: %d\n", std::to_string(size));
+#if DEBUG == 1
+        UARTManager::logger->error(str);
+#endif
+        throw std::invalid_argument(str);
     }
 
     // Inverse le buffer

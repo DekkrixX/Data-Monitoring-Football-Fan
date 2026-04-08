@@ -83,6 +83,20 @@ class Logger
         ~Logger();
 
 // ============================================================================
+//  Méthode static
+// ============================================================================
+
+    public:
+        /**
+         * @brief Créer une chaine de caractère pour les message de log.
+         * 
+         * @param format Le format de la chaine.
+         * 
+         * @return std::string La chaine de caractère.
+         */
+        static std::string logString(const char * format, ...);
+
+// ============================================================================
 //  Méthodes publiques
 // ============================================================================
 
@@ -92,21 +106,21 @@ class Logger
          *
          * @param message Message à journaliser.
          */
-        void info(const char * message);
+        void info(const std::string & message);
 
         /**
          * @brief Journalise un message de niveau WARNING.
          *
          * @param message Message à journaliser.
          */
-        void warning(const char * message);
+        void warning(const std::string & message);
 
         /**
          * @brief Journalise un message de niveau ERROR.
          *
          * @param message Message à journaliser.
          */
-        void error(const char * message);
+        void error(const std::string & message);
 
 // ============================================================================
 //  Méthodes privées

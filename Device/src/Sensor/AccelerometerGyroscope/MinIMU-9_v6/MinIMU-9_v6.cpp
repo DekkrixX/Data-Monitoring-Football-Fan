@@ -32,9 +32,9 @@ supporterId(supporterId)
 {
     MinIMU_9_v6::logger = new Logger("MinIMU-9 v6", true);
 
-    char str[LOGGER_MAX_MESSAGE_SIZE];
-    snprintf(str, sizeof(str), "[MinIMU-9 V6] Instanciation du capteur %s\n", MinIMU_9_v6::name.c_str());
-    MinIMU_9_v6::logger->info(str);
+#if DEBUG == 1
+    MinIMU_9_v6::logger->info(Logger::logString("[MinIMU-9 V6] Instanciation du capteur %s\n", MinIMU_9_v6::name.c_str()));
+#endif
 }
 
 // ============================================================================
@@ -53,30 +53,9 @@ MinIMU_9_v6::~MinIMU_9_v6()
 
 std::string MinIMU_9_v6::formatData(MinIMU_9_v6Data & data)
 {
-    char str[LOGGER_MAX_MESSAGE_SIZE];
-    snprintf(str, sizeof(str), "[MinIMU-9 V6] formatData - Accelerometre: [ ");
-    for (int i=0; i < 3; i++)
-    {
-        char val[6];
-        snprintf(val, sizeof(val), "%d ", data.accelerometer[i]);
-        strcat(str, val);
-    }
-    strcat(str, "] Gyroscope: [ ");
-    for (int i=0; i < 3; i++)
-    {
-        char val[6];
-        snprintf(val, sizeof(val), "%d ", data.gyroscope[i]);
-        strcat(str, val);
-    }
-    strcat(str, "] Magnetometre: [ ");
-    for (int i=0; i < 3; i++)
-    {
-        char val[6];
-        snprintf(val, sizeof(val), "%d ", data.magnetometer[i]);
-        strcat(str, val);
-    }
-    strcat(str, "]\n");
-    MinIMU_9_v6::logger->info(str);
+#if DEBUG == 1
+    MinIMU_9_v6::logger->info(Logger::logString("[MinIMU-9 V6] formatData - Accelerometre: [%d, %d, %d] Gyroscope: [%d, %d, %d] Magnetometre: [%d, %d, %d]\n", data.accelerometer[0], data.accelerometer[1], data.accelerometer[2], data.gyroscope[0], data.gyroscope[1], data.gyroscope[2], data.magnetometer[0], data.magnetometer[1], data.magnetometer[2]));
+#endif
 
     std::string jsonString;
     JsonDocument json;
@@ -107,11 +86,15 @@ std::string MinIMU_9_v6::formatData(MinIMU_9_v6Data & data)
 
 void MinIMU_9_v6::begin()
 {
-    MinIMU_9_v6::logger->info("[MINIMU-9 V6] begin - Démarrage du capteur");
+#if DEBUG ==1
+    MinIMU_9_v6::logger->info(Logger::logString("[MINIMU-9 V6] begin - Démarrage du capteur\n"));
+#endif
 
     Wire.begin(SDA_PIN, SCL_PIN);
 
-    MinIMU_9_v6::logger->info("[MINIMU-9 V6] begin - Configuration des registres");
+#if DEBUG == 1
+    MinIMU_9_v6::logger->info(Logger::logString("[MINIMU-9 V6] begin - Configuration des registres"));
+#endif
 
     // Configuration des registres
     writeRegister(LSM6DS33_ADDRESS, REGISTER_ACCELEROMETER_NUMBER, REGISTER_ACCELEROMETER_VALUE);
@@ -127,11 +110,15 @@ void MinIMU_9_v6::begin()
 
 void MinIMU_9_v6::end()
 {
-    MinIMU_9_v6::logger->info("[MINIMU-9 V6] end - Arrêt du capteur");
+#if DEBUG == 1
+    MinIMU_9_v6::logger->info(Logger::logString("[MINIMU-9 V6] end - Arrêt du capteur\n"));
+#endif
 
     Sensor::state = ConnectionState::DISCONNECTED;
 
-    MinIMU_9_v6::logger->info("[MINIMU-9 V6] end - Capteur arrêté");
+#if DEBUG == 1
+    MinIMU_9_v6::logger->info(Logger::logString("[MINIMU-9 V6] end - Capteur arrêté\n"));
+#endif
 
     return ;
 }
@@ -140,33 +127,40 @@ void MinIMU_9_v6::end()
 
 void MinIMU_9_v6::update()
 {
-    MinIMU_9_v6::logger->info("[MINIMU-9 V6] update - Mise à jour du capteur");
+#if DEBUG == 1
+    MinIMU_9_v6::logger->info(Logger::logString("[MINIMU-9 V6] update - Mise à jour du capteur\n"));
+#endif
 
     // Lecture de l'accéléromètre
     readRegister(LSM6DS33_ADDRESS, REGISTER_ACCELEROMETER_OUT, this->data.accelerometer);
 
-    char str[LOGGER_MAX_MESSAGE_SIZE];
-    snprintf(str, sizeof(str), "[MINIMU-9 V6] update - Accelerometre: x:%d y:%d z:%d", this->data.accelerometer[0], this->data.accelerometer[1], this->data.accelerometer[2]);
-    MinIMU_9_v6::logger->info(str);
+#if DEBUG == 1
+    MinIMU_9_v6::logger->info(Logger::logString("[MINIMU-9 V6] update - Accelerometre: x:%d y:%d z:%d", this->data.accelerometer[0], this->data.accelerometer[1], this->data.accelerometer[2]));
+#endif
     
     // Lecture du gyroscope
     readRegister(LSM6DS33_ADDRESS, REGISTER_GYROSCOPE_OUT, this->data.gyroscope);
 
-    snprintf(str, sizeof(str), "[MINIMU-9 V6] update - Gyroscope: x:%d y:%d z:%d", this->data.gyroscope[0], this->data.gyroscope[1], this->data.gyroscope[2]);
-    MinIMU_9_v6::logger->info(str);
-    
+#if DEBUG == 1
+    MinIMU_9_v6::logger->info(Logger::logString("[MINIMU-9 V6] update - Gyroscope: x:%d y:%d z:%d", this->data.gyroscope[0], this->data.gyroscope[1], this->data.gyroscope[2]));
+#endif
+
     // Lecture du magnétomètre
     readRegister(LIS3MDL_ADDRESS, REGISTER_MAGNETOMETER_OUT, this->data.magnetometer);
 
-    snprintf(str, sizeof(str), "[MINIMU-9 V6] update - Magnetometre: x:%d y:%d z:%d", this->data.magnetometer[0], this->data.magnetometer[1], this->data.magnetometer[2]);
-    MinIMU_9_v6::logger->info(str);
+#if DEBUG == 1
+    MinIMU_9_v6::logger->info(Logger::logString("[MINIMU-9 V6] update - Magnetometre: x:%d y:%d z:%d", this->data.magnetometer[0], this->data.magnetometer[1], this->data.magnetometer[2]));
+#endif
 
     // Mise à jour des données
     std::string format = MinIMU_9_v6::formatData(this->data);
     Sensor::data = format;
 
-    snprintf(str, sizeof(str), "[MinIMU-9 V6] update - Nouvelle mesure sérialisée: %s", format.c_str()); 
-    MinIMU_9_v6::logger->info(str);
+#if DEBUG == 1
+    MinIMU_9_v6::logger->info(Logger::logString("[MinIMU-9 V6] update - Nouvelle mesure sérialisée: %s", format.c_str()));
+#else
+    MinIMU_9_v6::logger->info(Logger::logString("Accéléromètre: %d,%d,%d\nGyroscope: %d,%d,%d\nMagnétomètre: %d,%d,%d\n", this->data.accelerometer[0], this->data.accelerometer[1], this->data.accelerometer[2], this->data.gyroscope[0], this->data.gyroscope[1], this->data.gyroscope[2], this->data.magnetometer[0], this->data.magnetometer[1], this->data.magnetometer[2]));
+#endif
 
     return ;
 }
@@ -175,9 +169,9 @@ void MinIMU_9_v6::update()
 
 void MinIMU_9_v6::readRegister(uint8_t address, uint8_t registerAddress, int * out)
 {
-    char str[LOGGER_MAX_MESSAGE_SIZE];
-    snprintf(str, sizeof(str), "[MINIMU-9 V6] readRegister - Lecture du registre %d de la transmission %d", registerAddress, address);
-    MinIMU_9_v6::logger->info(str);
+#if DEBUG == 1
+    MinIMU_9_v6::logger->info(Logger::logString("[MINIMU-9 V6] readRegister - Lecture du registre %d de la transmission %d", registerAddress, address));
+#endif
 
     // Initialisation de la transmission
     Wire.beginTransmission(address);
@@ -201,9 +195,9 @@ void MinIMU_9_v6::readRegister(uint8_t address, uint8_t registerAddress, int * o
 
 void MinIMU_9_v6::writeRegister(uint8_t address, uint8_t registerAddress, uint8_t value)
 {
-    char str[LOGGER_MAX_MESSAGE_SIZE];
-    snprintf(str, sizeof(str), "[MINIMU-9 V6] writeRegister - Écriture du registre %d de la transmission %d (valeur %d)", registerAddress, address, value);
-    MinIMU_9_v6::logger->info(str);
+#if DEBUG == 1
+    MinIMU_9_v6::logger->info(Logger::logString("[MINIMU-9 V6] writeRegister - Écriture du registre %d de la transmission %d (valeur %d)", registerAddress, address, value));
+#endif
     
     // Initialisation de la transmission
     Wire.beginTransmission(address);
@@ -215,9 +209,11 @@ void MinIMU_9_v6::writeRegister(uint8_t address, uint8_t registerAddress, uint8_
     // Fin de la transmission
     if (Wire.endTransmission() != 0)
     {
-        char str[LOGGER_MAX_MESSAGE_SIZE];
-        snprintf(str, sizeof(str), "[MINIMU-9 V6] writeRegister - Erreur lors de la transmission %d sur le registre %d", address, registerAddress);
-        throw std::runtime_error("Erreur d'écriture");
+        std::string str = Logger::logString("[MINIMU-9 V6] writeRegister - Erreur lors de la transmission %d sur le registre %d", address, registerAddress);
+#if DEBUG == 1
+        MinIMU_9_v6::logger->error(str);
+#endif
+        throw std::runtime_error(str);
     }
 
     return ;

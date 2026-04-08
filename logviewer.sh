@@ -37,6 +37,9 @@ function usage()
     echo -e "\t-h | --help"
     echo -e "\t\tAffiche cette aide."
     echo -e "\t\tExemple: $name --help"
+    echo -e "\t-d | --data"
+    echo -e "\t\tActive la lecture de log de données."
+    echo -e "\t\tExemple: $name --data data.log"
     echo ""
     echo -e $_WHITE"ARGUMENTS"$_RESET
     echo -e "\t<fichier.log>"
@@ -50,11 +53,6 @@ function usage()
     echo -e "\t${_DIM}Space / b$_RESET          Page suivante / précédente"
     echo -e "\t${_DIM}g / G$_RESET              Aller au début / à la fin"
     echo -e "\t${_DIM}q$_RESET                  Quitter"
-    echo ""
-    echo -e $_WHITE"COLORATION"$_RESET
-    echo -e "\t${_CYAN}[INFO]$_RESET    → Cyan"
-    echo -e "\t${_YELLOW}[WARNING]$_RESET → Jaune"
-    echo -e "\t${_RED}[ERROR]$_RESET   → Rouge"
 
     return
 }
@@ -92,14 +90,6 @@ function checkLogFile()
     if [[ ! -r "$file" ]]
     then
         echo -e $_RED"[ERREUR] Permission refusée pour '$file'."$_RESET >&2
-        exit 1
-    fi
-
-    # Vérification du contenu — au moins une entrée de log reconnue
-    if ! grep -qE "\[(INFO|WARNING|ERROR)\]" "$file"
-    then
-        echo -e $_RED"[ERREUR] '$file' ne contient aucune entrée de log reconnue."$_RESET >&2
-        echo -e $_DIM"Format attendu : [TIMESTAMP] [INFO|WARNING|ERROR] message"$_RESET >&2
         exit 1
     fi
 
@@ -155,11 +145,73 @@ function parseLogFile()
     echo -e "$_WHITE║  Résumé                                                      ║$_RESET"
     echo -e "$_WHITE╠══════════════════════════════════════════════════════════════╣$_RESET"
     echo -e "$_WHITE║  $(printf "%-60s" "Total   : ${countTotal}")║${_RESET}"
-    echo -e "$_WHITE║  $(printf "%-84s" "${_CYAN}INFO$_RESET$_WHITE    : $countInfo")║$_RESET"
-    echo -e "$_WHITE║  $(printf "%-84s" "${_YELLOW}WARNING$_RESET$_WHITE : ${countWarning}")║$_RESET"
-    echo -e "$_WHITE║  $(printf "%-84s" "${_RED}ERROR$_RESET$_WHITE   : ${countError}")║$_RESET"
+    echo -e "$_WHITE║  $(printf "%-86s" "${_CYAN}INFO$_RESET$_WHITE    : $countInfo")║$_RESET"
+    echo -e "$_WHITE║  $(printf "%-86s" "${_YELLOW}WARNING$_RESET$_WHITE : ${countWarning}")║$_RESET"
+    echo -e "$_WHITE║  $(printf "%-86s" "${_RED}ERROR$_RESET$_WHITE   : ${countError}")║$_RESET"
     echo -e "$_WHITE╚══════════════════════════════════════════════════════════════╝$_RESET"
 
+    return
+}
+
+
+
+function parseDataFile()
+{
+    local file="$1"
+ 
+    # Déclarer un tableau associatif
+    declare -A keyCounts
+ 
+    echo -e "$_WHITE╔══════════════════════════════════════════════════════════════╗$_RESET"
+    echo -e "$_WHITE║  $(printf "%-60s" "Fichier : $(basename "$file")")║$_RESET"
+    echo -e "$_WHITE╚══════════════════════════════════════════════════════════════╝$_RESET"
+    echo ""
+
+    # Lire le fichier ligne par ligne
+    while IFS= read -r line; do
+        # Extraire la clé (entre "] " et ":")
+        local key=$(echo "$line" | sed -E 's/^.*\] ([^:]+):.*$/\1/')
+
+        # Incrémenter le compteur si clé non vide
+        if [[ -n "$key" ]]; then
+            ((keyCounts["$key"]++))
+        fi
+
+        if echo "$line" | grep -q "\[INFO\]"
+        then
+            countInfo=$((countInfo + 1))
+            echo -e "$_CYAN$line$_RESET"
+
+        elif echo "$line" | grep -q "\[WARNING\]"
+        then
+            countWarning=$((countWarning + 1))
+            echo -e "$_YELLOW$line$_RESET"
+
+        elif echo "$line" | grep -q "\[ERROR\]"
+        then
+            countError=$((countError + 1))
+            echo -e "$_RED$line$_RESET"
+
+        else
+            # Ligne sans niveau reconnu
+            echo "$line"
+        fi
+    done < "$file"
+ 
+    # Résumé : nombre de lignes par clé
+    echo ""
+    echo -e "$_WHITE╔══════════════════════════════════════════════════════════════╗$_RESET"
+    echo -e "$_WHITE║  Résumé des données                                          ║$_RESET"
+    echo -e "$_WHITE╠══════════════════════════════════════════════════════════════╣$_RESET"
+
+    printf "%s\n" "${!keyCounts[@]}" | sort | while IFS= read -r key
+    do
+        local count=${keyCounts["$key"]}
+        echo -e "$_WHITE║  $(printf "%-87s" "${_MAGENTA}${key}${_RESET}${_WHITE} : ${count} entrée(s)")║$_RESET"
+    done
+ 
+    echo -e "$_WHITE╚══════════════════════════════════════════════════════════════╝$_RESET"
+ 
     return
 }
 
@@ -177,15 +229,32 @@ function main()
     fi
 
     # Vérification du nombre d'arguments
-    if [[ $# -ne 1 ]]
+    if [[ $# -gt 2 ]]
     then
         usage
         exit 1
     fi
 
-    local file="$1"
+    local file=""
+    local mode="log"
+ 
+    for arg in "$@"
+    do
+        if [[ "$arg" == "-d" || "$arg" == "--data" ]]
+        then
+            mode="data"
+        else
+            file="$arg"
+        fi
+    done
 
     # Validation du fichier avant parsing
+    if [[ -z "$file" ]]
+    then
+        echo -e $_RED"[ERREUR] Aucun fichier spécifié."$_RESET >&2
+        usage
+        exit 1
+    fi
     checkLogFile "$file"
 
     # Affichage paginé via less
@@ -193,9 +262,12 @@ function main()
     # -S : désactive le retour à la ligne automatique
     # -N : affiche les numéros de ligne
     # -M : affiche le pourcentage de progression en bas
-    parseLogFile "$file" | less -R -S -N -M --prompt=" Navigation : [Flèches/j/k] Défiler  [Space/b] Page  [g/G] Début/Fin  [q] Quitter  --"
-
-    return
+    if [[ "$mode" == "data" ]]
+    then
+        parseDataFile "$file" | less -R -S -N -M --prompt=" Navigation : [Flèches/j/k] Défiler  [Space/b] Page  [g/G] Début/Fin  [q] Quitter  --"
+    else
+        parseLogFile "$file" | less -R -S -N -M --prompt=" Navigation : [Flèches/j/k] Défiler  [Space/b] Page  [g/G] Début/Fin  [q] Quitter  --"
+    fi
 }
 
 # Lancement du script avec tous les arguments
