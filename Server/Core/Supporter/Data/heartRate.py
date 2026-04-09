@@ -36,7 +36,7 @@ class HeartRateData:
 #  Accesseurs
 # =============================================================================
 
-    def getLatest(self):
+    def getLasted(self):
         ##
         # @brief Retourne la dernière mesure reçue.
         #
@@ -85,7 +85,7 @@ class HeartRateData:
         # @return int  Dernière fréquence cardiaque en bpm.
         # @return None Si aucune mesure n'a encore été reçue.
         ##
-        return self.getLatest()
+        return self.getLasted()
 
 # =============================================================================
 #  Ajout de données

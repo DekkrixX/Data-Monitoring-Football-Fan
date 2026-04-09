@@ -78,6 +78,61 @@ def _getSupporterField(supporterId, field):
 
 
 # =============================================================================
+#  Lecture du fichier stadiumBleacher.json
+# =============================================================================
+
+def _loadStadiumBleacherFile():
+    ##
+    # @brief Charge et retourne le contenu du fichier stadiumBleacher.json.
+    #
+    # @return list Liste de dictionnaires représentant les tribunes.
+    #
+    # @throws RuntimeError Si le fichier est absent ou malformé.
+    ##
+
+    filePath = Config.PATH["data"] + "stadiumBleacher.json"
+
+    try:
+        logger.info(f"[Data] Lecture du fichier tribunes du stade : '{filePath}'")
+
+        with open(filePath, "r") as file:
+            return json.load(file)
+
+    except FileNotFoundError:
+        message = f"[Data] Fichier tribunes du stade introuvable : '{filePath}'"
+        logger.error(message)
+        raise RuntimeError(message)
+
+    except json.JSONDecodeError as e:
+        message = f"[Data] Fichier tribunes du stade invalide (JSON malformé) : '{filePath}'"
+        logger.error(message)
+        raise RuntimeError(message) from e
+
+
+def _getStadiumBleacherField(stadiumBleacherId, field):
+    ##
+    # @brief Retourne la valeur d'un champ donné pour la tribune identifié.
+    #
+    # @param stadiumBleacherId Identifiant de la tribune recherché.
+    # @param field             Nom du champ à retourner (ex : "name", "color").
+    #
+    # @return Valeur du champ pour la tribune correspondant.
+    #
+    # @throws RuntimeError Si aucune tribune ne correspond à l'identifiant.
+    ##
+
+    stadiumBleachers = _loadStadiumBleacherFile()
+
+    for item in stadiumBleachers:
+        if item["id"] == stadiumBleacherId:
+            return item[field]
+
+    message = f"[Data] Aucune tribune de stade trouvé avec l'id '{supporterId}'"
+    logger.error(message)
+    raise RuntimeError(message)
+
+
+# =============================================================================
 #  Accesseurs publics
 # =============================================================================
 
@@ -108,11 +163,38 @@ def getColorOfSupporter(supporterId):
     return _getSupporterField(supporterId, "color")
 
 
+def getNameOfStadiumBleacher(stadiumBleacherId):
+    ##
+    # @brief Retourne le nom de la tribune correspondant à l'identifiant donné.
+    #
+    # @param stadiumBleacherId Identifiant numérique de la tribune.
+    #
+    # @return str Nom de la tribune.
+    #
+    # @throws RuntimeError Si aucune tribune ne correspond à l'identifiant.
+    ##
+    return _getStadiumBleacherField(stadiumBleacherId, "name")
+
+
+def getColorOfStadiumBleacher(stadiumBleacherId):
+    ##
+    # @brief Retourne la couleur de la tribune correspondant à l'identifiant
+    #        donné.
+    #
+    # @param stadiumBleacher Identifiant numérique de la tribune.
+    #
+    # @return str Couleur de la tribune (ex : "#FF0000").
+    #
+    # @throws RuntimeError Si aucune tribune ne correspond à l'identifiant.
+    ##
+    return _getStadiumBleacherField(stadiumBleacherId, "color")
+
+
 # =============================================================================
 #  Formatage pour le client web
 # =============================================================================
 
-def createDataForClient(supporterId, name, color, heartRate):
+def createSupporterDataForClient(supporterId, name, color, heartRate):
     ##
     # @brief Construit le dictionnaire de données envoyé au client web via SocketIO.
     #
@@ -129,4 +211,23 @@ def createDataForClient(supporterId, name, color, heartRate):
         "name":      name,
         "color":     color,
         "heartRate": heartRate,
+    }
+
+def createStadiumBleacherDataForClient(stadiumBleacherId, name, color, accelerometer):
+    ##
+    # @brief Construit le dictionnaire de données envoyé au client web via SocketIO.
+    #
+    # @param stadiumBleacherId Identifiant de la tribune.
+    # @param name              Nom de la tribune.
+    # @param color             Couleur associée à la tribune.
+    # @param accelerometer     Dernière mesure de l'accéléromètre.
+    #
+    # @return dict Données formatées pour le client. Format : { "id": …, "name": …, "color": …, "accelerometer": … }
+    ##
+
+    return {
+        "id":        stadiumBleacherId,
+        "name":      name,
+        "color":     color,
+        "heartRate": accelerometer,
     }

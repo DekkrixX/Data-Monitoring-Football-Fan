@@ -27,12 +27,13 @@ logger = Logger("Serveur/Routes")
 #  Enregistrement des routes
 # =============================================================================
 
-def registerRoutes(app, supporterList):
+def registerRoutes(app, supporterList, stadiumBleacherList):
     ##
     # @brief Enregistre toutes les routes HTTP et les gestionnaires d'erreurs sur l'application Flask.
     #
-    # @param app           Instance Flask de l'application.
-    # @param supporterList Liste partagée des objets Supporter actifs.
+    # @param app                 Instance Flask de l'application.
+    # @param supporterList       Liste partagée des objets Supporter actifs.
+    # @param stadiumBleacherList Liste partagée des objets StadiumBleacher actifs.
     ##
 
     logger.info("[Routes] Enregistrement des routes et gestionnaires d'erreurs")
@@ -49,7 +50,7 @@ def registerRoutes(app, supporterList):
         return render_template("index.html", debug=int(Config.DEBUG))
 
 
-    @app.route("/supporter/<int:supporter_id>")
+    @app.route("/supporter/<int:supporterId>")
     def supporterPage(supporter_id):
         ##
         # @brief Page de détail d'un supporter.
@@ -58,7 +59,7 @@ def registerRoutes(app, supporterList):
         ##
 
         for supporter in supporterList:
-            if supporter.getId() == supporter_id:
+            if supporter.getId() == supporterId:
                 return render_template(
                     "supporter.html",
                     debug=int(Config.DEBUG),
@@ -70,12 +71,28 @@ def registerRoutes(app, supporterList):
         return render_template("supporter.html", debug=int(Config.DEBUG)), 404
 
 
+    @app.route("/stadiumBleacher/<int:stadiumBleacherId>")
+    def stadiumBleacherPage(stadiumBleacherId)
+        ##
+        # @TODO
+        ##
+        return render_template("stadiumBleacher.html", debug=int(Config.DEBUG)), 404
+
+
     @app.route("/comparison")
     def comparisonPage():
         ##
         # @brief Page de comparaison des données de tous les supporters.
         ##
-        return render_template("comparison.html", debug=int(Config.DEBUG))
+        return render_template("comparison.html", debug=int(Config.DEBUG)), 404
+
+
+    @app.route("/comparison/stadiumBleacher")
+    def comparisonStadiumBleacherPage():
+        ##
+        # @TODO
+        ##
+        return render_template("comparisonStadiumBleacher.html", debug=int(Config.DEBUG)), 404
 
 # ==========================================================================
 #  Gestionnaires d'erreurs HTTP

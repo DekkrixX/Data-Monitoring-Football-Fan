@@ -63,6 +63,7 @@ std::string MinIMU_9_v6::formatData(MinIMU_9_v6Data & data)
     // Construction de l'objet JSON avec les données du capteur
     json["t"] = getMQTTTopic(SensorType::ACCELEROMETER_GYROSCOPE);
     json["n"] = MinIMU_9_v6::name;
+    json["bid"] = STADIUM_BLEACHER_ID;
     JsonArray arrayA = json["a"].to<JsonArray>();
     for (int i=0; i < 3; i++)
         arrayA.add(data.accelerometer[i]);

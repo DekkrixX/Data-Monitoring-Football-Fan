@@ -27,12 +27,13 @@ logger = Logger("Serveur/SocketIO")
 #  Enregistrement des gestionnaires SocketIO
 # =============================================================================
 
-def registerSocketioHandlers(socketio, supporterList):
+def registerSocketioHandlers(socketio, supporterList, stadiumBleacherList):
     ##
     # @brief Enregistre tous les gestionnaires d'événements SocketIO.
     #
     # @param socketio      Instance SocketIO de l'application.
     # @param supporterList Liste partagée des objets Supporter actifs.
+    # @param stadiumBleacherList Liste partagée des objets StadiumBleacher actifs.
     ##
 
 # =============================================================================

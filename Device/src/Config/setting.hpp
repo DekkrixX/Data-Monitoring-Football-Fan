@@ -17,6 +17,13 @@
 #define SUPPORTER_ID 0 ///< @brief Identifiant numérique unique du porteur du capteur (0 = Pas de supporter).
 
 // ============================================================================
+//  ID de la tribune du stade
+// ============================================================================
+
+// À MODIFIER
+#define STADIUM_BLEACHER_ID 1 ///< @brief Identifiant numérique unique de la tribune du stade dans laquelle est placé le capteur (0 = Pas de tribune).
+
+// ============================================================================
 //  Paramètres des capteurs
 // ============================================================================
 
