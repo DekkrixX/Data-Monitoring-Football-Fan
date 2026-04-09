@@ -19,7 +19,7 @@ from Server.Config.setting import Config
 from Server.Core.Supporter.supporter import Supporter
 from Server.Core.StadiumBleacher.stadiumBleacher import StadiumBleacher
 from Server.Utils.display import printBanner
-from Server.Utils.data import createSupporterDataForClient, getNameOfSupporter, getColorOfSupporter
+from Server.Utils.data import createSupporterDataForClient, getNameOfSupporter, getColorOfSupporter, createStadiumBleacherDataForClient, getNameOfStadiumBleacher, getColorOfStadiumBleacher
 from Server.Core.mqtt import MQTTClientWrapper
 from Server.Dashboard.routes import registerRoutes
 from Server.Dashboard.socketioHandlers import registerSocketioHandlers
@@ -120,7 +120,7 @@ def _onMqttMessage(message):
     logger.info(f"[Dashboard] Données décodées : {data}")
 
     # Message de supporter
-    if data["sid"] != None:
+    if "sid" in data:
         supporterId = data["sid"]
 
         if not _supporterExists(supporterId):
@@ -129,7 +129,7 @@ def _onMqttMessage(message):
         _addSupporterData(data)
 
     # Message de tribune du stade
-    if data["bid"] != None:
+    if "bid" in data:
         stadiumBleacherId = data["bid"]
 
         if not _stadiumBleacherExists(stadiumBleacherId):
@@ -216,7 +216,7 @@ def _addSupporterData(data):
         if supporter.getId() == supporterId:
             supporter.addData(data)
 
-            payload = createDataForClient(supporter.getId(), name, color, data["hr"])
+            payload = createSupporterDataForClient(supporter.getId(), name, color, data["hr"])
             payload.update({
                 "average": supporter.heartRate.getAverage(),
                 "minimum": supporter.heartRate.getMinimum(),

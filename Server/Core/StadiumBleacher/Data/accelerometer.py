@@ -56,11 +56,7 @@ class AccelerometerData:
         if not self._history:
             return None
 
-        res = ()
-        for i in range(3):
-            res += self._total[i] // len(self._history)
-
-        return res
+        return tuple(self._total[i] // len(self._history) for i in range(3))
 
 
     def getMinimum(self):
@@ -133,15 +129,14 @@ class AccelerometerData:
         for a in accelerometer:
             if a != (-1, -1, -1):
                 self._history.append(a)
-                for i in range(3):
-                    self._total[i] += a[i]
+                self._total = tuple(self._total[i] + a[i] for i in range(3))
 
                 if self._minimum is None:
-                    for i in range(3):
-                        if a[i] < self._minimum[i]:
-                            self._minimum[i] = a[i]
+                    self._minimum = a
+                else:
+                    self._minimum = tuple(min(self._minimum[i], a[i]) for i in range(3))
 
                 if self._maximum is None:
-                    for i in range(3):
-                        if a[i] < self._maximum[i]:
-                            self._maximum[i] = a[i]
+                    self._maximum = a
+                else:
+                    self._maximum = tuple(max(self._maximum[i], a[i]) for i in range(3))

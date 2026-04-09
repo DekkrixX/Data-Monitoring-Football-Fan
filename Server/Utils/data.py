@@ -229,5 +229,5 @@ def createStadiumBleacherDataForClient(stadiumBleacherId, name, color, accelerom
         "id":        stadiumBleacherId,
         "name":      name,
         "color":     color,
-        "heartRate": accelerometer,
+        "accelerometer": accelerometer,
     }

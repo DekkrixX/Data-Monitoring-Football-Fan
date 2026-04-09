@@ -12,7 +12,7 @@
 # =============================================================================
 
 from Server.Config.setting import Config
-from Server.Core.stadiumBleacher.Data.accelermeterData import AccelermeterData
+from Server.Core.StadiumBleacher.Data.accelerometer import AccelerometerData
 from Server.Utils.logger import Logger
 
 # =============================================================================
@@ -46,7 +46,7 @@ class StadiumBleacher:
 
         self.stadiumBleacherId = stadiumBleacherId  ##< @brief Identifiant unique de la tribune du stade.
         self.name              = name               ##< @brief Nom d'affichage de la tribune du stade.
-        self.accelermeter      = AccelermeterData() ##< @brief Données de fréquence cardiaque du supporter.
+        self.accelerometer     = AccelerometerData() ##< @brief Données de fréquence cardiaque du supporter.
 
 # =============================================================================
 #  Accesseurs
@@ -82,8 +82,8 @@ class StadiumBleacher:
 
         dataType = data.get("t")
 
-        if dataType == "accelermeter_gyroscope":
-            self.accelermeter.addData(data["a"])
+        if dataType == "accelerometer_gyroscope":
+            self.accelerometer.addData(data["a"])
         else:
             # Type inconnu : logué mais non bloquant
             logger.warning(f"[StadiumBleacher] Type de données inconnu ignoré : '{dataType}'")

@@ -1,0 +1,42 @@
+[
+    {
+        "id": 1,
+        "name": "Nord",
+        "color": "#E57373"
+    },
+    {
+        "id": 2,
+        "name": "Sud",
+        "color": "#64B5F6"
+    },
+    {
+        "id": 3,
+        "name": "Est",
+        "color": "#81C784"
+    },
+    {
+        "id": 4,
+        "name": "Ouest",
+        "color": "#FFF176"
+    },
+    {
+        "id": 5,
+        "name": "Nord-Est",
+        "color": "#FFB74D"
+    },
+    {
+        "id": 6,
+        "name": "Nord-Ouest",
+        "color": "#F48FB1"
+    },
+    {
+        "id": 7,
+        "name": "Sud-Est",
+        "color": "#BA68C8"
+    },
+    {
+        "id": 8,
+        "name": "Sud-Ouest",
+        "color": "#A1887F"
+    }
+]

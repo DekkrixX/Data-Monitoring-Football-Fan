@@ -14,7 +14,7 @@
 from flask import render_template
 
 from Server.Config.setting import Config
-from Server.Utils.data import getColorOfSupporter
+from Server.Utils.data import getColorOfSupporter, getColorOfStadiumBleacher
 from Server.Utils.logger import Logger
 
 # =============================================================================
@@ -50,7 +50,7 @@ def registerRoutes(app, supporterList, stadiumBleacherList):
         return render_template("index.html", debug=int(Config.DEBUG))
 
 
-    @app.route("/supporter/<int:supporterId>")
+    @app.route("/supporter/<int:supporter_id>")
     def supporterPage(supporter_id):
         ##
         # @brief Page de détail d'un supporter.
@@ -59,7 +59,7 @@ def registerRoutes(app, supporterList, stadiumBleacherList):
         ##
 
         for supporter in supporterList:
-            if supporter.getId() == supporterId:
+            if supporter.getId() == supporter_id:
                 return render_template(
                     "supporter.html",
                     debug=int(Config.DEBUG),
@@ -71,28 +71,41 @@ def registerRoutes(app, supporterList, stadiumBleacherList):
         return render_template("supporter.html", debug=int(Config.DEBUG)), 404
 
 
-    @app.route("/stadiumBleacher/<int:stadiumBleacherId>")
-    def stadiumBleacherPage(stadiumBleacherId)
+    @app.route("/stadiumBleacher/<int:stadium_bleacher_id>")
+    def stadiumBleacherPage(stadium_bleacher_id):
         ##
-        # @TODO
+        # @brief Page de détail d'une tribune.
+        #
+        # @param stadium_bleacher_id Identifiant de la tribune extrait de l'URL. Le type <int:…> garantit la conversion automatique par Flask et la compatibilité avec stadiumBleacher.getId().
         ##
+
+        for stadiumBleacher in stadiumBleacherList:
+            if stadiumBleacher.getId() == stadium_bleacher_id:
+                return render_template(
+                    "stadiumBleacher.html",
+                    debug=int(Config.DEBUG),
+                    id=stadiumBleacher.getId(),
+                    name=stadiumBleacher.getName(),
+                    color=getColorOfStadiumBleacher(stadiumBleacher.getId())
+                )
+
         return render_template("stadiumBleacher.html", debug=int(Config.DEBUG)), 404
 
 
-    @app.route("/comparison")
-    def comparisonPage():
+    @app.route("/comparison/Supporter")
+    def comparisonSupporterPage():
         ##
         # @brief Page de comparaison des données de tous les supporters.
         ##
-        return render_template("comparison.html", debug=int(Config.DEBUG)), 404
+        return render_template("comparisonSupporter.html", debug=int(Config.DEBUG), color="black")
 
 
-    @app.route("/comparison/stadiumBleacher")
+    @app.route("/comparison/StadiumBleacher")
     def comparisonStadiumBleacherPage():
         ##
-        # @TODO
+        # @brief Page de comparaison des données de toutes les tribunes.
         ##
-        return render_template("comparisonStadiumBleacher.html", debug=int(Config.DEBUG)), 404
+        return render_template("comparisonStadiumBleacher.html", debug=int(Config.DEBUG), color="black")
 
 # ==========================================================================
 #  Gestionnaires d'erreurs HTTP

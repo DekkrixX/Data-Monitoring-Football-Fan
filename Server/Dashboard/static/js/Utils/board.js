@@ -54,23 +54,69 @@ export function supporterCard(id, name, color)
     return card;
 }
 
+/**
+ * @brief Crée et retourne une carte HTML cliquable représentant une tribune.
+ *
+ * @param {number} id    Identifiant unique de la tribune.
+ * @param {string} name  Nom d'affichage de la tribune.
+ * @param {string} color Code couleur de la tribune
+ *
+ * @returns {HTMLDivElement} Élément div prêt à être inséré dans le DOM.
+ */
+export function stadiumBleacherCard(id, name, color)
+{
+    if (DEBUG)
+        console.log(`[Board] stadiumBleacherCard - Création de la carte pour la tribune id=${id} (${name})`);
+
+    // Création de la carte
+    const card = document.createElement("div");
+    card.id = "b" + id;
+    card.classList.add("card");
+
+    // Redirection vers la page de détail de la tribune au clic
+    card.addEventListener("click", () =>
+        {
+            if (DEBUG)
+                console.log(`[Board] stadiumBleacherCard - Clic sur la carte du supporter id=${id}, redirection vers /stadiumBleacher/${id}`);
+
+            window.location.href = "/stadiumBleacher/" + id;
+        });
+
+    // Création des éléments texte
+    const pName = document.createElement("p");
+    pName.textContent = name;
+    pName.classList.add("name");
+    pName.style.color = color;
+
+    const pId = document.createElement("p");
+    pId.textContent = "Tribune n°" + id;
+    pId.classList.add("id");
+
+    card.appendChild(pName);
+    card.appendChild(pId);
+
+    return card;
+}
+
 // ============================================================================
 //  Carte comparaison (page d'accueil)
 // ============================================================================
 
 /**
- * @brief Crée et retourne la carte HTML de comparaison entre supporters.
+ * @brief Crée et retourne la carte HTML de comparaison entre supporters ou tribunes.
+ * 
+ * @param type Type de comparaison.
  *
  * @returns {HTMLDivElement} Élément div prêt à être inséré dans le DOM.
  */
-export function comparisonCard()
+export function comparisonCard(type)
 {
     if (DEBUG)
         console.log("[Board] comparisonCard - Création de la carte de comparaison");
 
     // Création de la carte
     const card = document.createElement("div");
-    card.id = "comparison";
+    card.id = "comparison" + type;
     card.classList.add("card");
 
     // Redirection vers la page de comparaison au clic
@@ -79,7 +125,7 @@ export function comparisonCard()
             if (DEBUG)
                 console.log("[Board] comparisonCard - Clic sur la carte de comparaison, redirection vers /comparison");
 
-            window.location.href = "/comparison";
+            window.location.href = "/comparison/" + type;
         });
 
     // Création des éléments texte
