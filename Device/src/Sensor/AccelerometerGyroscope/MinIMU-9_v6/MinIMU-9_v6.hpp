@@ -10,9 +10,9 @@
  * {
  *   "t": "accelerometer_gyroscope",
  *   "n": "MinUMI-9 v6",
- *   "a": [<int>, <int>, <int>],
- *   "g": [<int>, <int>, <int>],
- *   "m": [<int>, <int>, <int>]
+ *   "a": [[<int>, <int>, <int>]],
+ *   "g": [[<int>, <int>, <int>]],
+ *   "m": [[<int>, <int>, <int>]]
  * }
  * @endcode
  */
