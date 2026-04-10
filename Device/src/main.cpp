@@ -31,6 +31,7 @@
 
 #include "./Sensor/HeartRate/PolarH10/PolarH10.hpp"
 #include "./Sensor/AccelerometerGyroscope/MinIMU-9_v6/MinIMU-9_v6.hpp"
+#include "./Sensor/Acoustic/INMP441/INMP441.hpp"
 
 // ============================================================================
 //  Variable globale
@@ -75,8 +76,14 @@ void setup()
     // Démarrage de l'interface UART
     uartManager->begin();
 
+#if SUPPORTER_ID != 0
+#define ID SUPPORTER_ID
+#else
+#define ID STADIUM_BLEACHER_ID
+#endif
+    
     // Initialisation du capteur
-    sensor = new SENSOR(SUPPORTER_ID);
+    sensor = new SENSOR(ID);
 
 #if DEBUG == 1
     logger->info(Logger::logString("[SETUP] Capteur instancié: %s (supporter id: %d)\n", sensor->getSensorName().c_str(), SUPPORTER_ID));

@@ -10,7 +10,8 @@
  * {
  *   "t": "acoustic",
  *   "n": "INMP441",
- *   "db": [<int>],
+ *   "bid": <int>,
+ *   "db": [<float>]
  * }
  * @endcode
  */
@@ -25,6 +26,7 @@
 #include <string>
 #include <Arduino.h>
 #include <ArduinoJson.h>
+#include <driver/i2s.h>
 
 // ============================================================================
 //  Import des headers internes
@@ -41,14 +43,18 @@
 // ============================================================================
 
 /**
- * @defgroup CONFIG_MINIMU_9_V6 Configuration des registres du capteur MinIMU-9 v6
- * @{
+ * @defgroup CONFIG_INMP441 Configuration des échanges de données via I2S
  */
 
+#define I2S_PORT I2S_NUM_0    ///< @brief Port du protocol I2S.
+#define I2S_SAMPLE_RATE 16000 ///< @brief Nombre d'échantillon par seconde.
+#define I2S_BUFFER_SIZE 1024  ///< @brief Taille du buffer d'échange de données.
 
 /*
  * @}
  */
+
+#define RMS_REFERENCE 800 ///< @brief Valeur référence pour la convertion en décibel.
 
 /**
  * @class INMP441
@@ -70,8 +76,8 @@ class INMP441: public Acoustic
          */
         struct INMP441Data
         {
-            int decibelIndex = 0;      ///< @brief Taille courante du buffer de décibel.
-            int decibel[NB_VALUE] = 0; ///< @brief Buffer de décibel en db.
+            int decibelIndex = 0;  ///< @brief Taille courante du buffer de décibel.
+            float decibel[NB_VALUE]; ///< @brief Buffer de décibel en db.
         };
         using INMP441Data = struct INMP441Data;
 
@@ -121,11 +127,12 @@ class INMP441: public Acoustic
         /**
          * @brief Sérialise les données du INMP441 en chaîne JSON.
          * 
-         * @param data Référence vers la stucture INMP441Data à sérialiser.
+         * @param data              Référence vers la stucture INMP441Data à sérialiser.
+         * @param stadiumBleacherId Identifiant de la tribune à inclure dans le JSON.
          * 
          * @return std::string Chaîne JSON terminée par un saut de ligne.
          */
-        static std::string formatData(INMP441Data & data);
+        static std::string formatData(INMP441Data & data, int stadiumBleacherId);
 
 // ============================================================================
 //  Méthode

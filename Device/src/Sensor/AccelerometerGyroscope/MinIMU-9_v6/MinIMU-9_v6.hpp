@@ -106,9 +106,9 @@ class MinIMU_9_v6: public AccelerometerGyroscope
 // ============================================================================
 
     private:
-        MinIMU_9_v6Data data; ///< @brief Dernières données collectées.
+        MinIMU_9_v6Data data;  ///< @brief Dernières données collectées.
         
-        int supporterId; ///< @brief Identifiant du supporter.
+        int stadiumBleacherId; ///< @brief Identifiant de la tribune du stade.
 
 // ============================================================================
 //  Constructeur
@@ -118,7 +118,7 @@ class MinIMU_9_v6: public AccelerometerGyroscope
         /**
          * @brief Construit un capteur MinIMU-9 v6.
          */
-        MinIMU_9_v6(int supporterId);
+        MinIMU_9_v6(int stadiumBleacherId);
 
 // ============================================================================
 //  Destructeur
@@ -139,10 +139,11 @@ class MinIMU_9_v6: public AccelerometerGyroscope
          * @brief Sérialise les données du MinIMU-9 v6 en chaîne JSON.
          * 
          * @param data Référence vers la stucture MinIMU_9_v6Data à sérialiser.
+         * @param stadiumBleacherId Identifiant de la tribune à inclure dans le JSON.
          * 
          * @return std::string Chaîne JSON terminée par un saut de ligne.
          */
-        static std::string formatData(MinIMU_9_v6Data & data);
+        static std::string formatData(MinIMU_9_v6Data & data, int stadiumBleacherId);
 
 // ============================================================================
 //  Méthode

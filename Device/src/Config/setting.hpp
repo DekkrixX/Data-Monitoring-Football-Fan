@@ -30,7 +30,7 @@
 // À MODIFIER
 #define NB_SENSOR 1 ///< @brief Nombre de capteurs total du système.
 
-#define ACQUISITION_TIME 500///< @brief Temps de délais entre les acquisitions du capteur (en miliseconde).
+#define ACQUISITION_TIME 1000///< @brief Temps de délais entre les acquisitions du capteur (en miliseconde).
 
 /**
  * @defgroup Capteur Sélection du capteur actif
@@ -42,7 +42,9 @@
 //#define POLARH10 1 ///< @brief Active le capteur Polar H10.
 #define MAC_ADDRESS "c7:6f:37:f6:01:36" ///< @brief Adresse MAC Bluetooth Low Energy du Polar H10 cible (format "xx:xx:xx:xx:xx:xx").
 
-#define MINIMU_9_V6 1 ///< @brief Active le capteur MinIMU-9 v6.
+//#define MINIMU_9_V6 1 ///< @brief Active le capteur MinIMU-9 v6.
+
+#define _INMP441_ 1 ///< @brief Active le capteur INMP441.
 
 /**
  * @}
@@ -79,14 +81,22 @@
 //  Paramètres I2C
 // ============================================================================
 
-#define SDA_PIN 5 ///< @brief Broche SDA de la carte ESP32
-#define SCL_PIN 6 ///< @brief Broche SCL de la carte ESP32
+#define SDA_PIN 5 ///< @brief Broche SDA de la carte ESP32.
+#define SCL_PIN 6 ///< @brief Broche SCL de la carte ESP32.
+
+// ============================================================================
+//  Paramètres I2S
+// ============================================================================
+
+#define WS_PIN 5  ///< @brief Broche WS de la carte ESP32.
+#define SCK_PIN 6 ///< @brief Broche SCK de la carte ESP32.
+#define SD_PIN 7  ///< @brief Broche SD de la carte ESP32.
 
 // ============================================================================
 //  Paramètres de logs
 // ============================================================================
 
-#define NB_LOGGER                 4 ///< @brief Nombre de logger présent sur la carte
+#define NB_LOGGER                 4 ///< @brief Nombre de logger présent sur la carte.
 #define LOGGER_MAX_MESSAGE_SIZE 256 ///< @brief Taille maximale d'un message de log en caractères.
 
 #if NB_LOGGER <= 0

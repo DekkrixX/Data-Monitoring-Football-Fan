@@ -39,6 +39,27 @@ Le projet de monitoring pour supporters de football a pour objectif de collecter
 - Communication maître-esclave : le maître initie les échanges, l’esclave répond.
 - Supporte des vitesses standard (100kHz), rapide (400kHz), et haute vitesse (3,4MHz).
 
+### I2S
+
+- Protocole filaire dédié à la transmission de données audio numériques entre microcontrôleurs et périphériques audio (microphones, DAC, amplificateurs).
+- Utilise généralement 3 à 4 fils :
+    - BCLK (Bit Clock) : horloge des bits
+    - WS / LRCLK (Word Select) : indique le canal gauche/droite
+    - SD (Serial Data) : données audio
+    - (optionnel) MCLK (Master Clock) : horloge maître pour certains périphériques
+- Transmet des données audio sous forme de flux continu synchronisé, généralement en PCM.
+- Architecture maître-esclave :
+    - Le maître génère les horloges (BCLK, WS)
+    - Le périphérique (micro ou DAC) suit la synchronisation
+- Supporte plusieurs formats audio :
+    - 16, 24 ou 32 bits par échantillon
+    - Mono ou stéréo
+- Fréquences d’échantillonnage courantes :
+    - 8 kHz (voix basse qualité)
+    - 16 kHz (voix)
+    - 44,1 kHz (qualité CD)
+    - 48 kHz (standard audio)
+
 ## Schéma de montage des capteurs
 
 | ![Schéma module LoRa](../Resources/Images/schema_esp32_LoRa.png) |
