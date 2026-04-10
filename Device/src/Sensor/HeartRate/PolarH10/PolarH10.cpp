@@ -380,7 +380,7 @@ void PolarH10::notify(NimBLERemoteCharacteristic * characteristic, uint8_t * dat
 #endif
 
     // Signale une nouvelle donnée disponible uniquement si la valeur est cohérente
-    if (this->data.heartRateIndex > 0)
+    if (this->data.heartRate[this->data.heartRateIndex - 1] > 0)
         this->isNotify = true;
 
     return ;

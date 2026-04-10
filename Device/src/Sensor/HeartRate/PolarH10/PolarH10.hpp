@@ -61,9 +61,6 @@
  * @}
  */
 
-#define NB_VALUE_FOR_SENSOR (DUTY_CYCLE_TIME_FOR_SENSOR / 1000) ///< @brief Nombre de valeur du buffer pour un capteur
-#define NB_VALUE (NB_VALUE_FOR_SENSOR * NB_SENSOR) ///< @brief Nombre de valeur du buffer en fonction du nombre total de capteur
-
 
 
 /**

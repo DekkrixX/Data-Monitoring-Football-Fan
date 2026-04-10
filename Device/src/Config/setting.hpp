@@ -95,6 +95,13 @@
 #define LOGGER_MAX_FILE_SIZE (((1024 * 1024) * 6) / NB_LOGGER) ///< @brief Taille maximale d'un fichier de log en octets.
 #endif
 
+// ============================================================================
+//  Capacité du buffer de données
+// ============================================================================
+
+#define NB_VALUE_FOR_SENSOR (DUTY_CYCLE_TIME_FOR_SENSOR / ACQUISITION_TIME) ///< @brief Nombre de valeur du buffer pour un capteur
+#define NB_VALUE (NB_VALUE_FOR_SENSOR * NB_SENSOR) ///< @brief Nombre de valeur du buffer en fonction du nombre total de capteur
+
 
 
 #endif // _SETTING_HPP_

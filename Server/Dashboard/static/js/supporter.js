@@ -10,7 +10,7 @@
 //  Import des bibliothèques
 // ============================================================================
 
-import { createChart } from "./Utils/board.js";
+import { createSupporterChart } from "./Utils/board.js";
 import { subtractSeconds } from "./Utils/time.js";
 
 // ============================================================================
@@ -25,7 +25,7 @@ if (window.DEBUG)
 // Création du graphique de fréquence cardiaque
 const canva = document.getElementById("chart");
 const ctx   = canva.getContext("2d");
-const chart = createChart(ctx, [{ title: window.name, color: window.color }]);
+const chart = createSupporterChart(ctx, [{ title: window.name, color: window.color }]);
 
 // Demande des données initiales du supporter
 // window.id est utilisé explicitement pour éviter toute ambiguïté avec une

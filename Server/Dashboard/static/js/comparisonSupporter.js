@@ -1,5 +1,5 @@
 /**
- * @file comparison.js
+ * @file comparisonSupporter.js
  *
  * @brief Logique de la page de comparaison des supporters.
  *
@@ -10,7 +10,7 @@
 //  Import des bibliothèques
 // ============================================================================
 
-import { createChart } from "./Utils/board.js";
+import { createSupporterChart } from "./Utils/board.js";
 import { subtractSeconds } from "./Utils/time.js";
 
 // ============================================================================
@@ -20,12 +20,12 @@ import { subtractSeconds } from "./Utils/time.js";
 const socket = io();
 
 if (window.DEBUG)
-    console.log("[Comparison] Initialisation - Demande des données de tous les supporters");
+    console.log("[ComparisonSuporter] Initialisation - Demande des données de tous les supporters");
 
 // Création du graphique multi-courbes (vide au départ, alimenté par les événements)
 const canva = document.getElementById("chart");
 const ctx   = canva.getContext("2d");
-const chart = createChart(ctx, []);
+const chart = createSupporterChart(ctx, []);
 
 // Demande des données initiales de tous les supporters connectés
 socket.emit("getSupporterDataAll");
@@ -42,12 +42,12 @@ socket.emit("getSupporterDataAll");
 socket.on("getSupporterDataAllResponse", (dataList) =>
     {
         if (window.DEBUG)
-            console.log(`[Comparison] getSupporterDataAllResponse - Réception des données de ${dataList.length} supporter(s)`);
+            console.log(`[ComparisonSupporter] getSupporterDataAllResponse - Réception des données de ${dataList.length} supporter(s)`);
 
         for (const data of dataList)
         {
             if (window.DEBUG)
-                console.log(`[Comparison] getSupporterDataAllResponse - Ajout du supporter '${data.name}' (HR=${data.heartRate} bpm)`);
+                console.log(`[ComparisonSupporter] getSupporterDataAllResponse - Ajout du supporter '${data.name}' (HR=${data.heartRate} bpm)`);
 
             _addSupporterToGraphic(chart, data.name, data.color);
             _fillGraphic(chart, data.name, data.heartRate);
@@ -63,7 +63,7 @@ socket.on("getSupporterDataAllResponse", (dataList) =>
 socket.on("newSupporterData", (data) =>
     {
         if (window.DEBUG)
-            console.log(`[Comparison] newSupporterData - Nouvelle mesure pour '${data.name}' (HR=${data.heartRate} bpm)`);
+            console.log(`[ComparisonSupporter] newSupporterData - Nouvelle mesure pour '${data.name}' (HR=${data.heartRate} bpm)`);
 
         _fillGraphic(chart, data.name, data.heartRate);
     });
@@ -77,7 +77,7 @@ socket.on("newSupporterData", (data) =>
 socket.on("supporterConnection", (data) =>
     {
         if (window.DEBUG)
-            console.log(`[Comparison] supporterConnection - Nouveau supporter '${data.name}', ajout de la courbe`);
+            console.log(`[ComparisonSupporter] supporterConnection - Nouveau supporter '${data.name}', ajout de la courbe`);
 
         _addSupporterToGraphic(chart, data.name, data.color);
     });
@@ -90,7 +90,7 @@ socket.on("supporterConnection", (data) =>
 socket.on("supporterDisconnection", (supporterName) =>
     {
         if (window.DEBUG)
-            console.log(`[Comparison] supporterDisconnection - Suppression de la courbe du supporter '${supporterName}'`);
+            console.log(`[ComparisonSupporter] supporterDisconnection - Suppression de la courbe du supporter '${supporterName}'`);
 
         _removeSupporterFromGraphic(chart, supporterName);
     });
@@ -101,7 +101,7 @@ socket.on("supporterDisconnection", (supporterName) =>
 socket.on("serverClose", () =>
     {
         if (window.DEBUG)
-            console.log("[Comparison] serverClose - Fermeture du serveur, redirection vers l'accueil");
+            console.log("[ComparisonSupporter] serverClose - Fermeture du serveur, redirection vers l'accueil");
 
         window.location.href = "/";
     });
@@ -125,7 +125,7 @@ function _fillGraphic(chart, name, heartRate)
     if (index === -1)
     {
         if (window.DEBUG)
-            console.log(`[Comparison] _fillGraphic - Courbe '${name}' introuvable, point ignoré`);
+            console.log(`[ComparisonSupporter] _fillGraphic - Courbe '${name}' introuvable, point ignoré`);
         return;
     }
 
@@ -140,7 +140,7 @@ function _fillGraphic(chart, name, heartRate)
             const timestamp = time.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
 
             if (window.DEBUG)
-                console.log(`[Comparison] _fillGraphic - Ajout du point HR=${heartRate[i]} bpm pour '${name}' à t=${timestamp}`);
+                console.log(`[ComparisonSupporter] _fillGraphic - Ajout du point HR=${heartRate[i]} bpm pour '${name}' à t=${timestamp}`);
 
             chart.data.datasets[index].data.push({ x: timestamp, y: heartRate[i] });
 
@@ -169,12 +169,12 @@ function _addSupporterToGraphic(chart, name, color)
     if (alreadyExists)
     {
         if (window.DEBUG)
-            console.log(`[Comparison] _addSupporterToGraphic - Courbe '${name}' déjà présente, ajout ignoré`);
+            console.log(`[ComparisonSupporter] _addSupporterToGraphic - Courbe '${name}' déjà présente, ajout ignoré`);
         return;
     }
 
     if (window.DEBUG)
-        console.log(`[Comparison] _addSupporterToGraphic - Ajout de la courbe '${name}' (color='${color}')`);
+        console.log(`[ComparisonSupporter] _addSupporterToGraphic - Ajout de la courbe '${name}' (color='${color}')`);
 
     chart.data.datasets.push({
         label:           name,
@@ -203,12 +203,12 @@ function _removeSupporterFromGraphic(chart, name)
     if (index === -1)
     {
         if (window.DEBUG)
-            console.log(`[Comparison] _removeSupporterFromGraphic - Courbe '${name}' introuvable, suppression ignorée`);
+            console.log(`[ComparisonSupporter] _removeSupporterFromGraphic - Courbe '${name}' introuvable, suppression ignorée`);
         return;
     }
 
     if (window.DEBUG)
-        console.log(`[Comparison] _removeSupporterFromGraphic - Suppression de la courbe '${name}'`);
+        console.log(`[ComparisonSupporter] _removeSupporterFromGraphic - Suppression de la courbe '${name}'`);
 
     chart.data.datasets.splice(index, 1);
     chart.update("none");

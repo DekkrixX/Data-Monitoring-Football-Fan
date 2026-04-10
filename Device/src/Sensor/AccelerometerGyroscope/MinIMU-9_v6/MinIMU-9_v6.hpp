@@ -85,9 +85,10 @@ class MinIMU_9_v6: public AccelerometerGyroscope
          */
         struct MinIMU_9_v6Data
         {
-            int accelerometer[3] = {-1, -1, -1}; ///< @brief Données de l'accéléromètre.
-            int gyroscope[3]     = {-1, -1, -1}; ///< @brief Données du gyroscope.
-            int magnetometer[3]  = {-1, -1, -1}; ///< @brief Données du magnétomètre.
+            int dataIndex = 0;                             ///< Taille courante des buffers de données.
+            int accelerometer[NB_VALUE][3] = {-1, -1, -1}; ///< @brief Buffer de données de l'accéléromètre.
+            int gyroscope[NB_VALUE][3]     = {-1, -1, -1}; ///< @brief Buffer de données du gyroscope.
+            int magnetometer[NB_VALUE][3]  = {-1, -1, -1}; ///< @brief Buffer de données du magnétomètre.
         };
         using MinIMU_9_v6Data = struct MinIMU_9_v6Data;
 

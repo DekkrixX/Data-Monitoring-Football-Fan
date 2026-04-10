@@ -27,10 +27,11 @@ class AccelerometerData:
         # @brief Initialise une instance AccelerometerData sans aucune mesure.
         ##
 
-        self._history = []        ##< @brief Historique complet des mesures.
-        self._total   = (0, 0, 0) ##< @brief Somme cumulée des mesures pour le calcul de la moyenne.
-        self._minimum = None      ##< @brief Valeur minimale enregistrée (None si aucune mesure).
-        self._maximum = None      ##< @brief Valeur maximale enregistrée (None si aucune mesure).
+        self._history  = []        ##< @brief Historique complet des mesures.
+        self._lastData = []        ##< @brief Dernier envoi de données par le capteur.
+        self._total    = (0, 0, 0) ##< @brief Somme cumulée des mesures pour le calcul de la moyenne.
+        self._minimum  = None      ##< @brief Valeur minimale enregistrée (None si aucune mesure).
+        self._maximum  = None      ##< @brief Valeur maximale enregistrée (None si aucune mesure).
 
 # =============================================================================
 #  Accesseurs
@@ -81,12 +82,11 @@ class AccelerometerData:
 
     def getAccelerometer(self):
         ##
-        # @brief Alias de getLatest(). Conservé pour compatibilité avec l'existant.
+        # @brief Retourne le dernier envoi de donnée du capteur.
         #
-        # @return (int, int, int) La dernière mesure de l'accélération sur les trois axes.
-        # @return None Si aucune mesure n'a encore été reçue.
+        # @return [(int, int, int)] Dernier envoi de l'accélération.
         ##
-        return self.getLasted()
+        return self._lastData
 
 
     def getLastAccelerationVectorX(self):
@@ -140,3 +140,6 @@ class AccelerometerData:
                     self._maximum = a
                 else:
                     self._maximum = tuple(max(self._maximum[i], a[i]) for i in range(3))
+
+        self._lastData = accelerometer
+        

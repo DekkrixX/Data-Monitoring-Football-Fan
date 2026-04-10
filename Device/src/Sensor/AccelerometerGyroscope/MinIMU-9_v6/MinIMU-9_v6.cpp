@@ -65,14 +65,23 @@ std::string MinIMU_9_v6::formatData(MinIMU_9_v6Data & data)
     json["n"] = MinIMU_9_v6::name;
     json["bid"] = STADIUM_BLEACHER_ID;
     JsonArray arrayA = json["a"].to<JsonArray>();
-    for (int i=0; i < 3; i++)
-        arrayA.add(data.accelerometer[i]);
+    for (int index=0; index < NB_VALUE; index++)
+    {
+        for (int i=0; i < 3; i++)
+            arrayA.add(data.accelerometer[index][i]);
+    }
     JsonArray arrayG = json["g"].to<JsonArray>();
-    for (int i=0; i < 3; i++)
-        arrayG.add(data.gyroscope[i]);
+    for (int index=0; index < NB_VALUE; index++)
+    {
+        for (int i=0; i < 3; i++)
+            arrayA.add(data.gyroscope[index][i]);
+    }
     JsonArray arrayM = json["m"].to<JsonArray>();
-    for (int i=0; i < 3; i++)
-        arrayM.add(data.magnetometer[i]);
+    for (int index=0; index < NB_VALUE; index++)
+    {
+        for (int i=0; i < 3; i++)
+            arrayA.add(data.magnetometer[index][i]);
+    }
 
     // Sérialisation en chaîne JSON + ajout d'un saut de ligne comme délimiteur de message
     serializeJson(json, jsonString);
@@ -133,24 +142,24 @@ void MinIMU_9_v6::update()
 #endif
 
     // Lecture de l'accéléromètre
-    readRegister(LSM6DS33_ADDRESS, REGISTER_ACCELEROMETER_OUT, this->data.accelerometer);
+    readRegister(LSM6DS33_ADDRESS, REGISTER_ACCELEROMETER_OUT, this->data.accelerometer[this->data.dataIndex]);
 
 #if DEBUG == 1
-    MinIMU_9_v6::logger->info(Logger::logString("[MINIMU-9 V6] update - Accelerometre: x:%d y:%d z:%d", this->data.accelerometer[0], this->data.accelerometer[1], this->data.accelerometer[2]));
+    MinIMU_9_v6::logger->info(Logger::logString("[MINIMU-9 V6] update - Accelerometre: x:%d y:%d z:%d", this->data.accelerometer[this->data.dataIndex][0], this->data.accelerometer[this->data.dataIndex][1], this->data.accelerometer[this->data.dataIndex][2]));
 #endif
     
     // Lecture du gyroscope
-    readRegister(LSM6DS33_ADDRESS, REGISTER_GYROSCOPE_OUT, this->data.gyroscope);
+    readRegister(LSM6DS33_ADDRESS, REGISTER_GYROSCOPE_OUT, this->data.gyroscope[this->data.dataIndex]);
 
 #if DEBUG == 1
-    MinIMU_9_v6::logger->info(Logger::logString("[MINIMU-9 V6] update - Gyroscope: x:%d y:%d z:%d", this->data.gyroscope[0], this->data.gyroscope[1], this->data.gyroscope[2]));
+    MinIMU_9_v6::logger->info(Logger::logString("[MINIMU-9 V6] update - Gyroscope: x:%d y:%d z:%d", this->data.gyroscope[this->data.dataIndex][0], this->data.gyroscope[this->data.dataIndex][1], this->data.gyroscope[this->data.dataIndex][2]));
 #endif
 
     // Lecture du magnétomètre
-    readRegister(LIS3MDL_ADDRESS, REGISTER_MAGNETOMETER_OUT, this->data.magnetometer);
+    readRegister(LIS3MDL_ADDRESS, REGISTER_MAGNETOMETER_OUT, this->data.magnetometer[this->data.dataIndex]);
 
 #if DEBUG == 1
-    MinIMU_9_v6::logger->info(Logger::logString("[MINIMU-9 V6] update - Magnetometre: x:%d y:%d z:%d", this->data.magnetometer[0], this->data.magnetometer[1], this->data.magnetometer[2]));
+    MinIMU_9_v6::logger->info(Logger::logString("[MINIMU-9 V6] update - Magnetometre: x:%d y:%d z:%d", this->data.magnetometer[this->data.dataIndex][0], this->data.magnetometer[this->data.dataIndex][1], this->data.magnetometer[this->data.dataIndex][2]));
 #endif
 
     // Mise à jour des données
@@ -160,8 +169,10 @@ void MinIMU_9_v6::update()
 #if DEBUG == 1
     MinIMU_9_v6::logger->info(Logger::logString("[MinIMU-9 V6] update - Nouvelle mesure sérialisée: %s", format.c_str()));
 #else
-    MinIMU_9_v6::logger->info(Logger::logString("Accéléromètre: %d,%d,%d\nGyroscope: %d,%d,%d\nMagnétomètre: %d,%d,%d\n", this->data.accelerometer[0], this->data.accelerometer[1], this->data.accelerometer[2], this->data.gyroscope[0], this->data.gyroscope[1], this->data.gyroscope[2], this->data.magnetometer[0], this->data.magnetometer[1], this->data.magnetometer[2]));
+    MinIMU_9_v6::logger->info(Logger::logString("Accéléromètre: %d,%d,%d\nGyroscope: %d,%d,%d\nMagnétomètre: %d,%d,%d\n", this->data.accelerometer[this->data.dataIndex][0], this->data.accelerometer[this->data.dataIndex][1], this->data.accelerometer[this->data.dataIndex][2], this->data.gyroscope[this->data.dataIndex][0], this->data.gyroscope[this->data.dataIndex][1], this->data.gyroscope[this->data.dataIndex][2], this->data.magnetometer[this->data.dataIndex][0], this->data.magnetometer[this->data.dataIndex][1], this->data.magnetometer[this->data.dataIndex][2]));
 #endif
+
+    this->data.dataIndex++;
 
     return ;
 }

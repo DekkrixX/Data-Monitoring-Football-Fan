@@ -14,7 +14,7 @@
 from flask_socketio import emit
 
 from Server.Config.setting import Config
-from Server.Utils.data import createSupporterDataForClient, getNameOfSupporter, getColorOfSupporter
+from Server.Utils.data import createSupporterDataForClient, getNameOfSupporter, getColorOfSupporter, createStadiumBleacherDataForClient, getNameOfStadiumBleacher, getColorOfStadiumBleacher
 from Server.Utils.logger import Logger
 
 # =============================================================================
@@ -138,7 +138,7 @@ def registerSocketioHandlers(socketio, supporterList, stadiumBleacherList):
 
         for stadiumBleacher in stadiumBleacherList:
             if stadiumBleacher.getId() == int(stadiumBleacherId):
-                payload = createStadiumBleacherDataForClient(supporterId, name, color, stadiumBleacher.accelerometer.getAccelerometer())
+                payload = createStadiumBleacherDataForClient(stadiumBleacherId, name, color, stadiumBleacher.accelerometer.getAccelerometer())
                 payload.update({
                     "average": stadiumBleacher.accelerometer.getAverage(),
                     "minimum": stadiumBleacher.accelerometer.getMinimum(),
