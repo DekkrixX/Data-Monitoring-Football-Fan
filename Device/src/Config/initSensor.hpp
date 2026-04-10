@@ -30,6 +30,9 @@
 #ifdef MINIMU_9_V6
 #define SENSOR MinIMU_9_v6 ///< @brief Alias vers la classe concrète MinIMU_9_v6, résolu à la compilation.
 #endif // MINIMU_9_V6
+#ifdef _INMP441_
+#define SENSOR INMP441 ///< @brief Alias vers la classe concrète MinIMU_9_v6, résolu à la compilation.
+#endif // INMP441
 
 // ============================================================================
 //  Vérification de l'initialisation d'un capteur
@@ -41,6 +44,7 @@
 
 #if POLARH10
   + MINIMU_9_V6 
+  + _INMP441_
  != 1
 #error "Erreur de configuration: Plusieurs capteurs sont définis"
 #endif
@@ -51,6 +55,9 @@
 
 #ifndef SUPPORTER_ID
 #error "Erreur de configuration: Aucun identifiant de supporter"
+#endif
+#ifndef STADIUM_BLEACHER_ID
+#error "Erreur de configuration: Aucun identifiant de tribune"
 #endif
 
 

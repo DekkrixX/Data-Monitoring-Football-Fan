@@ -26,9 +26,9 @@ Logger * MinIMU_9_v6::logger = nullptr;
 //  Constructeur
 // ============================================================================
 
-MinIMU_9_v6::MinIMU_9_v6(int supporterId):
+MinIMU_9_v6::MinIMU_9_v6(int stadiumBleacherId):
 AccelerometerGyroscope(MinIMU_9_v6::name),
-supporterId(supporterId)
+stadiumBleacherId(stadiumBleacherId)
 {
     MinIMU_9_v6::logger = new Logger("MinIMU-9 v6", true);
 
@@ -51,7 +51,7 @@ MinIMU_9_v6::~MinIMU_9_v6()
 //  Méthode static
 // ============================================================================
 
-std::string MinIMU_9_v6::formatData(MinIMU_9_v6Data & data)
+std::string MinIMU_9_v6::formatData(MinIMU_9_v6Data & data, int stadiumBleacherId)
 {
 #if DEBUG == 1
     MinIMU_9_v6::logger->info(Logger::logString("[MinIMU-9 V6] formatData - Accelerometre: [%d, %d, %d] Gyroscope: [%d, %d, %d] Magnetometre: [%d, %d, %d]\n", data.accelerometer[0], data.accelerometer[1], data.accelerometer[2], data.gyroscope[0], data.gyroscope[1], data.gyroscope[2], data.magnetometer[0], data.magnetometer[1], data.magnetometer[2]));
@@ -63,7 +63,7 @@ std::string MinIMU_9_v6::formatData(MinIMU_9_v6Data & data)
     // Construction de l'objet JSON avec les données du capteur
     json["t"] = getMQTTTopic(SensorType::ACCELEROMETER_GYROSCOPE);
     json["n"] = MinIMU_9_v6::name;
-    json["bid"] = STADIUM_BLEACHER_ID;
+    json["bid"] = stadiumBleacherId;
     JsonArray arrayA = json["a"].to<JsonArray>();
     for (int index=0; index < NB_VALUE; index++)
     {
@@ -74,13 +74,13 @@ std::string MinIMU_9_v6::formatData(MinIMU_9_v6Data & data)
     for (int index=0; index < NB_VALUE; index++)
     {
         for (int i=0; i < 3; i++)
-            arrayA.add(data.gyroscope[index][i]);
+            arrayG.add(data.gyroscope[index][i]);
     }
     JsonArray arrayM = json["m"].to<JsonArray>();
     for (int index=0; index < NB_VALUE; index++)
     {
         for (int i=0; i < 3; i++)
-            arrayA.add(data.magnetometer[index][i]);
+            arrayM.add(data.magnetometer[index][i]);
     }
 
     // Sérialisation en chaîne JSON + ajout d'un saut de ligne comme délimiteur de message
@@ -163,7 +163,7 @@ void MinIMU_9_v6::update()
 #endif
 
     // Mise à jour des données
-    std::string format = MinIMU_9_v6::formatData(this->data);
+    std::string format = MinIMU_9_v6::formatData(this->data, this->stadiumBleacherId);
     Sensor::data = format;
 
 #if DEBUG == 1
@@ -173,6 +173,8 @@ void MinIMU_9_v6::update()
 #endif
 
     this->data.dataIndex++;
+    if (this->data.dataIndex == NB_VALUE)
+        this->data.dataIndex = 0;
 
     return ;
 }

@@ -23,7 +23,17 @@ Format d'envoi: JSON
     "t"  : <string>,                       # Type de capteur
     "n"  : <string>,                       # Nom du capteur
     "bid": <int>,                          # Identifiant de la tribune du stade
-    "a"  : [[<int>, <int>, <int>], ...],   # Valeur x,y,z de l'accéléromètre
-    "g"  : [[<int>, <int>, <int>], ...],   # Valeur x,y,z du gyroscope
-    "m"  : [[<int>, <int>, <int>], ...]    # Valeur x,y,z du magnétomètre
+    "a"  : [[<int>, <int>, <int>], ...],   # Liste de valeurs x,y,z de l'accéléromètre
+    "g"  : [[<int>, <int>, <int>], ...],   # Liste de valeurs x,y,z du gyroscope
+    "m"  : [[<int>, <int>, <int>], ...]    # Liste de Valeurs x,y,z du magnétomètre
+}
+
+### INMP441
+
+Format d'envoi: JSON
+{
+    "t"  : <string>,    # Type de capteur
+    "n"  : <string>,    # Nom du capteur
+    "bid": <int>,       # Identifiant de la tribune du stade
+    "db" : [<float>, ...] # Liste de valeurs de décibel
 }

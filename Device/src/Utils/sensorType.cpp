@@ -31,6 +31,9 @@ std::string getMQTTTopic(SensorType type)
         case SensorType::ACCELEROMETER_GYROSCOPE:
             topic = "accelerometer_gyroscope";
             break;
+        case SensorType::ACOUSTIC:
+            topic = "acoustic";
+            break;
         case SensorType::SYSTEM:
             topic = "system";
             break;
