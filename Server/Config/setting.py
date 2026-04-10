@@ -127,6 +127,13 @@ class Config:
     GRAFANA_HOST = os.getenv("GRAFANA_HOST", None)         ##< Hôte du serveur Grafana.
     GRAFANA_PORT = int(os.getenv("GRAFANA_PORT", 0))       ##< Port du serveur Grafana.
 
+# =============================================================================
+#  Délais d'échantillonage des capteurs
+# =============================================================================
+
+    HEART_RATE_SENSOR_DELAY = float(os.getenv("HEART_RATE_SENSOR_DELAY", 0))                                                            ##< Délais d'échantillonage du capteur de fréquence cardiaque.
+    ACCELEROMETER_GYROSCOPE_SENSOR_DELAY = float(os.getenv("ACCELEROMETER_GYROSCOPE_SENSOR_DELAY", 0)) ##< Délais d'échantillonage du capteur accéléromètre gyroscope.
+
 
     @classmethod
     def validate(cls):
@@ -177,6 +184,10 @@ class Config:
             # Grafana
             "GRAFANA_HOST": cls.GRAFANA_HOST,
             "GRAFANA_PORT": cls.GRAFANA_PORT,
+
+            # Délais d'échantillonage des capteurs
+            "HEART_RATE_SENSOR_DELAY": cls.HEART_RATE_SENSOR_DELAY,
+            "ACCELEROMETER_GYROSCOPE_SENSOR_DELAY": cls.ACCELEROMETER_GYROSCOPE_SENSOR_DELAY,
         }
 
         if cls.DEBUG:

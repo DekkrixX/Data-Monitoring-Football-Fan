@@ -219,7 +219,7 @@ function _fillGraphic(chart, accelerometer)
         if (accelerometer[i] != 0)
         { 
             // Heure de la mesure formatée HH:MM:SS comme label de l'axe X
-            const time = new Date(subtractSeconds(now, i));
+            const time = new Date(subtractSeconds(now, i * window.accelerometerGyroscopeSensorDelay));
             const timestamp = time.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
 
             if (window.DEBUG)

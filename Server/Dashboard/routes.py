@@ -65,7 +65,8 @@ def registerRoutes(app, supporterList, stadiumBleacherList):
                     debug=int(Config.DEBUG),
                     id=supporter.getId(),
                     name=supporter.getName(),
-                    color=getColorOfSupporter(supporter.getId())
+                    color=getColorOfSupporter(supporter.getId()),
+                    heartRateSensorDelay=Config.HEART_RATE_SENSOR_DELAY
                 )
 
         return render_template("supporter.html", debug=int(Config.DEBUG)), 404
@@ -86,7 +87,8 @@ def registerRoutes(app, supporterList, stadiumBleacherList):
                     debug=int(Config.DEBUG),
                     id=stadiumBleacher.getId(),
                     name=stadiumBleacher.getName(),
-                    color=getColorOfStadiumBleacher(stadiumBleacher.getId())
+                    color=getColorOfStadiumBleacher(stadiumBleacher.getId()),
+                    accelerometerGyroscopeSensorDelay=Config.ACCELEROMETER_GYROSCOPE_SENSOR_DELAY
                 )
 
         return render_template("stadiumBleacher.html", debug=int(Config.DEBUG)), 404
@@ -97,7 +99,7 @@ def registerRoutes(app, supporterList, stadiumBleacherList):
         ##
         # @brief Page de comparaison des données de tous les supporters.
         ##
-        return render_template("comparisonSupporter.html", debug=int(Config.DEBUG), color="black")
+        return render_template("comparisonSupporter.html", debug=int(Config.DEBUG), color="black", heartRateSensorDelay=Config.HEART_RATE_SENSOR_DELAY)
 
 
     @app.route("/comparison/StadiumBleacher")
@@ -105,7 +107,7 @@ def registerRoutes(app, supporterList, stadiumBleacherList):
         ##
         # @brief Page de comparaison des données de toutes les tribunes.
         ##
-        return render_template("comparisonStadiumBleacher.html", debug=int(Config.DEBUG), color="black")
+        return render_template("comparisonStadiumBleacher.html", debug=int(Config.DEBUG), color="black", accelerometerGyroscopeSensorDelay=Config.ACCELEROMETER_GYROSCOPE_SENSOR_DELAY)
 
 # ==========================================================================
 #  Gestionnaires d'erreurs HTTP

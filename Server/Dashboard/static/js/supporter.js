@@ -180,7 +180,7 @@ function _fillGraphic(chart, heartRate)
         if (heartRate[i] != 0)
         { 
             // Heure de la mesure formatée HH:MM:SS comme label de l'axe X
-            const time = new Date(subtractSeconds(now, i));
+            const time = new Date(subtractSeconds(now, i * window.heartRateSensorDelay));
             const timestamp = time.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
 
             if (window.DEBUG)
