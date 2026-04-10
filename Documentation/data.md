@@ -20,10 +20,10 @@ Format d'envoi: JSON
 
 Format d'envoi: JSON
 {
-    "t"  : <string>,                # Type de capteur
-    "n"  : <string>,                # Nom du capteur
-    "bid": <int>,                   # Identifiant de la tribune du stade
-    "a"  : [<int>, <int>, <int>],   # Valeur x,y,z de l'accéléromètre
-    "g"  : [<int>, <int>, <int>],   # Valeur x,y,z du gyroscope
-    "m"  : [<int>, <int>, <int>]    # Valeur x,y,z du magnétomètre
+    "t"  : <string>,                       # Type de capteur
+    "n"  : <string>,                       # Nom du capteur
+    "bid": <int>,                          # Identifiant de la tribune du stade
+    "a"  : [[<int>, <int>, <int>], ...],   # Valeur x,y,z de l'accéléromètre
+    "g"  : [[<int>, <int>, <int>], ...],   # Valeur x,y,z du gyroscope
+    "m"  : [[<int>, <int>, <int>], ...]    # Valeur x,y,z du magnétomètre
 }
