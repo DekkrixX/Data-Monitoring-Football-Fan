@@ -26,5 +26,8 @@ Le projet de monitoring pour supporters de football est la réalisation d'une co
 ## Fonctionnalitées du projet
 
 - Collect de la fréquence cardiaque
+- Collect de données de mouvement
+- Collect de données acoustique
 - Collect d'information système
-- Affichage des statistiques de la fréquance cardiaque de tous les utilisateurs
+- Affichage des statistiques des données des utilisateurs
+- Affichage des statistiques des données des tribunes du stade
