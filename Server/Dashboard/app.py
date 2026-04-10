@@ -17,8 +17,9 @@ from flask_socketio import SocketIO
 
 from Server.Config.setting import Config
 from Server.Core.Supporter.supporter import Supporter
+from Server.Core.StadiumBleacher.stadiumBleacher import StadiumBleacher
 from Server.Utils.display import printBanner
-from Server.Utils.data import createDataForClient, getNameOfSupporter, getColorOfSupporter
+from Server.Utils.data import createSupporterDataForClient, getNameOfSupporter, getColorOfSupporter, createStadiumBleacherDataForClient, getNameOfStadiumBleacher, getColorOfStadiumBleacher
 from Server.Core.mqtt import MQTTClientWrapper
 from Server.Dashboard.routes import registerRoutes
 from Server.Dashboard.socketioHandlers import registerSocketioHandlers
@@ -36,6 +37,8 @@ logger = Logger("Serveur/App")
 
 ## @brief Liste des supporters actifs, alimentée par les messages MQTT.
 supporterList = []
+## @brief Liste des tribunes du stade actives, alimentée par les messages MQTT.
+stadiumBleacherList = []
 ## @brief Instance SocketIO partagée entre main() et les callbacks MQTT.
 socketio = None
 
@@ -64,8 +67,8 @@ def main():
     app      = _createFlaskApp()
     socketio = SocketIO(app, cors_allowed_origins="*", async_mode="threading")
 
-    registerRoutes(app, supporterList)
-    registerSocketioHandlers(socketio, supporterList)
+    registerRoutes(app, supporterList, stadiumBleacherList)
+    registerSocketioHandlers(socketio, supporterList, stadiumBleacherList)
 
     # Connexion au broker MQTT pour recevoir les données des supporters en temps réel
     mqttClient = MQTTClientWrapper(
@@ -116,12 +119,23 @@ def _onMqttMessage(message):
 
     logger.info(f"[Dashboard] Données décodées : {data}")
 
-    supporterId = data["id"]
+    # Message de supporter
+    if "sid" in data:
+        supporterId = data["sid"]
 
-    if not _supporterExists(supporterId):
-        _createSupporter(supporterId)
+        if not _supporterExists(supporterId):
+            _createSupporter(supporterId)
 
-    _addSupporterData(data)
+        _addSupporterData(data)
+
+    # Message de tribune du stade
+    if "bid" in data:
+        stadiumBleacherId = data["bid"]
+
+        if not _stadiumBleacherExists(stadiumBleacherId):
+            _createStadiumBleacher(stadiumBleacherId)
+
+        _addStadiumBleacherData(data)
 
 
 # =============================================================================
@@ -183,7 +197,7 @@ def _createSupporter(supporterId):
     supporterList.append(Supporter(supporterId, name))
 
     # heartRate=0: valeur initiale avant la première mesure
-    payload = createDataForClient(supporterId, name, color, 0)
+    payload = createSupporterDataForClient(supporterId, name, color, 0)
     socketio.emit("supporterConnection", payload)
 
 
@@ -194,7 +208,7 @@ def _addSupporterData(data):
     # @param data Dictionnaire de données reçu depuis le broker MQTT.
     ##
 
-    supporterId = data["id"]
+    supporterId = data["sid"]
     name        = getNameOfSupporter(supporterId)
     color       = getColorOfSupporter(supporterId)
 
@@ -202,7 +216,7 @@ def _addSupporterData(data):
         if supporter.getId() == supporterId:
             supporter.addData(data)
 
-            payload = createDataForClient(supporter.getId(), name, color, data["hr"])
+            payload = createSupporterDataForClient(supporter.getId(), name, color, data["hr"])
             payload.update({
                 "average": supporter.heartRate.getAverage(),
                 "minimum": supporter.heartRate.getMinimum(),
@@ -213,6 +227,75 @@ def _addSupporterData(data):
             return
 
     logger.warning(f"[Dashboard] Données reçues pour un supporter inconnu (id={supporterId}), message ignoré")
+
+
+# =============================================================================
+#  Gestion des tribunes du stade
+# =============================================================================
+
+def _stadiumBleacherExists(stadiumBleacherId):
+    ##
+    # @brief Indique si un StadiumBleacher avec cet identifiant est déjà présent
+    #        dans stadiumBleacherList.
+    #
+    # @param stadiumeBleacherId Identifiant de la tribune recherché.
+    #
+    # @return bool True si la tribune existe, False sinon.
+    ##
+
+    for stadiumBleacher in stadiumBleacherList:
+        if stadiumBleacher.getId() == stadiumBleacherId:
+            return True
+    return False
+
+
+def _createStadiumBleacher(stadiumBleacherId):
+    ##
+    # @brief Crée un nouveau StadiumBleacher, l'ajoute à stadiumBleacherList et notifie les clients web de sa connexion via SocketIO.
+    #
+    # @param stadiumBleacher Identifiant de la nouvelle tribune.
+    ##
+
+    global socketio
+
+    logger.info(f"[Dashboard] Nouvelle tribune détecté (id={stadiumBleacherId})")
+
+    name  = getNameOfStadiumBleacher(stadiumBleacherId)
+    color = getColorOfStadiumBleacher(stadiumBleacherId)
+
+    stadiumBleacherList.append(StadiumBleacher(stadiumBleacherId, name))
+
+    # accelerometer=(-1, -1, -1): valeur initiale avant la première mesure
+    payload = createStadiumBleacherDataForClient(stadiumBleacherId, name, color, (-1, -1, -1))
+    socketio.emit("stadiumBleacherConnection", payload)
+
+
+def _addStadiumBleacherData(data):
+    ##
+    # @brief Enregistre une nouvelle mesure pour la tribune correspondant et pousse la mise à jour aux clients web via SocketIO.
+    #
+    # @param data Dictionnaire de données reçu depuis le broker MQTT.
+    ##
+
+    stadiumBleacherId = data["bid"]
+    name              = getNameOfStadiumBleacher(stadiumBleacherId)
+    color             = getColorOfStadiumBleacher(stadiumBleacherId)
+
+    for stadiumBleacher in stadiumBleacherList:
+        if stadiumBleacher.getId() == stadiumBleacherId:
+            stadiumBleacher.addData(data)
+
+            payload = createStadiumBleacherDataForClient(stadiumBleacher.getId(), name, color, data["a"])
+            payload.update({
+                "average": stadiumBleacher.accelerometer.getAverage(),
+                "minimum": stadiumBleacher.accelerometer.getMinimum(),
+                "maximum": stadiumBleacher.accelerometer.getMaximum(),
+            })
+
+            socketio.emit("newStadiumBleacherData", payload)
+            return
+
+    logger.warning(f"[Dashboard] Données reçues pour une tribune inconnu (id={stadiumBleacherId}), message ignoré")
 
 
 # =============================================================================

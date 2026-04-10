@@ -27,16 +27,17 @@ class HeartRateData:
         # @brief Initialise une instance HeartRateData sans aucune mesure.
         ##
 
-        self._history = []    ##< @brief Historique complet des mesures en bpm.
-        self._total   = 0     ##< @brief Somme cumulée des mesures pour le calcul de la moyenne.
-        self._minimum = None  ##< @brief Valeur minimale enregistrée (None si aucune mesure).
-        self._maximum = None  ##< @brief Valeur maximale enregistrée (None si aucune mesure).
+        self._history  = []    ##< @brief Historique complet des mesures en bpm.
+        self._lastData = []    ##< @brief Dernier envoi de données par le capteur.
+        self._total    = 0     ##< @brief Somme cumulée des mesures pour le calcul de la moyenne.
+        self._minimum  = None  ##< @brief Valeur minimale enregistrée (None si aucune mesure).
+        self._maximum  = None  ##< @brief Valeur maximale enregistrée (None si aucune mesure).
 
 # =============================================================================
 #  Accesseurs
 # =============================================================================
 
-    def getLatest(self):
+    def getLasted(self):
         ##
         # @brief Retourne la dernière mesure reçue.
         #
@@ -80,12 +81,11 @@ class HeartRateData:
 
     def getHeartRate(self):
         ##
-        # @brief Alias de getLatest(). Conservé pour compatibilité avec l'existant.
+        # @brief Retourne le dernier envoi de donnée du capteur.
         #
-        # @return int  Dernière fréquence cardiaque en bpm.
-        # @return None Si aucune mesure n'a encore été reçue.
+        # @return [int] Dernier envoi de la fréquence cardiaque en bpm.
         ##
-        return self.getLatest()
+        return self._lastData
 
 # =============================================================================
 #  Ajout de données
@@ -108,3 +108,5 @@ class HeartRateData:
 
                 if self._maximum is None or hr > self._maximum:
                     self._maximum = hr
+
+        self._lastData = heartRate

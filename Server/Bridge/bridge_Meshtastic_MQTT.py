@@ -82,7 +82,7 @@ def main():
         meshtasticClient.waitForever()
 
     except KeyboardInterrupt:
-        logger.info("\n[Bridge Meshtastic-MQTT] Arrêt demandé par l'utilisateur (Ctrl+C)")
+        logger.info("[Bridge Meshtastic-MQTT] Arrêt demandé par l'utilisateur (Ctrl+C)")
 
         meshtasticClient.close()
         mqttClient.stop()

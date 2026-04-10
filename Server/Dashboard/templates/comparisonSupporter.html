@@ -5,6 +5,12 @@
         <title>Comparaison</title>
         <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
         <link rel="stylesheet" href="{{ url_for('static', filename='css/comparaison.css') }}">
+        <style>
+            :root 
+            {
+                --color: {{ color }};
+            }
+        </style>
     </head>
     <body>
         <header>
@@ -19,7 +25,8 @@
         <script>
             // Définition des variables dynamiques
             window.DEBUG = {{ debug }};
+            window.heartRateSensorDelay = {{ heartRateSensorDelay }};
         </script>
-        <script type="module" src="{{ url_for('static', filename='js/comparison.js') }}"></script>
+        <script type="module" src="{{ url_for('static', filename='js/comparisonSupporter.js') }}"></script>
     </body>
 </html>

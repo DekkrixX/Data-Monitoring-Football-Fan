@@ -2,9 +2,9 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>Supporter n°{{ id }}</title>
+        <title>Tribune n°{{ id }}</title>
         <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/supporter.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/stadiumBleacher.css') }}">
         <style>
             :root 
             {
@@ -15,13 +15,13 @@
     <body>
         <header>
             <h2>{{ name }}</h2>
-            <h1>Supporter n°{{ id }}</h1>
+            <h1>Tribune n°{{ id }}</h1>
             <a href="/" class="button">← Retour</a>
         </header>
         <div id="grid">
             <div class="card">
-                <p id="heart-rate" class="value">-</p>
-                <p class="label">BPM</p>
+                <p id="accelerometer" class="value">-</p>
+                <p class="label">Accéléromètre</p>
             </div>
             <div class="card">
                 <p id="average" class="value">-</p>
@@ -47,8 +47,8 @@
             window.id = {{ id }};
             window.name = "{{ name }}";
             window.color = "{{ color }}";
-            window.heartRateSensorDelay = {{ heartRateSensorDelay }};
+            window.accelerometerGyroscopeSensorDelay = {{ accelerometerGyroscopeSensorDelay }};
         </script>
-        <script type="module" src="{{ url_for('static', filename='js/supporter.js') }}"></script>
+        <script type="module" src="{{ url_for('static', filename='js/stadiumBleacher.js') }}"></script>
     </body>
 </html>

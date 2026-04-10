@@ -11,7 +11,7 @@
 //  Import des bibliothèques
 // ============================================================================
 
-#include "Logger.hpp"
+#include "./Logger.hpp"
 
 // ============================================================================
 //  Constructeur
@@ -27,18 +27,17 @@ filePath(std::string("/Logs/") + name + ".log")
     if (stat("/littlefs/Logs", &st) != 0)
     {
         mkdir("/littlefs/Logs", 0755);
-        if (DEBUG)
-        {
-            Serial.println("[Logger] Dossier /Logs créé");
-            Serial.flush();
-        }
+
+#if DEBUG == 1
+        Serial.println("[Logger] Dossier /Logs créé");
+        Serial.flush();
+#endif
     }
 
-    if (DEBUG)
-    {
-        Serial.printf("[Logger] Logger '%s' initialisé (fichier=%s)\n", name, fileEnabled ? filePath.c_str() : "désactivé");
-        Serial.flush();
-    }
+#if DEBUG == 1
+    Serial.printf("[Logger] Logger '%s' initialisé (fichier=%s)\n", name, fileEnabled ? filePath.c_str() : "désactivé");
+    Serial.flush();
+#endif
 }
 
 // ============================================================================
@@ -48,28 +47,43 @@ filePath(std::string("/Logs/") + name + ".log")
 Logger::~Logger() = default;
 
 // ============================================================================
+//  Méthode static
+// ============================================================================
+
+std::string Logger::logString(const char * format, ...)
+{
+    va_list args;
+    va_start(args, format);
+    char buffer[LOGGER_MAX_MESSAGE_SIZE];
+    std::vsnprintf(buffer, sizeof(buffer), format, args);
+    va_end(args);
+
+    return std::string(buffer);
+}
+
+// ============================================================================
 //  Méthodes publiques
 // ============================================================================
 
-void Logger::info(const char * message)
+void Logger::info(const std::string & message)
 {
-    this->write(Level::INFO, message);
+    this->write(Level::INFO, message.c_str());
     return ;
 }
 
 
 
-void Logger::warning(const char * message)
+void Logger::warning(const std::string & message)
 {
-    this->write(Level::WARNING, message);
+    this->write(Level::WARNING, message.c_str());
     return ;
 }
 
 
 
-void Logger::error(const char * message)
+void Logger::error(const std::string & message)
 {
-    this->write(Level::ERROR, message);
+    this->write(Level::ERROR, message.c_str());
     return ;
 }
 
@@ -110,9 +124,12 @@ void Logger::writeFile(const char * entry)
     // Vérification que l'entrée seule ne dépasse pas la limite
     if (entrySize > LOGGER_MAX_FILE_SIZE)
     {
+#if DEBUG == 1
         Serial.printf("[Logger] ERREUR : entrée trop grande pour '%s' (%u > %u)\n",
             this->filePath.c_str(), (unsigned)entrySize, (unsigned)LOGGER_MAX_FILE_SIZE);
         Serial.flush();
+#endif
+
         return ;
     }
 
@@ -132,9 +149,12 @@ void Logger::writeFile(const char * entry)
 
     if (!fp)
     {
+#if DEBUG == 1
         Serial.printf("[Logger] ERREUR : fopen failed pour '%s' (errno=%d)\n",
             posixPath.c_str(), errno);
         Serial.flush();
+#endif
+
         return ;
     }
 
@@ -157,9 +177,12 @@ void Logger::trimFile(size_t entrySize)
 
     if (!fp)
     {
+#if DEBUG == 1
         Serial.printf("[Logger] ERREUR : impossible d'ouvrir '%s' pour trim (errno=%d)\n",
             posixPath.c_str(), errno);
         Serial.flush();
+#endif
+
         return ;
     }
 
@@ -172,10 +195,14 @@ void Logger::trimFile(size_t entrySize)
 
     if (!content)
     {
+#if DEBUG == 1
         Serial.printf("[Logger] ERREUR : ps_malloc(%u) échoué pour trim de '%s'\n",
             (unsigned)(fileSize + 1), posixPath.c_str());
         Serial.flush();
+#endif
+
         fclose(fp);
+        
         return ;
     }
 
@@ -213,10 +240,14 @@ void Logger::trimFile(size_t entrySize)
 
     if (!fpw)
     {
+#if DEBUG == 1
         Serial.printf("[Logger] ERREUR : impossible de réécrire '%s' après trim (errno=%d)\n",
             posixPath.c_str(), errno);
         Serial.flush();
+#endif
+
         free(content);
+        
         return ;
     }
 
@@ -227,9 +258,9 @@ void Logger::trimFile(size_t entrySize)
     fflush(fpw);
     fclose(fpw);
 
-    if (DEBUG)
-        Serial.printf("[Logger] Trim '%s' : %u octets supprimés en tête\n",
-            this->filePath.c_str(), (unsigned)offset);
+#if DEBUG == 1
+    Serial.printf("[Logger] TrimFile '%s' : %u octets supprimés en tête\n", this->filePath.c_str(), (unsigned)offset);
+#endif
 
     return ;
 }

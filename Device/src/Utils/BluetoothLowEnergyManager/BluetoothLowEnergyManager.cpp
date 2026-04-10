@@ -53,22 +53,19 @@ BluetoothLowEnergyManager::~BluetoothLowEnergyManager()
 
 void BluetoothLowEnergyManager::notifyCallback(NimBLERemoteCharacteristic * pRemoteCharacteristic, uint8_t * pData, size_t length, bool isNotify)
 {
-    if (DEBUG)
-    {
-        char str[LOGGER_MAX_MESSAGE_SIZE];
-        snprintf(str, sizeof(str), "[BLE] notifyCallback - Caractéristique: %s, %s, %u octet(s)\n", pRemoteCharacteristic->getUUID().toString().c_str(), isNotify ? "NOTIFY" : "INDICATE", length);
-        BluetoothLowEnergyManager::logger->info(str);
+#if DEBUG == 1
+    BluetoothLowEnergyManager::logger->info(Logger::logString("[BLE] notifyCallback - Caractéristique: %s, %s, %u octet(s)\n", pRemoteCharacteristic->getUUID().toString().c_str(), isNotify ? "NOTIFY" : "INDICATE", length));
 
-        // Affichage hexadécimal des données brutes reçues
-        snprintf(str, sizeof(str), "[BLE] Données brutes: ");
-        for (size_t i = 0; i < length; i++)
-        {
-            char val[5];
-            snprintf(val, sizeof(val), "%02X ", pData[i]);
-            strcat(str, val);
-        }
-        BluetoothLowEnergyManager::logger->info(str);
+    // Affichage hexadécimal des données brutes reçues
+    char str[LOGGER_MAX_MESSAGE_SIZE];
+    for (size_t i = 0; i < length; i++)
+    {
+        char val[5];
+        snprintf(val, sizeof(val), "%02X ", pData[i]);
+        strcat(str, val);
     }
+    BluetoothLowEnergyManager::logger->info(Logger::logString("[BLE] Données brutes: %s\n", str));
+#endif
 
     // Délégation du traitement au capteur actif
     sensor->notify(pRemoteCharacteristic, pData, length);
@@ -82,13 +79,17 @@ void BluetoothLowEnergyManager::notifyCallback(NimBLERemoteCharacteristic * pRem
 
 void BluetoothLowEnergyManager::begin()
 {
-    BluetoothLowEnergyManager::logger->info("[BLE] begin - Initialisation de la pile NimBLE");
+#if DEBUG == 1
+    BluetoothLowEnergyManager::logger->info(Logger::logString("[BLE] begin - Initialisation de la pile NimBLE\n"));
+#endif
 
     // Initialisation du stack Bluetooth Low Energy (NimBLE)
     if (not NimBLEDevice::init(""))
     {
-        char str[LOGGER_MAX_MESSAGE_SIZE] = "[BLE] begin - Échec de l'initialisation de la pile NimBLE";
+        std::string str = Logger::logString("[BLE] begin - Échec de l'initialisation de la pile NimBLE\n");
+#if DEBUG == 1
         BluetoothLowEnergyManager::logger->error(str);
+#endif
         throw std::runtime_error(str);
     }
 
@@ -97,8 +98,10 @@ void BluetoothLowEnergyManager::begin()
 
     if (not this->client)
     {
-        char str[LOGGER_MAX_MESSAGE_SIZE] = "[BLE] begin - Échec de la création du client GATT";
+        std::string str = Logger::logString("[BLE] begin - Échec de la création du client GATT\n");
+#if DEBUG == 1
         BluetoothLowEnergyManager::logger->error(str);
+#endif
         throw std::runtime_error(str);
     }
 
@@ -106,7 +109,9 @@ void BluetoothLowEnergyManager::begin()
     this->clientCallbacks = new ClientCallbacks(this);
     this->client->setClientCallbacks(this->clientCallbacks);
 
-    BluetoothLowEnergyManager::logger->info("[BLE] begin - Client GATT créé, démarrage du scan");
+#if DEBUG == 1
+    BluetoothLowEnergyManager::logger->info(Logger::logString("[BLE] begin - Client GATT créé, démarrage du scan\n"));
+#endif
 
     // Démarrage du scan pour trouver le périphérique cible
     this->startScan();
@@ -118,7 +123,9 @@ void BluetoothLowEnergyManager::begin()
 
 void BluetoothLowEnergyManager::end()
 {
-    BluetoothLowEnergyManager::logger->info("[BLE] end - Arrêt du gestionnaire Bluetooth Low Energy");
+#if DEBUG == 1
+    BluetoothLowEnergyManager::logger->info(Logger::logString("[BLE] end - Arrêt du gestionnaire Bluetooth Low Energy\n"));
+#endif
 
     // Libération des callbacks avant la destruction de NimBLE
     if (this->scanCallbacks != nullptr)
@@ -130,7 +137,9 @@ void BluetoothLowEnergyManager::end()
     if (NimBLEDevice::isInitialized())
         NimBLEDevice::deinit(true);
 
-    BluetoothLowEnergyManager::logger->info("[BLE] end - Gestionnaire Bluetooth Low Energy arrêté");
+#if DEBUG == 1
+    BluetoothLowEnergyManager::logger->info(Logger::logString("[BLE] end - Gestionnaire Bluetooth Low Energy arrêté\n"));
+#endif
 
     return ;
 }
@@ -145,9 +154,9 @@ void BluetoothLowEnergyManager::update()
         // Si le scan s'est arrêté sans trouver la cible, on le relance
         if (not this->scan->isScanning())
         {
-            char str[LOGGER_MAX_MESSAGE_SIZE];
-            snprintf(str, sizeof(str), "[BLE] update - Périphérique cible (%s) non trouvé, relance du scan\n", this->macAddress.c_str());
-            BluetoothLowEnergyManager::logger->info(str);
+#if DEBUG == 1
+            BluetoothLowEnergyManager::logger->info(Logger::logString("[BLE] update - Périphérique cible (%s) non trouvé, relance du scan\n", this->macAddress.c_str()));
+#endif
 
             if (this->device)
                 delete this->device;
@@ -162,9 +171,9 @@ void BluetoothLowEnergyManager::update()
     // Périphérique trouvé mais pas encore connecté: tentative de connexion
     if (not this->isConnected())
     {
-        char str[LOGGER_MAX_MESSAGE_SIZE];
-        snprintf(str, sizeof(str), "[BLE] update - Périphérique trouvé, tentative de connexion à %s\n", this->macAddress.c_str());
-        BluetoothLowEnergyManager::logger->info(str);
+#if DEBUG == 1
+        BluetoothLowEnergyManager::logger->info(Logger::logString("[BLE] update - Périphérique trouvé, tentative de connexion à %s\n", this->macAddress.c_str()));
+#endif
 
         this->connection(this->device);
     }
@@ -183,15 +192,17 @@ bool BluetoothLowEnergyManager::isConnected()
 
 NimBLEAttValue BluetoothLowEnergyManager::getValue(const std::string & uuidService, const std::string & uuidCharacteristic)
 {
-    char str[LOGGER_MAX_MESSAGE_SIZE];
-    snprintf(str, sizeof(str), "[BLE] getValue - Lecture de la caractéristique %s (service: %s)\n", uuidCharacteristic.c_str(), uuidService.c_str());
-    BluetoothLowEnergyManager::logger->info(str);
+#if DEBUG == 1
+    BluetoothLowEnergyManager::logger->info(Logger::logString("[BLE] getValue - Lecture de la caractéristique %s (service: %s)\n", uuidCharacteristic.c_str(), uuidService.c_str()));
+#endif
 
     // Vérification de la connection du client
     if (not this->isConnected())
     {
-        char str[LOGGER_MAX_MESSAGE_SIZE] = "[BLE] getValue - Client non connecté, lecture impossible";
+        std::string str = Logger::logString("[BLE] getValue - Client non connecté, lecture impossible\n");
+#if DEBUG == 1
         BluetoothLowEnergyManager::logger->error(str);
+#endif
         throw std::runtime_error(str);
     }
 
@@ -205,16 +216,19 @@ NimBLEAttValue BluetoothLowEnergyManager::getValue(const std::string & uuidServi
 
     if (not characteristic->canRead())
     {
-        std::string str = "[BLE] getValue - La caractéristique " + uuidCharacteristic + " ne supporte pas la lecture";
-        BluetoothLowEnergyManager::logger->error(str.c_str());
-        throw std::invalid_argument(str.c_str());
+        std::string str = Logger::logString("[BLE] getValue - La caractéristique %s ne supporte pas la lecture\n", uuidCharacteristic.c_str());
+#if DEBUG == 1
+        BluetoothLowEnergyManager::logger->error(str);
+#endif
+        throw std::invalid_argument(str);
     }
 
     // Récupération de la valeur de la caractéristique
     NimBLEAttValue value = service->getValue(uuid);
 
-    snprintf(str, sizeof(str), "[BLE] getValue() - Valeur lue (%u octet(s))\n", value.size());
-    BluetoothLowEnergyManager::logger->info(str);
+#if DEBUG == 1
+    BluetoothLowEnergyManager::logger->info(Logger::logString("[BLE] getValue() - Valeur lue (%u octet(s))\n", value.size()));
+#endif
 
     return value;
 }
@@ -223,15 +237,17 @@ NimBLEAttValue BluetoothLowEnergyManager::getValue(const std::string & uuidServi
 
 void BluetoothLowEnergyManager::subscribe(const std::string & uuidService, const std::string & uuidCharacteristic)
 {
-    char str[LOGGER_MAX_MESSAGE_SIZE];
-    snprintf(str, sizeof(str), "[BLE] subscribe - Souscription à la caractéristique %s (service: %s)\n", uuidCharacteristic.c_str(), uuidService.c_str());
-    BluetoothLowEnergyManager::logger->info(str);
+#if DEBUG == 1
+    BluetoothLowEnergyManager::logger->info(Logger::logString("[BLE] subscribe - Souscription à la caractéristique %s (service: %s)\n", uuidCharacteristic.c_str(), uuidService.c_str()));
+#endif
 
     // Vérification de la connection du client
     if (not this->isConnected())
     {
-        char str[LOGGER_MAX_MESSAGE_SIZE] = "[BLE] subscribe - Client non connecté, souscription impossible";
+        std::string str = Logger::logString("[BLE] subscribe - Client non connecté, souscription impossible\n");
+#if DEBUG == 1
         BluetoothLowEnergyManager::logger->error(str);
+#endif
         throw std::runtime_error(str);
     }
 
@@ -243,21 +259,26 @@ void BluetoothLowEnergyManager::subscribe(const std::string & uuidService, const
 
     if (not characteristic->canNotify())
     {
-        std::string str = "[BLE] subscribe - La caractéristique " + uuidCharacteristic + " ne supporte pas les notifications";
-        BluetoothLowEnergyManager::logger->error(str.c_str());
-        throw std::invalid_argument(str.c_str());
+        std::string str = Logger::logString("[BLE] subscribe - La caractéristique %s ne supporte pas les notifications\n", uuidCharacteristic.c_str());
+#if DEBUG == 1
+        BluetoothLowEnergyManager::logger->error(str);
+#endif
+        throw std::invalid_argument(str);
     }
 
     // Souscription à la caractéristique
     if (not characteristic->subscribe(true, BluetoothLowEnergyManager::notifyCallback))
     {
-        std::string str = "[BLE] subscribe - Échec de la souscription à la caractéristique " + uuidCharacteristic;
-        BluetoothLowEnergyManager::logger->error(str.c_str());
-        throw std::runtime_error(str.c_str());
+        std::string str = Logger::logString("[BLE] subscribe - Échec de la souscription à la caractéristique %s\n", uuidCharacteristic.c_str());
+#if DEBUG == 1
+        BluetoothLowEnergyManager::logger->error(str);
+#endif
+        throw std::runtime_error(str);
     }
 
-    snprintf(str, sizeof(str), "[BLE] subscribe - Souscription établie sur %s\n", uuidCharacteristic.c_str());
-    BluetoothLowEnergyManager::logger->info(str);
+#if DEBUG == 1
+    BluetoothLowEnergyManager::logger->info(Logger::logString("[BLE] subscribe - Souscription établie sur %s\n", uuidCharacteristic.c_str()));
+#endif
 
     return ;
 }
@@ -266,9 +287,9 @@ void BluetoothLowEnergyManager::subscribe(const std::string & uuidService, const
 
 void BluetoothLowEnergyManager::startScan()
 {
-    char str[LOGGER_MAX_MESSAGE_SIZE];
-    snprintf(str, sizeof(str), "[BLE] startScan - Démarrage du scan, cible: %s\n", this->macAddress.c_str());
-    BluetoothLowEnergyManager::logger->info(str);
+#if DEBUG == 1
+    BluetoothLowEnergyManager::logger->info(Logger::logString("[BLE] startScan - Démarrage du scan, cible: %s\n", this->macAddress.c_str()));
+#endif
 
     // Récupération et configuration de l'objet scan NimBLE
     this->scan = NimBLEDevice::getScan();
@@ -280,8 +301,10 @@ void BluetoothLowEnergyManager::startScan()
     // Durée 0 = scan continu jusqu'à l'appel explicite de stop()
     if (not this->scan->start(0, false))
     {
-        char str[LOGGER_MAX_MESSAGE_SIZE] = "[BLE] startScan - Impossible de démarrer le scan BLE";
+        std::string str = Logger::logString("[BLE] startScan - Impossible de démarrer le scan BLE\n");
+#if DEBUG == 1
         BluetoothLowEnergyManager::logger->error(str);
+#endif
         throw std::runtime_error(str);
     }
 
@@ -292,22 +315,23 @@ void BluetoothLowEnergyManager::startScan()
 
 void BluetoothLowEnergyManager::connection(const NimBLEAdvertisedDevice * device)
 {
-    char str[LOGGER_MAX_MESSAGE_SIZE];
-    snprintf(str, sizeof(str), "[BLE] connection - Connexion à %s en cours\n", device->getAddress().toString().c_str());
-    BluetoothLowEnergyManager::logger->info(str);
+#if DEBUG == 1
+    BluetoothLowEnergyManager::logger->info(Logger::logString("[BLE] connection - Connexion à %s en cours\n", device->getAddress().toString().c_str()));
+#endif
 
     // Tentative de connexion au périphérique
     if (not this->client->connect(device))
     {
-        char str[LOGGER_MAX_MESSAGE_SIZE];
-        snprintf(str, sizeof(str), "[BLE] connection - Échec de la connexion à %s\n", device->getAddress().toString().c_str());
-        BluetoothLowEnergyManager::logger->warning(str);
+#if DEBUG == 1
+        BluetoothLowEnergyManager::logger->warning(Logger::logString("[BLE] connection - Échec de la connexion à %s\n", device->getAddress().toString().c_str()));
+#endif
 
         return ;
     }
 
-    snprintf(str, sizeof(str), "[BLE] connection - Connecté à %s\n", device->getAddress().toString().c_str());
-    BluetoothLowEnergyManager::logger->info(str);
+#if DEBUG == 1
+    BluetoothLowEnergyManager::logger->info(Logger::logString("[BLE] connection - Connecté à %s\n", device->getAddress().toString().c_str()));
+#endif
 
     return ;
 }
@@ -316,18 +340,20 @@ void BluetoothLowEnergyManager::connection(const NimBLEAdvertisedDevice * device
 
 NimBLERemoteService * BluetoothLowEnergyManager::getService(const std::string & uuidService)
 {
-    char str[LOGGER_MAX_MESSAGE_SIZE];
-    snprintf(str, sizeof(str), "[BLE] getService - Recherche du service %s\n", uuidService.c_str());
-    BluetoothLowEnergyManager::logger->info(str);
+#if DEBUG == 1
+    BluetoothLowEnergyManager::logger->info(Logger::logString("[BLE] getService - Recherche du service %s\n", uuidService.c_str()));
+#endif
 
     // Recherche du service GATT sur le périphérique connecté
     NimBLERemoteService * service = this->client->getService(uuidService);
 
     if (service == nullptr)
     {
-        std::string str = "[BLE] getService - Service introuvable: " + uuidService;
-        BluetoothLowEnergyManager::logger->error(str.c_str());
-        throw std::invalid_argument(str.c_str());
+        std::string str = Logger::logString("[BLE] getService - Service introuvable: %s\n", uuidService.c_str());
+#if DEBUG == 1
+        BluetoothLowEnergyManager::logger->error(str);
+#endif
+        throw std::invalid_argument(str);
     }
     
     return service;
@@ -337,18 +363,20 @@ NimBLERemoteService * BluetoothLowEnergyManager::getService(const std::string & 
 
 NimBLERemoteCharacteristic * BluetoothLowEnergyManager::getCharacteristic(const std::string & uuidCharacteristic, NimBLERemoteService * service)
 {
-    char str[LOGGER_MAX_MESSAGE_SIZE];
-    snprintf(str, sizeof(str), "[BLE] getCharacteristic - Recherche de la caractéristique %s\n", uuidCharacteristic.c_str());
-    BluetoothLowEnergyManager::logger->info(str);
+#if DEBUG == 1
+    BluetoothLowEnergyManager::logger->info(Logger::logString("[BLE] getCharacteristic - Recherche de la caractéristique %s\n", uuidCharacteristic.c_str()));
+#endif
 
     // Recherche de la caractéristique dans le service fourni
     NimBLERemoteCharacteristic * characteristic = service->getCharacteristic(uuidCharacteristic);
 
     if (characteristic == nullptr)
     {
-        std::string str = "[BLE] getCharacteristic - Caractéristique introuvable: " + uuidCharacteristic;
-        BluetoothLowEnergyManager::logger->error(str.c_str());
-        throw std::invalid_argument(str.c_str());
+        std::string str = Logger::logString("[BLE] getCharacteristic - Caractéristique introuvable: %s\n", uuidCharacteristic.c_str());
+#if DEBUG == 1
+        BluetoothLowEnergyManager::logger->error(str);
+#endif
+        throw std::invalid_argument(str);
     }
 
     return characteristic;
@@ -374,16 +402,16 @@ void BluetoothLowEnergyManager::ScanCallbacks::onResult(const NimBLEAdvertisedDe
     const NimBLEAddress & deviceMACAddress = advertisedDevice->getAddress();
     NimBLEAddress macAddress = NimBLEAddress(this->bleManager->macAddress, 1);
 
-    char str[LOGGER_MAX_MESSAGE_SIZE];
-    snprintf(str, sizeof(str), "[BLE][SCAN] onResult - Périphérique détecté: %s\n", deviceMACAddress.toString().c_str());
-    BluetoothLowEnergyManager::logger->info(str);
+#if DEBUG == 1
+    BluetoothLowEnergyManager::logger->info(Logger::logString("[BLE][SCAN] onResult - Périphérique détecté: %s\n", deviceMACAddress.toString().c_str()));
+#endif
 
     // Comparaison de l'adresse MAC détectée avec la cible configurée
     if (deviceMACAddress.equals(macAddress))
     {
-        char str[LOGGER_MAX_MESSAGE_SIZE];
-        snprintf(str, sizeof(str), "[BLE][SCAN] onResult - Périphérique cible trouvé: %s — arrêt du scan\n", deviceMACAddress.toString().c_str());
-        BluetoothLowEnergyManager::logger->info(str);
+#if DEBUG == 1
+        BluetoothLowEnergyManager::logger->info(Logger::logString("[BLE][SCAN] onResult - Périphérique cible trouvé: %s — arrêt du scan\n", deviceMACAddress.toString().c_str()));
+#endif
 
         // Copie du périphérique trouvé pour utilisation après l'arrêt du scan
         this->bleManager->device = new NimBLEAdvertisedDevice(*advertisedDevice);
@@ -412,9 +440,9 @@ BluetoothLowEnergyManager::ClientCallbacks::~ClientCallbacks() = default;
 
 void BluetoothLowEnergyManager::ClientCallbacks::onConnect(NimBLEClient * pClient)
 {
-    char str[LOGGER_MAX_MESSAGE_SIZE];
-    snprintf(str, sizeof(str), "[BLE][CLIENT] onConnect - Connexion établie avec %s\n", pClient->getPeerAddress().toString().c_str());
-    BluetoothLowEnergyManager::logger->info(str);
+#if DEBUG == 1
+    BluetoothLowEnergyManager::logger->info(Logger::logString("[BLE][CLIENT] onConnect - Connexion établie avec %s\n", pClient->getPeerAddress().toString().c_str()));
+#endif
 
     return ;
 }
@@ -423,9 +451,9 @@ void BluetoothLowEnergyManager::ClientCallbacks::onConnect(NimBLEClient * pClien
 
 void BluetoothLowEnergyManager::ClientCallbacks::onDisconnect(NimBLEClient * pClient, int reason)
 {
-    char str[LOGGER_MAX_MESSAGE_SIZE];
-    snprintf(str, sizeof(str), "[BLE][CLIENT] onDisconnect - Déconnexion de %s (code: %d) — relance du scan au prochain update()\n", pClient->getPeerAddress().toString().c_str(), reason);
-    BluetoothLowEnergyManager::logger->info(str);
+#if DEBUG == 1
+    BluetoothLowEnergyManager::logger->info(Logger::logString("[BLE][CLIENT] onDisconnect - Déconnexion de %s (code: %d) — relance du scan au prochain update()\n", pClient->getPeerAddress().toString().c_str(), reason));
+#endif
 
     // Réinitialisation de l'état: un nouveau scan sera déclenché au prochain update()
     this->bleManager->deviceFound = false;

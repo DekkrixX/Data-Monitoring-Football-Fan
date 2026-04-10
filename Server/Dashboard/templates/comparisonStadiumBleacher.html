@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Comparaison</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/comparaison.css') }}">
+        <style>
+            :root 
+            {
+                --color: {{ color }};
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <h1>Comparaison des données entre les tribunes du stade</h1>
+            <a href="/" class="button">← Retour</a>
+        </header>
+        <div class="chart-container">
+            <canvas id="chart"></canvas>
+        </div>
+        <script src="{{ url_for('static', filename='lib/socket.io.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='lib/chart.umd.min.js') }}"></script>
+        <script>
+            // Définition des variables dynamiques
+            window.DEBUG = {{ debug }};
+            window.accelerometerGyroscopeSensorDelay = {{ accelerometerGyroscopeSensorDelay }};
+        </script>
+        <script type="module" src="{{ url_for('static', filename='js/comparisonStadiumBleacher.js') }}"></script>
+    </body>
+</html>

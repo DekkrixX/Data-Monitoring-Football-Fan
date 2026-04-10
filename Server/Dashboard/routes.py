@@ -14,7 +14,7 @@
 from flask import render_template
 
 from Server.Config.setting import Config
-from Server.Utils.data import getColorOfSupporter
+from Server.Utils.data import getColorOfSupporter, getColorOfStadiumBleacher
 from Server.Utils.logger import Logger
 
 # =============================================================================
@@ -27,12 +27,13 @@ logger = Logger("Serveur/Routes")
 #  Enregistrement des routes
 # =============================================================================
 
-def registerRoutes(app, supporterList):
+def registerRoutes(app, supporterList, stadiumBleacherList):
     ##
     # @brief Enregistre toutes les routes HTTP et les gestionnaires d'erreurs sur l'application Flask.
     #
-    # @param app           Instance Flask de l'application.
-    # @param supporterList Liste partagée des objets Supporter actifs.
+    # @param app                 Instance Flask de l'application.
+    # @param supporterList       Liste partagée des objets Supporter actifs.
+    # @param stadiumBleacherList Liste partagée des objets StadiumBleacher actifs.
     ##
 
     logger.info("[Routes] Enregistrement des routes et gestionnaires d'erreurs")
@@ -64,18 +65,49 @@ def registerRoutes(app, supporterList):
                     debug=int(Config.DEBUG),
                     id=supporter.getId(),
                     name=supporter.getName(),
-                    color=getColorOfSupporter(supporter.getId())
+                    color=getColorOfSupporter(supporter.getId()),
+                    heartRateSensorDelay=Config.HEART_RATE_SENSOR_DELAY
                 )
 
         return render_template("supporter.html", debug=int(Config.DEBUG)), 404
 
 
-    @app.route("/comparison")
-    def comparisonPage():
+    @app.route("/stadiumBleacher/<int:stadium_bleacher_id>")
+    def stadiumBleacherPage(stadium_bleacher_id):
+        ##
+        # @brief Page de détail d'une tribune.
+        #
+        # @param stadium_bleacher_id Identifiant de la tribune extrait de l'URL. Le type <int:…> garantit la conversion automatique par Flask et la compatibilité avec stadiumBleacher.getId().
+        ##
+
+        for stadiumBleacher in stadiumBleacherList:
+            if stadiumBleacher.getId() == stadium_bleacher_id:
+                return render_template(
+                    "stadiumBleacher.html",
+                    debug=int(Config.DEBUG),
+                    id=stadiumBleacher.getId(),
+                    name=stadiumBleacher.getName(),
+                    color=getColorOfStadiumBleacher(stadiumBleacher.getId()),
+                    accelerometerGyroscopeSensorDelay=Config.ACCELEROMETER_GYROSCOPE_SENSOR_DELAY
+                )
+
+        return render_template("stadiumBleacher.html", debug=int(Config.DEBUG)), 404
+
+
+    @app.route("/comparison/Supporter")
+    def comparisonSupporterPage():
         ##
         # @brief Page de comparaison des données de tous les supporters.
         ##
-        return render_template("comparison.html", debug=int(Config.DEBUG))
+        return render_template("comparisonSupporter.html", debug=int(Config.DEBUG), color="black", heartRateSensorDelay=Config.HEART_RATE_SENSOR_DELAY)
+
+
+    @app.route("/comparison/StadiumBleacher")
+    def comparisonStadiumBleacherPage():
+        ##
+        # @brief Page de comparaison des données de toutes les tribunes.
+        ##
+        return render_template("comparisonStadiumBleacher.html", debug=int(Config.DEBUG), color="black", accelerometerGyroscopeSensorDelay=Config.ACCELEROMETER_GYROSCOPE_SENSOR_DELAY)
 
 # ==========================================================================
 #  Gestionnaires d'erreurs HTTP

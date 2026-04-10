@@ -17,11 +17,20 @@
 #define SUPPORTER_ID 0 ///< @brief Identifiant numérique unique du porteur du capteur (0 = Pas de supporter).
 
 // ============================================================================
+//  ID de la tribune du stade
+// ============================================================================
+
+// À MODIFIER
+#define STADIUM_BLEACHER_ID 1 ///< @brief Identifiant numérique unique de la tribune du stade dans laquelle est placé le capteur (0 = Pas de tribune).
+
+// ============================================================================
 //  Paramètres des capteurs
 // ============================================================================
 
 // À MODIFIER
 #define NB_SENSOR 1 ///< @brief Nombre de capteurs total du système.
+
+#define ACQUISITION_TIME 500///< @brief Temps de délais entre les acquisitions du capteur (en miliseconde).
 
 /**
  * @defgroup Capteur Sélection du capteur actif
@@ -85,6 +94,13 @@
 #else
 #define LOGGER_MAX_FILE_SIZE (((1024 * 1024) * 6) / NB_LOGGER) ///< @brief Taille maximale d'un fichier de log en octets.
 #endif
+
+// ============================================================================
+//  Capacité du buffer de données
+// ============================================================================
+
+#define NB_VALUE_FOR_SENSOR (DUTY_CYCLE_TIME_FOR_SENSOR / ACQUISITION_TIME) ///< @brief Nombre de valeur du buffer pour un capteur
+#define NB_VALUE (NB_VALUE_FOR_SENSOR * NB_SENSOR) ///< @brief Nombre de valeur du buffer en fonction du nombre total de capteur
 
 
 

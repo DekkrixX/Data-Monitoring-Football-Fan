@@ -41,9 +41,9 @@ bleManager(nullptr)
 {
     PolarH10::logger = new Logger("PolarH10", true);
 
-    char str[LOGGER_MAX_MESSAGE_SIZE];
-    snprintf(str, sizeof(str), "[POLARH10] Instanciation pour le supporter. id: %d, adresse MAC cible: %s\n", supporterId, MAC_ADDRESS);
-    PolarH10::logger->info(str);
+#if DEBUG == 1
+    PolarH10::logger->info(Logger::logString("[POLARH10] Instanciation pour le supporter. id: %d, adresse MAC cible: %s\n", supporterId, MAC_ADDRESS));
+#endif
 
     // Instanciation du gestionnaire Bluetooth Low Energy avec l'adresse MAC configurée dans setting.hpp
     this->bleManager = new BluetoothLowEnergyManager(MAC_ADDRESS);
@@ -66,16 +66,16 @@ PolarH10::~PolarH10()
 
 std::string PolarH10::formatData(PolarH10Data & data, int supporterId)
 {
+#if DEBUG == 1
     char str[LOGGER_MAX_MESSAGE_SIZE];
-    snprintf(str, sizeof(str), "[POLARH10] formatData - HR: [ ");
     for (int i=0; i < NB_VALUE; i++)
     {
         char val[5];
         snprintf(val, sizeof(val), "%d ", data.heartRate[i]);
         strcat(str, val);
     }
-    strcat(str, "] bpm\n");
-    PolarH10::logger->info(str);
+    PolarH10::logger->info(Logger::logString("[POLARH10] formatData - HR: [ %s] bpm\n", str));
+#endif
 
     std::string jsonString;
     JsonDocument json;
@@ -83,7 +83,7 @@ std::string PolarH10::formatData(PolarH10Data & data, int supporterId)
     // Construction de l'objet JSON avec les données du capteur
     json["t"] = getMQTTTopic(SensorType::HEART_RATE);
     json["n"] = PolarH10::name;
-    json["id"] = supporterId;
+    json["sid"] = supporterId;
     JsonArray array = json["hr"].to<JsonArray>();
     for (int i=0; i < NB_VALUE; i++)
         array.add(data.heartRate[i]);
@@ -101,7 +101,9 @@ std::string PolarH10::formatData(PolarH10Data & data, int supporterId)
 
 void PolarH10::begin()
 {
-    PolarH10::logger->info("[POLARH10] begin - Démarrage du capteur");
+#if DEBUG == 1
+    PolarH10::logger->info(Logger::logString("[POLARH10] begin - Démarrage du capteur\n"));
+#endif
 
     // Démarrage de la pile Bluetooth Low Energy et du scan
     this->bleManager->begin();
@@ -109,7 +111,9 @@ void PolarH10::begin()
     // État transitoire: en attente de connexion
     Sensor::state = ConnectionState::CONNECTING;
 
-    PolarH10::logger->info("[POLARH10] begin - État: CONNECTING, en attente du périphérique Bluetooth Low Energy");
+#if DEBUG == 1
+    PolarH10::logger->info(Logger::logString("[POLARH10] begin - État: CONNECTING, en attente du périphérique Bluetooth Low Energy"));
+#endif
 
     return ;
 }
@@ -118,12 +122,16 @@ void PolarH10::begin()
 
 void PolarH10::end()
 {
-    PolarH10::logger->info("[POLARH10] end - Arrêt du capteur");
+#if DEBUG == 1
+    PolarH10::logger->info(Logger::logString("[POLARH10] end - Arrêt du capteur\n"));
+#endif
 
     // Fermeture de l'interface Bluetooth Low Energy
     this->bleManager->end();
 
-    PolarH10::logger->info("[POLARH10] end - Capteur arrêté");
+#if DEBUG == 1
+    PolarH10::logger->info(Logger::logString("[POLARH10] end - Capteur arrêté\n"));
+#endif
 
     return ;
 }
@@ -132,7 +140,9 @@ void PolarH10::end()
 
 void PolarH10::update()
 {
-    PolarH10::logger->info("[POLARH10] update - Mise à jour du capteur");
+#if DEBUG == 1
+    PolarH10::logger->info(Logger::logString("[POLARH10] update - Mise à jour du capteur\n"));
+#endif
 
     // Délègue la gestion Bluetooth Low Energy au gestionnaire
     this->bleManager->update();
@@ -144,18 +154,24 @@ void PolarH10::update()
         {
             Sensor::state = ConnectionState::CONNECTED;
 
-            PolarH10::logger->info("[POLARH10] update - État: CONNECTED");
+#if DEBUG == 1
+            PolarH10::logger->info(Logger::logString("[POLARH10] update - État: CONNECTED\n"));
+#endif
         }
 
         // Première connexion: lecture des métadonnées et souscription aux notifications
         if (not this->isSubscribed)
         {
-            PolarH10::logger->info("[POLARH10] update - Première connexion: lecture des métadonnées statiques");
+#if DEBUG == 1
+            PolarH10::logger->info(Logger::logString("[POLARH10] update - Première connexion: lecture des métadonnées statiques\n"));
+#endif
 
             // Lecture bloquante du niveau de batterie et de la localisation du capteur
             this->getData();
 
-            PolarH10::logger->info("[POLARH10] update - Souscription aux notifications Heart Rate active");
+#if DEBUG == 1
+            PolarH10::logger->info(Logger::logString("[POLARH10] update - Souscription aux notifications Heart Rate active\n"));
+#endif
 
             // Souscription aux notifications Heart Rate Measurement
             this->bleManager->subscribe(UUID_HEARTRATE_SERVICE, UUID_HEARTRATE_MEASUREMENT_CHARACTERISTIC);
@@ -179,12 +195,16 @@ void PolarH10::update()
 
             Sensor::data = format;
 
-            char str[LOGGER_MAX_MESSAGE_SIZE];
-            snprintf(str, sizeof(str), "[POLARH10] update - Nouvelle mesure sérialisée: %s", format.c_str()); 
-            PolarH10::logger->info(str);
+#if DEBUG == 1
+            PolarH10::logger->info(Logger::logString("[POLARH10] update - Nouvelle mesure sérialisée: %s\n", format.c_str()));
+#else
+            PolarH10::logger->info(Logger::logString("Fréquence cardiaque: %dbpm\n", this->data.heartRate[this->data.heartRateIndex]));
+#endif
         }
+#if DEBUG == 1
         else
-            PolarH10::logger->info("[POLARH10] update - Aucune nouvelle notification depuis le dernier cycle");
+            PolarH10::logger->info(Logger::logString("[POLARH10] update - Aucune nouvelle notification depuis le dernier cycle\n"));
+#endif
     }
     else
     {
@@ -192,7 +212,9 @@ void PolarH10::update()
         Sensor::state = ConnectionState::DISCONNECTED;
         this->isSubscribed = false;
 
-        PolarH10::logger->info("[POLARH10] update - État: DISCONNECTED");
+#if DEBUG == 1
+        PolarH10::logger->info(Logger::logString("[POLARH10] update - État: DISCONNECTED\n"));
+#endif
     }
 
     return ;
@@ -202,13 +224,17 @@ void PolarH10::update()
 
 void PolarH10::getData()
 {
-    PolarH10::logger->info("[POLARH10] getData - Lecture des caractéristiques statiques");
+#if DEBUG == 1
+    PolarH10::logger->info(Logger::logString("[POLARH10] getData - Lecture des caractéristiques statiques\n"));
+#endif
 
     NimBLEAttValue value;
 
     std::lock_guard<std::mutex> lock(dataMutex);
 
-    PolarH10::logger->info("[POLARH10] getData - Lecture du niveau de batterie");
+#if DEBUG == 1
+    PolarH10::logger->info(Logger::logString("[POLARH10] getData - Lecture du niveau de batterie\n"));
+#endif
 
     // Lecture du niveau de batterie: boucle jusqu'à obtenir une valeur valide (!= 255)
     uint8_t batteryLevel = 255;
@@ -221,13 +247,17 @@ void PolarH10::getData()
             const uint8_t * data = value.data();
             batteryLevel = data[0];
 
-            char str[LOGGER_MAX_MESSAGE_SIZE];
-            snprintf(str, sizeof(str), "[POLARH10] getData - Niveau de batterie: %u%%\n", batteryLevel);
-            PolarH10::logger->info(str);
+#if DEBUG == 1
+            PolarH10::logger->info(Logger::logString("[POLARH10] getData - Niveau de batterie: %u%%\n", batteryLevel));
+#else
+            PolarH10::logger->info(Logger::logString("Batterie: %u%%\n", batteryLevel));
+#endif
         } 
     }
 
-    PolarH10::logger->info("[POLARH10] getData - Lecture de la localisation du capteur");
+#if DEBUG == 1
+    PolarH10::logger->info(Logger::logString("[POLARH10] getData - Lecture de la localisation du capteur\n"));
+#endif
 
     // Lecture de la localisation du capteur: boucle jusqu'à obtenir une valeur valide (!= "")
     std::string bodySensorLocation = "";
@@ -265,14 +295,17 @@ void PolarH10::getData()
                     bodySensorLocation = "Reserved";
             }
 
-            char str[LOGGER_MAX_MESSAGE_SIZE];
-            snprintf(str, sizeof(str), "[POLARH10] getData - Localisation: %s (code: %u)\n",
-                    bodySensorLocation.c_str(), data[0]);
-            PolarH10::logger->info(str);
+#if DEBUG == 1
+            PolarH10::logger->info(Logger::logString("[POLARH10] getData - Localisation: %s (code: %u)\n", bodySensorLocation.c_str(), data[0]));
+#else
+            PolarH10::logger->info(Logger::logString("Localisation: %s\n", bodySensorLocation.c_str()));
+#endif
         }
     }
 
-    PolarH10::logger->info("[POLARH10] getData - Lecture des caractéristiques statiques terminée");
+#if DEBUG == 1
+    PolarH10::logger->info(Logger::logString("[POLARH10] getData - Lecture des caractéristiques statiques terminée\n"));
+#endif
 
     std::string jsonString;
     JsonDocument json;
@@ -315,9 +348,9 @@ void PolarH10::notify(NimBLERemoteCharacteristic * characteristic, uint8_t * dat
                 // Fréquence cardiaque encodée sur 16 bits
                 this->data.heartRate[this->data.heartRateIndex] = static_cast<int>( data[1] | (data[2] << 8) );
 
-                char str[LOGGER_MAX_MESSAGE_SIZE];
-                snprintf(str, sizeof(str), "[POLARH10] notify - Fréquence cardiaque (UINT16): %d bpm\n", this->data.heartRate[this->data.heartRateIndex]);
-                PolarH10::logger->info(str);
+#if DEBUG == 1
+                PolarH10::logger->info(Logger::logString("[POLARH10] notify - Fréquence cardiaque (UINT16): %d bpm\n", this->data.heartRate[this->data.heartRateIndex]));
+#endif
 
                 this->data.heartRateIndex++;
             }
@@ -326,9 +359,9 @@ void PolarH10::notify(NimBLERemoteCharacteristic * characteristic, uint8_t * dat
                 // Fréquence cardiaque encodée sur 8 bits
                 this->data.heartRate[this->data.heartRateIndex] = static_cast<int>(data[1]);
 
-                char str[LOGGER_MAX_MESSAGE_SIZE];
-                snprintf(str, sizeof(str), "[POLARH10] notify - Fréquence cardiaque (UINT8): %d bpm\n", this->data.heartRate[this->data.heartRateIndex]);
-                PolarH10::logger->info(str);
+#if DEBUG == 1
+                PolarH10::logger->info(Logger::logString("[POLARH10] notify - Fréquence cardiaque (UINT8): %d bpm\n", this->data.heartRate[this->data.heartRateIndex]));
+#endif
 
                 this->data.heartRateIndex++;
             }
@@ -336,22 +369,18 @@ void PolarH10::notify(NimBLERemoteCharacteristic * characteristic, uint8_t * dat
             if (this->data.heartRateIndex >= NB_VALUE)
                 this->data.heartRateIndex = 0;
         }
+#if DEBUG == 1
         else
-        {
-            char str[LOGGER_MAX_MESSAGE_SIZE];
-            snprintf(str, sizeof(str), "[POLARH10] notify - Trame HeartRate trop courte (%u octet), ignorée\n", length);
-            PolarH10::logger->warning(str);
-        }
+            PolarH10::logger->warning(Logger::logString("[POLARH10] notify - Trame HeartRate trop courte (%u octet), ignorée\n", length));
+#endif
     }
+#if DEBUG == 1
     else
-    {
-        char str[LOGGER_MAX_MESSAGE_SIZE];
-        snprintf(str, sizeof(str), "[POLARH10] notify - Notification ignorée: UUID %s non reconnu\n", characteristic->getUUID().toString().c_str());
-        PolarH10::logger->warning(str);
-    }
+        PolarH10::logger->warning(Logger::logString("[POLARH10] notify - Notification ignorée: UUID %s non reconnu\n", characteristic->getUUID().toString().c_str()));
+#endif
 
     // Signale une nouvelle donnée disponible uniquement si la valeur est cohérente
-    if (this->data.heartRateIndex > 0)
+    if (this->data.heartRate[this->data.heartRateIndex - 1] > 0)
         this->isNotify = true;
 
     return ;

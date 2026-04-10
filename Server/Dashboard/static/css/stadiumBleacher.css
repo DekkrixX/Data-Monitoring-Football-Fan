@@ -1,26 +1,25 @@
 /* ==============================================================
-   COMPARAISON – STYLE GÉNÉRAL
+   TRIBUNE – STYLE GÉNÉRAL
    ============================================================== */
 
 /* ---------- Fond de page ----------
-   Utilise la variable de gris définie dans base.css */
+   Gris clair provenant des variables globales. */
 body
 {
   background-color: var(--c-gray);
 }
 
+
 /* ==============================================================
    HEADER
    --------------------------------------------------------------
-   Disposition en grille avec trois colonnes : logo / titre /
-   actions. Les marges et paddings utilisent les variables
-   d’espacement globales.
-   ============================================================== */
+   Trois colonnes égales, même mise en forme que le fichier
+   `comparaison.css`. */
 header
 {
   background-color: var(--c-white);
   display: grid;
-  grid-template-columns: 0.5fr 1fr 0.5fr;
+  grid-template-columns: 1fr 1fr 1fr;
   justify-content: space-between;
   align-items: center;
   justify-items: center;
@@ -29,22 +28,69 @@ header
   border-radius: var(--s-radius-sm);
 }
 
-
-/* ---------- Titre du header ----------
-   La couleur est injectée dynamiquement depuis le code Python. */
-header > h1
+/* ---------- Titres du header ----------
+   Couleur injectée dynamiquement depuis le code Python. */
+header > h1, header > h2
 {
   font-size: 50px;
   color: var(--color); /* injecté par le code Python */
-  grid-column: 2;
-  text-align: center;
 }
 
 
 /* ==============================================================
-   CONTENEUR DE GRAPHIQUE
+   GRID DE DONNÉES
+   --------------------------------------------------------------
+   Même disposition que le fichier `index.css`. */
+#grid
+{
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  justify-content: space-between;
+  align-items: center;
+  justify-items: center;
+  margin: 50px;
+}
+
+/* ==============================================================
+   CARTES DE SUPPORT
+   --------------------------------------------------------------
+   Dimensions fixes, fond blanc, coins arrondis. */
+.card
+{
+  background-color: var(--c-white);
+  height: 150px;
+  width: 250px;
+  border-radius: var(--s-radius-sm);
+}
+
+/* ---------- Texte centré et gras à l’intérieur de la carte ---------- */
+.card > p
+{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+
+/* ==============================================================
+   LABEL / VALEUR (affichage des métriques)
    ============================================================== */
-.chart-container 
+.label
+{
+  font-size: 25px;
+}
+.value
+{
+  height: 100px;
+  font-size: 25px;
+  color: var(--color); /* injecté par le code Python */
+}
+
+/* ==============================================================
+   CONTENEUR DE GRAPHIQUE (similaire à comparaison.css)
+   ============================================================== */
+.chart-container
 {
   margin: var(--sp-header-y) var(--sp-header-x);
   padding: var(--sp-btn-y) var(--sp-btn-x);

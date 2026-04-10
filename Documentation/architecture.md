@@ -38,3 +38,17 @@ Le projet de monitoring pour supporters de football a pour objectif de collecter
 - Permet de connecter plusieurs périphériques sur le même bus grâce aux adresses uniques.
 - Communication maître-esclave : le maître initie les échanges, l’esclave répond.
 - Supporte des vitesses standard (100kHz), rapide (400kHz), et haute vitesse (3,4MHz).
+
+## Schéma de montage des capteurs
+
+| ![Schéma module LoRa](../Resources/Images/schema_esp32_LoRa.png) |
+|:----------------------------------------------------------------:|
+| Schéma de montage du module LoRa                                 |
+
+| ![Schéma MinIMU-9 v6](../Resources/Images/schema_MinIMU-9_v6.png) |
+|:-----------------------------------------------------------------:|
+| Schéma de montage du capteur MinIMU-9 v6                          |
+
+| ![Schéma INMP441](../Ressources/Images/schema_INMP441.png) |
+|:----------------------------------------------------------:|
+| Schéma de montage du capteur INMP441                       |

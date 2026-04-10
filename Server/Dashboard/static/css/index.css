@@ -37,7 +37,7 @@ header
    GRID PRINCIPALE
    --------------------------------------------------------------
    4 colonnes égales, espacement généreux. */
-#grid
+#gridSupporter, #gridStadiumBleacher
 {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
