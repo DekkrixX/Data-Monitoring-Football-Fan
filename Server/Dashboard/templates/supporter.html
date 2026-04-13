@@ -18,26 +18,26 @@
             <h1>Supporter n°{{ id }}</h1>
             <a href="/" class="button">← Retour</a>
         </header>
-        <div id="grid">
+        <div id="heart-rate" class="grid">
             <div class="card">
-                <p id="heart-rate" class="value">-</p>
+                <p class="heart-rate value">-</p>
                 <p class="label">BPM</p>
             </div>
             <div class="card">
-                <p id="average" class="value">-</p>
+                <p class="average value">-</p>
                 <p class="label">Moyenne</p>
             </div>
             <div class="card">
-                <p id="minimum" class="value">-</p>
+                <p class="minimum value">-</p>
                 <p class="label">Minimum</p>
             </div>
             <div class="card">
-                <p id="maximum" class="value">-</p>
+                <p class="maximum value">-</p>
                 <p class="label">Maximum</p>
             </div>
         </div>
         <div class="chart-container">
-            <canvas id="chart"></canvas>
+            <canvas id="chart_heart-rate"></canvas>
         </div>
         <script src="{{ url_for('static', filename='lib/socket.io.min.js') }}"></script>
         <script src="{{ url_for('static', filename='lib/chart.umd.min.js') }}"></script>
@@ -47,7 +47,7 @@
             window.id = {{ id }};
             window.name = "{{ name }}";
             window.color = "{{ color }}";
-            window.heartRateSensorDelay = {{ heartRateSensorDelay }};
+            window.sensorDelay = {{ sensorDelay }};
         </script>
         <script type="module" src="{{ url_for('static', filename='js/supporter.js') }}"></script>
     </body>

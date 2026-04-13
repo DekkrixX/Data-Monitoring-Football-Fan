@@ -41,7 +41,7 @@ header > h1, header > h2
    GRID DE DONNÉES
    --------------------------------------------------------------
    Même disposition que le fichier `index.css`. */
-#grid
+.grid
 {
   display: grid;
   grid-template-columns: repeat(4, 1fr);

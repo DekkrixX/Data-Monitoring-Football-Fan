@@ -14,7 +14,7 @@
 from flask_socketio import emit
 
 from Server.Config.setting import Config
-from Server.Utils.data import createSupporterDataForClient, getNameOfSupporter, getColorOfSupporter, createStadiumBleacherDataForClient, getNameOfStadiumBleacher, getColorOfStadiumBleacher
+from Server.Utils.data import createSupporterHeartRateForClient, getNameOfSupporter, getColorOfSupporter, createStadiumBleacherAccelerometerForClient, createStadiumBleacherAcousticForClient, getNameOfStadiumBleacher, getColorOfStadiumBleacher
 from Server.Utils.logger import Logger
 
 # =============================================================================
@@ -55,8 +55,8 @@ def registerSocketioHandlers(socketio, supporterList, stadiumBleacherList):
 #  Données d'un supporter spécifique
 # =============================================================================
 
-    @socketio.on("getSupporterData")
-    def handleGetSupporterData(supporterId):
+    @socketio.on("getSupporterHeartRate")
+    def handleGetSupporterHeartRate(supporterId):
         ##
         # @brief Envoie les données complètes d'un supporter (heartRate,
         #        average, minimum, maximum).
@@ -64,20 +64,20 @@ def registerSocketioHandlers(socketio, supporterList, stadiumBleacherList):
         # @param supporterId Identifiant du supporter demandé.
         ##
 
-        logger.info(f"[SocketIO] Réception de 'getSupporterData' pour le supporter id={supporterId}")
+        logger.info(f"[SocketIO] Réception de 'getSupporterHeartRate' pour le supporter id={supporterId}")
 
         name  = getNameOfSupporter(supporterId)
         color = getColorOfSupporter(supporterId)
 
         for supporter in supporterList:
             if supporter.getId() == int(supporterId):
-                payload = createSupporterDataForClient(supporterId, name, color, supporter.heartRate.getHeartRate())
+                payload = createSupporterHeartRateForClient(supporterId, name, color, supporter.heartRate.getHeartRate())
                 payload.update({
                     "average": supporter.heartRate.getAverage(),
                     "minimum": supporter.heartRate.getMinimum(),
                     "maximum": supporter.heartRate.getMaximum(),
                 })
-                socketio.emit("getSupporterDataResponse", payload)
+                socketio.emit("getSupporterHeartRateResponse", payload)
                 return
 
         logger.warning(f"[SocketIO] Aucun supporter trouvé avec l'id={supporterId}")
@@ -86,22 +86,22 @@ def registerSocketioHandlers(socketio, supporterList, stadiumBleacherList):
 #  Données de tous les supporters
 # =============================================================================
 
-    @socketio.on("getSupporterDataAll")
-    def handleGetSupporterDataAll():
+    @socketio.on("getSupporterHeartRateAll")
+    def handleGetSupporterHeartRateAll():
         ##
         # @brief Envoie la liste des dernières fréquences cardiaques de tous les supporters actifs.
         ##
 
-        logger.info("[SocketIO] Réception de 'getSupporterDataAll'")
+        logger.info("[SocketIO] Réception de 'getSupporterHeartRateAll'")
 
         payload = []
         for supporter in supporterList:
             name  = getNameOfSupporter(supporter.getId())
             color = getColorOfSupporter(supporter.getId())
-            data  = createSupporterDataForClient(supporter.getId(), name, color, supporter.heartRate.getHeartRate())
+            data  = createSupporterHeartRateForClient(supporter.getId(), name, color, supporter.heartRate.getHeartRate())
             payload.append(data)
 
-        socketio.emit("getSupporterDataAllResponse", payload)
+        socketio.emit("getSupporterHeartRateAllResponse", payload)
 
 # =============================================================================
 #  Liste des tribunes
@@ -122,8 +122,8 @@ def registerSocketioHandlers(socketio, supporterList, stadiumBleacherList):
 #  Données d'une tribune spécifique
 # =============================================================================
 
-    @socketio.on("getStadiumBleacherData")
-    def handleGetStadiumBleacherData(stadiumBleacherId):
+    @socketio.on("getStadiumBleacherAccelerometer")
+    def handleGetStadiumBleacherAccelerometer(stadiumBleacherId):
         ##
         # @brief Envoie les données complètes d'une tribune (accelerometer,
         #        average, minimum, maximum).
@@ -131,20 +131,48 @@ def registerSocketioHandlers(socketio, supporterList, stadiumBleacherList):
         # @param stadiumBleacherId Identifiant de la tribune demandé.
         ##
 
-        logger.info(f"[SocketIO] Réception de 'getStadiumBleacherData' pour la tribune id={stadiumBleacherId}")
+        logger.info(f"[SocketIO] Réception de 'getStadiumBleacherAccelerometer' pour la tribune id={stadiumBleacherId}")
 
         name  = getNameOfStadiumBleacher(stadiumBleacherId)
         color = getColorOfStadiumBleacher(stadiumBleacherId)
 
         for stadiumBleacher in stadiumBleacherList:
             if stadiumBleacher.getId() == int(stadiumBleacherId):
-                payload = createStadiumBleacherDataForClient(stadiumBleacherId, name, color, stadiumBleacher.accelerometer.getAccelerometer())
+                payload = createStadiumBleacherAccelerometerForClient(stadiumBleacherId, name, color, stadiumBleacher.accelerometer.getAccelerometer())
                 payload.update({
                     "average": stadiumBleacher.accelerometer.getAverage(),
                     "minimum": stadiumBleacher.accelerometer.getMinimum(),
                     "maximum": stadiumBleacher.accelerometer.getMaximum(),
                 })
-                socketio.emit("getStadiumBleacherDataResponse", payload)
+                socketio.emit("getStadiumBleacherAccelerometerResponse", payload)
+                return
+
+        logger.warning(f"[SocketIO] Aucune tribune trouvé avec l'id={stadiumBleacherId}")
+
+
+    @socketio.on("getStadiumBleacherAcoustic")
+    def handleGetStadiumBleacherAcoustic(stadiumBleacherId):
+        ##
+        # @brief Envoie les données complètes d'une tribune (acoustic,
+        #        average, minimum, maximum).
+        #
+        # @param stadiumBleacherId Identifiant de la tribune demandé.
+        ##
+
+        logger.info(f"[SocketIO] Réception de 'getStadiumBleacherAcoustic' pour la tribune id={stadiumBleacherId}")
+
+        name  = getNameOfStadiumBleacher(stadiumBleacherId)
+        color = getColorOfStadiumBleacher(stadiumBleacherId)
+
+        for stadiumBleacher in stadiumBleacherList:
+            if stadiumBleacher.getId() == int(stadiumBleacherId):
+                payload = createStadiumBleacherAcousticForClient(stadiumBleacherId, name, color, stadiumBleacher.acoustic.getAcoustic())
+                payload.update({
+                    "average": stadiumBleacher.acoustic.getAverage(),
+                    "minimum": stadiumBleacher.acoustic.getMinimum(),
+                    "maximum": stadiumBleacher.acoustic.getMaximum(),
+                })
+                socketio.emit("getStadiumBleacherAcousticResponse", payload)
                 return
 
         logger.warning(f"[SocketIO] Aucune tribune trouvé avec l'id={stadiumBleacherId}")
@@ -153,19 +181,36 @@ def registerSocketioHandlers(socketio, supporterList, stadiumBleacherList):
 #  Données de toutes les tribunes
 # =============================================================================
 
-    @socketio.on("getStadiumBleacherDataAll")
-    def handleGetStadiumBleacherDataAll():
+    @socketio.on("getStadiumBleacherAccelerometerAll")
+    def handleGetStadiumBleacherAccelerometerAll():
         ##
         # @brief Envoie la liste des dernières mesure de l'accéléromètre de toutes les tribunes actives.
         ##
 
-        logger.info("[SocketIO] Réception de 'getStadiumBleacherDataAll'")
+        logger.info("[SocketIO] Réception de 'getStadiumBleacherAccelerometerAll'")
 
         payload = []
         for stadiumBleacher in stadiumBleacherList:
             name  = getNameOfStadiumBleacher(stadiumBleacher.getId())
             color = getColorOfStadiumBleacher(stadiumBleacher.getId())
-            data  = createStadiumBleacherDataForClient(stadiumBleacher.getId(), name, color, stadiumBleacher.accelerometer.getAccelerometer())
+            data  = createStadiumBleacherAccelerometerForClient(stadiumBleacher.getId(), name, color, stadiumBleacher.accelerometer.getAccelerometer())
             payload.append(data)
 
-        socketio.emit("getStadiumBleacherDataAllResponse", payload)
+        socketio.emit("getStadiumBleacherAccelerometerAllResponse", payload)
+
+    @socketio.on("getStadiumBleacherAcousticAll")
+    def handleGetStadiumBleacherAcousticAll():
+        ##
+        # @brief Envoie la liste des dernières mesure acoustique de toutes les tribunes actives.
+        ##
+
+        logger.info("[SocketIO] Réception de 'getStadiumBleacherAcousticAll'")
+
+        payload = []
+        for stadiumBleacher in stadiumBleacherList:
+            name  = getNameOfStadiumBleacher(stadiumBleacher.getId())
+            color = getColorOfStadiumBleacher(stadiumBleacher.getId())
+            data  = createStadiumBleacherAcousticForClient(stadiumBleacher.getId(), name, color, stadiumBleacher.acoustic.getAcoustic())
+            payload.append(data)
+
+        socketio.emit("getStadiumBleacherAcousticAllResponse", payload)

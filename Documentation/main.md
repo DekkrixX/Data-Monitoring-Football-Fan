@@ -45,11 +45,15 @@ Projet de Monitoring pour Supporters de Football
 │
 ├── Resources                   // Fichiers de données
 │   ├── Images
+│   │   ├── schema_esp32_LoRa.png
+│   │   ├── schema_INMP441.png
+│   │   ├── schema_MinIMU-9_v6.png
 │   │   └── architecture.png
 │   │
 │   └── Data
 │       ├── capteur.json
 │       ├── supporter.json
+│       ├── stadiumBleacher.json
 │       └── topicMQTT.json
 │
 ├── Logs                        // Fichiers de logs
@@ -72,6 +76,14 @@ Projet de Monitoring pour Supporters de Football
 │   │   │   │   │
 │   │   │   │   ├── AccelerometerGyroscope.cpp
 │   │   │   │   └── AccelerometerGyroscope.hpp
+│   │   │   │
+│   │   │   ├── Acoustic
+│   │   │   │   ├── INMP441
+│   │   │   │   │   ├── INMP441.cpp
+│   │   │   │   │   └── INMP441.hpp
+│   │   │   │   │
+│   │   │   │   ├── Acoustic.cpp
+│   │   │   │   └── Acoustic.hpp
 │   │   │   │
 │   │   │   ├── HeartRate
 │   │   │   │   ├── PolarH10
@@ -117,6 +129,12 @@ Projet de Monitoring pour Supporters de Football
 │   │   │   └── Data
 │   │   │       └── heartRate.py
 │   │   │
+│   │   ├── StadiumBleacher
+│   │   │   ├── stadiumBleacher.py
+│   │   │   └── Data
+│   │   │       ├── accelerometer.py
+│   │   │       └── acoustic.py
+│   │   │
 │   │   ├── influxdb.py
 │   │   ├── meshtastic.py
 │   │   ├── mqtt.py
@@ -130,6 +148,7 @@ Projet de Monitoring pour Supporters de Football
 │   │   ├── templates               // Fichiers HTML pour le serveur web
 │   │   │   ├── index.html
 │   │   │   ├── supporter.html
+│   │   │   ├── stadiumBleacher
 │   │   │   ├── comparaison.html
 │   │   │   └── error.html
 │   │   │
@@ -138,15 +157,19 @@ Projet de Monitoring pour Supporters de Football
 │   │   │   │   ├── base.css
 │   │   │   │   ├── index.css
 │   │   │   │   ├── supporter.css
+│   │   │   │   ├── stadiumBleacher.css
 │   │   │   │   ├── comparaison.css
 │   │   │   │   └── error.css
 │   │   │   │
 │   │   │   ├── js
 │   │   │   │   ├── index.js
 │   │   │   │   ├── supporter.js
+│   │   │   │   ├── stadiumBleacher.js
 │   │   │   │   ├── comparaison.js
 │   │   │   │   └── Utils
 │   │   │   │       ├── time.js
+│   │   │   │       ├── color.js
+│   │   │   │       ├── stringConversion.js
 │   │   │   │       └── board.js
 │   │   │   │
 │   │   │   └── lib                 // Fichiers de bibliothèque externe

@@ -131,8 +131,7 @@ class Config:
 #  Délais d'échantillonage des capteurs
 # =============================================================================
 
-    HEART_RATE_SENSOR_DELAY = float(os.getenv("HEART_RATE_SENSOR_DELAY", 0))                                                            ##< Délais d'échantillonage du capteur de fréquence cardiaque.
-    ACCELEROMETER_GYROSCOPE_SENSOR_DELAY = float(os.getenv("ACCELEROMETER_GYROSCOPE_SENSOR_DELAY", 0)) ##< Délais d'échantillonage du capteur accéléromètre gyroscope.
+    SENSOR_DELAY = float(os.getenv("SENSOR_DELAY", 0)) ##< Délais d'échantillonage des capteurs.
 
 
     @classmethod
@@ -186,8 +185,7 @@ class Config:
             "GRAFANA_PORT": cls.GRAFANA_PORT,
 
             # Délais d'échantillonage des capteurs
-            "HEART_RATE_SENSOR_DELAY": cls.HEART_RATE_SENSOR_DELAY,
-            "ACCELEROMETER_GYROSCOPE_SENSOR_DELAY": cls.ACCELEROMETER_GYROSCOPE_SENSOR_DELAY,
+            "SENSOR_DELAY": cls.SENSOR_DELAY
         }
 
         if cls.DEBUG:

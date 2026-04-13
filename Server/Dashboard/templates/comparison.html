@@ -14,19 +14,30 @@
     </head>
     <body>
         <header>
-            <h1>Comparaison des données entre les supporters</h1>
+            <h1></h1>
             <a href="/" class="button">← Retour</a>
         </header>
         <div class="chart-container">
             <canvas id="chart"></canvas>
+        </div>
+        <div class="chart-container display-none">
+            <canvas id="chartX"></canvas>
+        </div>
+        <div class="chart-container display-none">
+            <canvas id="chartY"></canvas>
+        </div>
+        <div class="chart-container display-none">
+            <canvas id="chartZ"></canvas>
         </div>
         <script src="{{ url_for('static', filename='lib/socket.io.min.js') }}"></script>
         <script src="{{ url_for('static', filename='lib/chart.umd.min.js') }}"></script>
         <script>
             // Définition des variables dynamiques
             window.DEBUG = {{ debug }};
-            window.heartRateSensorDelay = {{ heartRateSensorDelay }};
+            window.sensorDelay = {{ sensorDelay }};
+            window.data = "{{ data }}";
+            window.type = "{{ type }}";
         </script>
-        <script type="module" src="{{ url_for('static', filename='js/comparisonSupporter.js') }}"></script>
+        <script type="module" src="{{ url_for('static', filename='js/comparison.js') }}"></script>
     </body>
 </html>

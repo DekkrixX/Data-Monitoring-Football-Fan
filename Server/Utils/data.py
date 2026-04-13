@@ -194,7 +194,7 @@ def getColorOfStadiumBleacher(stadiumBleacherId):
 #  Formatage pour le client web
 # =============================================================================
 
-def createSupporterDataForClient(supporterId, name, color, heartRate):
+def createSupporterHeartRateForClient(supporterId, name, color, heartRate):
     ##
     # @brief Construit le dictionnaire de données envoyé au client web via SocketIO.
     #
@@ -213,7 +213,7 @@ def createSupporterDataForClient(supporterId, name, color, heartRate):
         "heartRate": heartRate,
     }
 
-def createStadiumBleacherDataForClient(stadiumBleacherId, name, color, accelerometer):
+def createStadiumBleacherAccelerometerForClient(stadiumBleacherId, name, color, accelerometer):
     ##
     # @brief Construit le dictionnaire de données envoyé au client web via SocketIO.
     #
@@ -230,4 +230,23 @@ def createStadiumBleacherDataForClient(stadiumBleacherId, name, color, accelerom
         "name":      name,
         "color":     color,
         "accelerometer": accelerometer,
+    }
+
+def createStadiumBleacherAcousticForClient(stadiumBleacherId, name, color, acoustic):
+    ##
+    # @brief Construit le dictionnaire de données envoyé au client web via SocketIO.
+    #
+    # @param stadiumBleacherId Identifiant de la tribune.
+    # @param name              Nom de la tribune.
+    # @param color             Couleur associée à la tribune.
+    # @param acostic           Dernière mesure acoustic.
+    #
+    # @return dict Données formatées pour le client. Format : { "id": …, "name": …, "color": …, "acoustic": … }
+    ##
+
+    return {
+        "id":        stadiumBleacherId,
+        "name":      name,
+        "color":     color,
+        "acoustic":  acoustic,
     }

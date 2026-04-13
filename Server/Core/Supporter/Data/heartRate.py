@@ -99,7 +99,7 @@ class HeartRateData:
         ##
 
         for hr in heartRate:
-            if hr != 0:
+            if hr != None:
                 self._history.append(hr)
                 self._total += hr
 

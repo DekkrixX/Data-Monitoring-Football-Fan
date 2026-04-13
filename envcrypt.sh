@@ -1,57 +1,162 @@
-# =============================================================================
-# envcrypt.sh - Chiffrement/déchiffrement de fichiers d'environnement via SOPS
+##
+# @file envcrypt.sh
+# 
+# @brief Chiffrement/déchiffrement de fichiers d'environnement via SOPS.
+# @details Le script permet de chiffrer ou déchiffrer un fichier mais aussi d'aujouter ou retirer des clés publiques au fichier chiffrer.
 #
-# Dépendances : sops (https://github.com/getsops/sops)
-# Usage       : voir la fonction usage() ci-dessous ou lancer avec --help
+# @see sops (https://github.com/getsops/sops)
+# @see Fonction usage() ou lancer le script avec --help
+#
+#
+# @since 1.0.0
+# @date 11 avril 2026
+# @author DekkrixX
+##
+
+# =============================================================================
+#  Import
 # =============================================================================
 
 # =============================================================================
-#  Codes de couleur ANSI
+#  Code de couleur ANSI
 # =============================================================================
 
-_RESET="\033[1;0m"
-_BLACK="\033[1;30m"
-_RED="\033[1;31m"
-_GREEN="\033[1;32m"
-_YELLOW="\033[1;33m"
-_BLUE="\033[1;34m"
-_MAGENTA="\033[1;35m"
-_CYAN="\033[1;36m"
-_GRAY="\033[1;37m"
-_WHITE="\033[1m"
+_RESET="\033[1;0m"    ##< @brief Réinitialise le style et la couleur du texte.
+_BLACK="\033[1;30m"   ##< @brief Texte noir.
+_RED="\033[1;31m"     ##< @brief Texte rouge.
+_GREEN="\033[1;32m"   ##< @brief Texte vert.
+_YELLOW="\033[1;33m"  ##< @brief Texte jaune.
+_BLUE="\033[1;34m"    ##< @brief Texte bleu.
+_MAGENTA="\033[1;35m" ##< @brief Texte magenta.
+_CYAN="\033[1;36m"    ##< @brief Texte cyan.
+_GRAY="\033[1;37m"    ##< @brief Texte gris clair.
+_WHITE="\033[1m"      ##< @brief Texte blanc.
 
 # =============================================================================
-#  Codes de sortie
+#  Fonction métier
 # =============================================================================
 
-argumentErrorCode=1         # Arguments manquants ou invalides
-installationErrorCode=2     # Dépendance manquante (sops non installé)
-fileNotFoundErrorCode=3     # Fichier source introuvable
-exportPublicKeyErrorCode=4  # Échec de l'export de la clé publique
-exportPrivateKeyErrorCode=5 # Échec de l'export de la clé privée
-importKeyErrorCode=6        # Échec de l'import d'une clé
-encryptFileErrorCode=7      # Échec du chiffrement
-decryptFileErrorCode=8      # Échec du déchiffrement
-addErrorCode=9              # Échec de l'ajout d'une clé publique
-removeErrorCode=10          # Échec de la suppression d'une clé publique
-readKeyErrorCode=11         # Échec de la lecture d'un fingerprint depuis un fichier .asc
+##
+# @brief Affiche un message de debug.
+#
+# @brief message Message de debug.
+#
+# @since 1.0.0
+# @date 11 avril 2026
+# @author DekkrixX
+##
+function debug()
+{
+    local message=$1
+
+    if [ "$VERBOSE" -eq 1 ]
+    then
+        echo -e $_WHITE"[DEBUG] $message"$_RESET >&2
+    fi
+
+    return
+}
+
+
+##
+# @brief Affiche un message d'information
+#
+# @param message Message d'information
+#
+# @since 1.0.0
+# @date 11 avril 2026
+# @author DekkrixX
+##
+function info()
+{
+    local message=$1
+
+    echo -e $_CYAN"[INFO] $message"$_RESET >&2
+
+    return
+}
+
+
+##
+# @brief Affiche un message d'avertissement.
+#
+# @param message Message d'avertissement.
+#
+# @since 1.0.0
+# @date 11 avril 2026
+# @author DekkrixX
+##
+function warning()
+{
+    local message=$1
+
+    echo -e $_YELLOW"[AVERTISSEMENT] $message"$_RESET >&2
+
+    return
+}
+
+
+##
+# @brief Affiche un message d'erreur et termine le programme avec un code d'erreur.
+#
+# @param code    Code d'erreur.
+# @param message Message d'erreur.
+#
+# @since 1.0.0
+# @date 11 avril 2026
+# @author DekkrixX
+##
+function error()
+{
+    local code=$1
+    local message=$2
+
+    echo -e $_RED"[ERREUR:$code] $message"$_RESET >&2
+
+    exit "$code"
+}
 
 # =============================================================================
-#  Flags
+#  Code de sortie
 # =============================================================================
 
-VERBOSE=0 # Mode verbeux — désactivé par défaut, activé par -v / --verbose
+argumentErrorCode=1         ##< @brief Arguments manquants ou invalides.
+installationErrorCode=2     ##< @brief Dépendance manquante.
+fileNotFoundErrorCode=3     ##< @brief Fichier source introuvable.
+exportPublicKeyErrorCode=4  ##< @brief Échec de l'export de la clé publique.
+exportPrivateKeyErrorCode=5 ##< @brief Échec de l'export de la clé privée.
+importKeyErrorCode=6        ##< @brief Échec de l'import d'une clé.
+encryptFileErrorCode=7      ##< @brief Échec du chiffrement.
+decryptFileErrorCode=8      ##< @brief Échec du déchiffrement.
+addErrorCode=9              ##< @brief Échec de l'ajout d'une clé publique.
+removeErrorCode=10          ##< @brief Échec de la suppression d'une clé publique.
+readKeyErrorCode=11         ##< @brief Échec de la lecture d'un fingerprint depuis un fichier .asc.
 
 # =============================================================================
-#  Variables globales
+#  Flag
 # =============================================================================
 
-publicKeyDirectory=".PublicKeys" # Dossier contenant les clés publiques utilisées pour le chiffrement
+VERBOSE=0 ##< @brief Mode verbeux (désactivé par défaut, activé par -v / --verbose)
 
 # =============================================================================
-#  Fonctions utilitaires
+#  Variable globale
 # =============================================================================
 
+publicKeyDirectory=".PublicKeys" ##< @brief Dossier contenant les clés publiques utilisées pour le chiffrement
+
+# =============================================================================
+#  Fonction utilitaire
+# =============================================================================
+
+##
+# @brief Affiche le manuel d'usage du script.
+#
+# @param name Nom du script.
+#
+# @since 1.0.0
+# @date 11 avril 2026
+# @author DekkrixX
+##
 function usage()
 {
     local name=$(basename "$0")
@@ -60,7 +165,7 @@ function usage()
     echo -e $_MAGENTA"\t$name [OPTIONS] <opération>"$_RESET
     echo ""
     echo -e $_WHITE"DESCRIPTION"$_RESET
-    echo -e "\tCe script Bash permettant de chiffrer et déchiffrer des fichiers d'environnement (.env et autres) via SOPS et GPG. Il permet l'export d'une paire de clés GPG, l'import d'une clé, le chiffrement d'un fichier, et le déchiffrement d'un fichier."
+    echo -e "\tCe script Bash permet de chiffrer et déchiffrer des fichiers d'environnement (.env et autres) via SOPS et GPG. Il permet l'export d'une paire de clés GPG, l'import d'une clé, le chiffrement d'un fichier, et le déchiffrement d'un fichier."
     echo ""
     echo -e $_WHITE"OPTIONS"$_RESET
     echo -e "\t-h | --help"
@@ -102,56 +207,20 @@ function usage()
     return
 }
 
-function debug()
-{
-    local message=$1
-
-    if [ "$VERBOSE" -eq 1 ]
-    then
-        echo -e $_WHITE"[DEBUG] $message"$_RESET >&2
-    fi
-
-    return
-}
-
-function info()
-{
-    local message=$1
-
-    echo -e $_CYAN"[INFO] $message"$_RESET >&2
-
-    return
-}
-
-function warning()
-{
-    local message=$1
-
-    echo -e $_YELLOW"[AVERTISSEMENT] $message"$_RESET >&2
-
-    return
-}
-
-function error()
-{
-    local code=$1
-    local message=$2
-
-    echo -e $_RED"[ERREUR:$code] $message"$_RESET >&2
-
-    # En cas d'erreur d'argument, on affiche l'usage pour guider l'utilisateur
-    if [ "$code" -eq "$argumentErrorCode" ]
-    then
-        usage
-    fi
-
-    exit "$code"
-}
-
 # =============================================================================
-#  Fonctions métier
+#  Fonction métier
 # =============================================================================
 
+##
+# @brief Export une clé publique sous forme de fichier clé .asc.
+#
+# @param key  Clé publique.
+# @param file Nom du fichier clé .asc créé.
+#
+# @since 1.0.0
+# @date 11 avril 2026
+# @author DekkrixX
+##
 function exportKey()
 {
     local key=$1
@@ -174,6 +243,18 @@ function exportKey()
     return
 }
 
+
+##
+# @brief Import une clé publique à partir d'un fichier clé .asc.
+#
+# @param fileKey Nom du fichier clé .asc.
+#
+# @pre fileKey Doit pouvoir être ouvert en lecture.
+#
+# @since 1.0.0
+# @date 11 avril 2026
+# @author DekkrixX
+##
 function importKey()
 {
     local fileKey=$1
@@ -195,6 +276,20 @@ function importKey()
     return
 }
 
+
+##
+# @brief Chiffre un fichier avec les clés publiques associées.
+#
+# @param file Nom du fichier.
+#
+# @pre file Doit pouvoir être ouvert en lecture.
+#
+# @remark Le fichier de base n'est pas écrasé.
+#
+# @since 1.0.0
+# @date 11 avril 2026
+# @author DekkrixX
+##
 function encryptFile()
 {
     local file=$1
@@ -211,14 +306,14 @@ function encryptFile()
         error $encryptFileErrorCode "Aucune clé publique trouvée dans '$publicKeyDirectory'. Ajoutez au moins un fichier .asc avant de chiffrer."
     fi
 
-    debug "Clés GPG utilisées pour le chiffrement : '$keys'."
+    debug "Clés GPG utilisées pour le chiffrement: '$keys'."
     debug "Début du chiffrement de '$file' -> '$encryptedFile' avec les clés GPG '$keys'."
 
     # Chiffrement du fichier
     debug "Chiffrement du fichier '$file'."
-    if sops --encrypt $(echo "$keys" | sed 's/,/ --pgp /g' | sed 's/^/--pgp /') "$file" > "$encryptedFile"
+    if sops --encrypt --input-type dotenv --output-type dotenv $(echo "$keys" | sed 's/,/ --pgp /g' | sed 's/^/--pgp /') "$file" > "$encryptedFile"
     then
-        info "Fichier chiffré avec succès : '$encryptedFile'."
+        info "Fichier chiffré avec succès: '$encryptedFile'."
     else
         # Nettoyer le fichier de sortie potentiellement vide ou corrompu
         rm -f "$encryptedFile"
@@ -230,6 +325,20 @@ function encryptFile()
     return
 }
 
+
+##
+# @brief Déchiffre un fichier chiffré.
+#
+# @param file Nom du fichier chiffré.
+#
+# @remark Le fichier chiffré n'est pas écrasé.
+#
+# @pre file Doit pouvoir être ouvert en lecture.
+#
+# @since 1.0.0
+# @date 11 avril 2026
+# @author DekkrixX
+##
 function decryptFile()
 {
     local file=$1
@@ -248,7 +357,7 @@ function decryptFile()
 
     # Chiffrement du fichier
     debug "Déchiffrement du fichier '$file'."
-    if sops --decrypt "$file" > "$decryptedFile"
+    if sops --decrypt --input-type dotenv --output-type dotenv "$file" > "$decryptedFile"
     then
         info "Fichier déchiffré avec succès: '$decryptedFile'."
     else
@@ -262,6 +371,19 @@ function decryptFile()
     return
 }
 
+
+##
+# @brief Ajoute une clé publique à associer au fichier chiffré.
+#
+# @param key  Clé publique.
+# @param file Nom du fichier chiffré.
+#
+# @pre file Doit pouvoir être ouvert en lecture.
+#
+# @since 1.0.0
+# @date 11 avril 2026
+# @author DekkrixX
+##
 function add()
 {
     local key=$1
@@ -279,6 +401,19 @@ function add()
     return
 }
 
+
+##
+# @brief Supprime une clé publique associée au fichier chiffré.
+#
+# @param key  Clé publique.
+# @param file Nom du fichier chiffré.
+#
+# @pre file Doit pouvoir être ouvert en lecture.
+#
+# @since 1.0.0
+# @date 11 avril 2026
+# @author DekkrixX
+##
 function remove()
 {
     local key=$1
@@ -296,6 +431,14 @@ function remove()
     return
 }
 
+
+##
+# @brief Lit tous les fichiers de clé .asc et afficher la clé publique de chaque fichier.
+#
+# @since 1.0.0
+# @date 11 avril 2026
+# @author DekkrixX
+##
 function readKeys()
 {
     local keys=""
@@ -313,8 +456,9 @@ function readKeys()
             continue
         fi
 
-        debug "Clé trouvée : '$(basename "$key")' -> '$fpr'."
-        keys="$keys $(basename $key): $fpr\n"
+        debug "Clé trouvée: '$(basename "$key")' -> '$fpr'."
+        local file=$(basename $key)
+        keys="$keys ${file%.asc}: $fpr\n"
     done
 
     echo -e "$keys"
@@ -322,6 +466,18 @@ function readKeys()
     return
 }
 
+
+##
+# @brief Affichage de la clé publique d'un fichier .asc.
+#
+# @param file Nom du fichier de clé .asc.
+#
+# @pre file Doit pouvoir être ouvert en lecture.
+#
+# @since 1.0.0
+# @date 11 avril 2026
+# @author DekkrixX
+##
 function getKeyFromFile()
 {
     local file=$1
@@ -347,6 +503,15 @@ function getKeyFromFile()
 #  Point d'entrée du script
 # =============================================================================
 
+##
+# @brief Parsing des arguments et exécution de la bonne commande.
+#
+# @param $@ Tous les arguments du script.
+#
+# @since 1.0.0
+# @date 11 avril 2026
+# @author DekkrixX
+##
 function main()
 {
     # Parsing de l'option -h/--help en première position
@@ -498,4 +663,7 @@ function main()
 }
 
 # Lancement du script avec tous les arguments
-main "$@"
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
+then
+    main "${@}"
+fi

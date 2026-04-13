@@ -127,7 +127,7 @@ class AccelerometerData:
         ##
 
         for a in accelerometer:
-            if a != (-1, -1, -1):
+            if a != None:
                 self._history.append(a)
                 self._total = tuple(self._total[i] + a[i] for i in range(3))
 

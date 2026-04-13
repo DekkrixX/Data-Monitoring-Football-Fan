@@ -10,7 +10,7 @@
 //  Import des bibliothèques
 // ============================================================================
 
-import { createSupporterChart } from "./Utils/board.js";
+import { createChart } from "./Utils/board.js";
 import { subtractSeconds } from "./Utils/time.js";
 
 // ============================================================================
@@ -23,14 +23,14 @@ if (window.DEBUG)
     console.log(`[Supporter] Initialisation - Demande des données du supporter id=${window.id}`);
 
 // Création du graphique de fréquence cardiaque
-const canva = document.getElementById("chart");
-const ctx   = canva.getContext("2d");
-const chart = createSupporterChart(ctx, [{ title: window.name, color: window.color }]);
+const canvaHeartRate = document.getElementById("chart_heart-rate");
+const ctxHeartRate   = canvaHeartRate.getContext("2d");
+const chartHeartRate = createChart(ctxHeartRate, [{ title: window.name, color: window.color }], "BPM", 40, 200, 10);
 
 // Demande des données initiales du supporter
 // window.id est utilisé explicitement pour éviter toute ambiguïté avec une
 // variable locale non définie
-socket.emit("getSupporterData", window.id);
+socket.emit("getSupporterHeartRate", window.id);
 
 // ============================================================================
 //  Événements SocketIO
@@ -41,16 +41,21 @@ socket.emit("getSupporterData", window.id);
  *
  * @param {{id: number, heartRate: number, average: number, minimum: number, maximum: number}} data Données du supporter.
  */
-socket.on("getSupporterDataResponse", (data) =>
+socket.on("getSupporterHeartRateResponse", (data) =>
     {
         if (data.id !== window.id)
             return;
 
         if (window.DEBUG)
-            console.log(`[Supporter] getSupporterDataResponse - Réception des données initiales (HR=${data.heartRate} bpm)`);
+            console.log(`[Supporter] getSupporterHeartRateResponse - Réception des données initiales (HR=${data.heartRate} bpm)`);
 
-        _displayData(data.heartRate, data.average, data.minimum, data.maximum);
-        _fillGraphic(chart, data.heartRate);
+        if (data.heartRate != "")
+        {
+            _displayData(data.heartRate, data.average, data.minimum, data.maximum, "heart-rate");
+            _fillGraphicData(chartHeartRate, data.heartRate, "heart-rate");
+        }
+        else
+            _displayData(["-"], "-", "-", "-", "heart-rate");
     });
 
 /**
@@ -58,16 +63,16 @@ socket.on("getSupporterDataResponse", (data) =>
  *
  * @param {{id: number, heartRate: number, average: number, minimum: number, maximum: number}} data Nouvelles données du supporter.
  */
-socket.on("newSupporterData", (data) =>
+socket.on("newSupporterHeartRate", (data) =>
     {
         if (data.id !== window.id)
             return;
 
         if (window.DEBUG)
-            console.log(`[Supporter] newSupporterData - Nouvelle mesure reçue (HR=${data.heartRate} bpm)`);
+            console.log(`[Supporter] newSupporterHeartRate - Nouvelle mesure reçue (HR=${data.heartRate} bpm)`);
 
-        _displayData(data.heartRate, data.average, data.minimum, data.maximum);
-        _fillGraphic(chart, data.heartRate);
+        _displayData(data.heartRate, data.average, data.minimum, data.maximum, "heart-rate");
+        _fillGraphicData(chartHeartRate, data.heartRate, "heart-rate");
     });
 
 /**
@@ -149,51 +154,65 @@ function _showDisconnectMessage()
 /**
  * @brief Met à jour les éléments DOM affichant les statistiques du supporter.
  *
- * @param {number} heartRate Dernière fréquence cardiaque en bpm.
- * @param {number} average   Moyenne des fréquences cardiaques en bpm.
- * @param {number} minimum   Minimum enregistré en bpm.
- * @param {number} maximum   Maximum enregistré en bpm.
+ * @param {number} data    Dernière donnée enregistré.
+ * @param {number} average Moyenne enregistré.
+ * @param {number} minimum Minimum enregistré.
+ * @param {number} maximum Maximum enregistré.
+ * @param {string} type    Type de données.
  */
-function _displayData(heartRate, average, minimum, maximum)
+function _displayData(data, average, minimum, maximum, type)
 {
     if (window.DEBUG)
-        console.log(`[Supporter] _displayData - HR=${heartRate} bpm, avg=${average}, min=${minimum}, max=${maximum}`);
+        console.log(`[Supporter] _displayData - DATA=${data}, avg=${average}, min=${minimum}, max=${maximum} type=${type}`);
 
-    document.getElementById("heart-rate").textContent = heartRate[heartRate.length - 1];
-    document.getElementById("average").textContent    = average;
-    document.getElementById("minimum").textContent    = minimum;
-    document.getElementById("maximum").textContent    = maximum;
+    const grid = document.getElementById(type);
+    grid.querySelector(`.${type}`).textContent = data[data.length - 1];
+    grid.querySelector(".average").textContent = average;
+    grid.querySelector(".minimum").textContent = minimum;
+    grid.querySelector(".maximum").textContent = maximum;
 }
 
 /**
- * @brief Ajoute un nouveau point de fréquence cardiaque sur le graphique.
+ * @brief Ajoute un nouveau point de données sur le graphique.
  *
- * @param {Chart}  chart     Instance Chart.js cible.
- * @param {number} heartRate Valeur de fréquence cardiaque en bpm.
+ * @param {Chart}  chart Instance Chart.js cible.
+ * @param {number} data  Valeur de la donnée.
+ * @param {number} type  Type de données.
  */
-function _fillGraphic(chart, heartRate)
+function _fillGraphicData(chart, data, type)
 {
     const now = new Date();
 
-    for (let i=heartRate.length - 1; i >= 0; i--)
+    for (let i=data.length - 1; i >= 0; i--)
     {
-        if (heartRate[i] != 0)
+        if (data[i] != 0)
         { 
             // Heure de la mesure formatée HH:MM:SS comme label de l'axe X
-            const time = new Date(subtractSeconds(now, i * window.heartRateSensorDelay));
+            const time = new Date(subtractSeconds(now, i * window.sensorDelay));
             const timestamp = time.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
 
             if (window.DEBUG)
-                console.log(`[Supporter] _fillGraphic - Ajout du point HR=${heartRate[i]} bpm à t=${timestamp}`);
+                console.log(`[Supporter] _fillGraphicData - Ajout du point DATA=${data[i]} à t=${timestamp}`);
 
-            chart.data.labels.push(timestamp);
-            chart.data.datasets[0].data.push(heartRate[i]);
+            if (type == "heart-rate")
+            {
+                chart.data.labels.push(timestamp);
+                chart.data.datasets[0].data.push(data[i]);
+            }
+            else
+            {
+                if (window.DEBUG)
+                console.log(`[Supporter] _fillGraphicData - Type de données inconnue: ${type}`);
+            }
 
             // Limite l'historique affiché à 100 points
             if (chart.data.labels.length > 100)
             {
-                chart.data.labels.shift();
-                chart.data.datasets[0].data.shift();
+                if (type == "heart-rate")
+                {
+                    chart.data.labels.shift();
+                    chart.data.datasets[0].data.shift();
+                }
             }
         }
     }

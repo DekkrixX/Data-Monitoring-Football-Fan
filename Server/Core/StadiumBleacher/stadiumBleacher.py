@@ -13,6 +13,7 @@
 
 from Server.Config.setting import Config
 from Server.Core.StadiumBleacher.Data.accelerometer import AccelerometerData
+from Server.Core.StadiumBleacher.Data.acoustic import AcousticData
 from Server.Utils.logger import Logger
 
 # =============================================================================
@@ -44,9 +45,10 @@ class StadiumBleacher:
         # @param name        Nom d'affichage de la tribune du stade.
         ##
 
-        self.stadiumBleacherId = stadiumBleacherId  ##< @brief Identifiant unique de la tribune du stade.
-        self.name              = name               ##< @brief Nom d'affichage de la tribune du stade.
-        self.accelerometer     = AccelerometerData() ##< @brief Données de fréquence cardiaque du supporter.
+        self.stadiumBleacherId = stadiumBleacherId   ##< @brief Identifiant unique de la tribune du stade.
+        self.name              = name                ##< @brief Nom d'affichage de la tribune du stade.
+        self.accelerometer     = AccelerometerData() ##< @brief Données d'accélération de la tribune.
+        self.acoustic          = AcousticData()      ##< @brief Données acoustic de la tribune.
 
 # =============================================================================
 #  Accesseurs
@@ -84,6 +86,8 @@ class StadiumBleacher:
 
         if dataType == "accelerometer_gyroscope":
             self.accelerometer.addData(data["a"])
+        elif dataType == "acoustic":
+            self.acoustic.addData(data["a"])
         else:
             # Type inconnu : logué mais non bloquant
             logger.warning(f"[StadiumBleacher] Type de données inconnu ignoré : '{dataType}'")

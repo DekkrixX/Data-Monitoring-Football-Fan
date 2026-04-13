@@ -32,8 +32,8 @@ Format d'envoi: JSON
 
 Format d'envoi: JSON
 {
-    "t"  : <string>,    # Type de capteur
-    "n"  : <string>,    # Nom du capteur
-    "bid": <int>,       # Identifiant de la tribune du stade
-    "db" : [<float>, ...] # Liste de valeurs de décibel
+    "t"  : <string>,      # Type de capteur
+    "n"  : <string>,      # Nom du capteur
+    "bid": <int>,         # Identifiant de la tribune du stade
+    "a"  : [<float>, ...] # Liste de valeurs de décibel
 }

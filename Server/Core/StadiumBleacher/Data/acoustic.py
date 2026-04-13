@@ -29,7 +29,7 @@ class AcousticData:
 
         self._history  = []        ##< @brief Historique complet des mesures.
         self._lastData = []        ##< @brief Dernier envoi de données par le capteur.
-        self._total    = (0, 0, 0) ##< @brief Somme cumulée des mesures pour le calcul de la moyenne.
+        self._total    = 0         ##< @brief Somme cumulée des mesures pour le calcul de la moyenne.
         self._minimum  = None      ##< @brief Valeur minimale enregistrée (None si aucune mesure).
         self._maximum  = None      ##< @brief Valeur maximale enregistrée (None si aucune mesure).
 
@@ -57,7 +57,7 @@ class AcousticData:
         if not self._history:
             return None
 
-        return tuple(self._total[i] / len(self._history) for i in range(3))
+        return self._total // len(self._history)
 
 
     def getMinimum(self):
@@ -80,7 +80,7 @@ class AcousticData:
         return self._maximum
 
 
-    def getAccelerometer(self):
+    def getAcoustic(self):
         ##
         # @brief Retourne le dernier envoi de donnée du capteur.
         #
@@ -100,14 +100,14 @@ class AcousticData:
         ##
 
         for a in acoustic:
-            if a != (-1, -1, -1):
+            if a != None:
                 self._history.append(a)
                 self._total += a
 
-                if self._minimum is None or hr < self._minimum:
+                if self._minimum is None or a < self._minimum:
                     self._minimum = a
 
-                if self._maximum is None or hr > self._maximum:
+                if self._maximum is None or a > self._maximum:
                     self._maximum = a
 
         self._lastData = acoustic

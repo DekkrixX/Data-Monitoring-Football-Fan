@@ -57,7 +57,7 @@ socket.on("getSupporterResponse", (dataList) =>
             if (DEBUG)
                 console.log("[Index] getSupporterResponse - Ajout de la carte de comparaison");
 
-            const comparison = comparisonCard("Supporter");
+            const comparison = comparisonCard("Supporter", "heart_rate", "Fréquence cardiaque");
             grid.appendChild(comparison);
         }
     });
@@ -95,7 +95,7 @@ socket.on("supporterConnection", (data) =>
                 if (DEBUG)
                     console.log("[Index] supporterConnection - Ajout de la carte de comparaison");
 
-                const comparison = comparisonCard("Supporter");
+                const comparison = comparisonCard("Supporter", "heart_rate", "Fréquence cardiaque");
                 grid.appendChild(comparison);
             }
         }
@@ -160,8 +160,10 @@ socket.on("getStadiumBleacherResponse", (dataList) =>
             if (DEBUG)
                 console.log("[Index] getStadiumBleacherResponse - Ajout de la carte de comparaison");
 
-            const comparison = comparisonCard("StadiumBleacher");
-            grid.appendChild(comparison);
+            const comparison1 = comparisonCard("StadiumBleacher", "accelerometer", "Mouvement");
+            const comparison2 = comparisonCard("StadiumBleacher", "acoustic", "Acoustique");
+            grid.appendChild(comparison1);
+            grid.appendChild(comparison2);
         }
     });
 
@@ -198,8 +200,10 @@ socket.on("stadiumBleacherConnection", (data) =>
                 if (DEBUG)
                     console.log("[Index] stadiumBleacherConnection - Ajout de la carte de comparaison");
 
-                const comparison = comparisonCard("StadiumBleacher");
-                grid.appendChild(comparison);
+                const comparison1 = comparisonCard("StadiumBleacher", "accelerometer", "Mouvement");
+                const comparison2 = comparisonCard("StadiumBleacher", "acoustic", "Acoustique");
+                grid.appendChild(comparison1);
+                grid.appendChild(comparison2);
             }
         }
     });

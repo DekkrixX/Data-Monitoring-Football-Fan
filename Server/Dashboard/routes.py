@@ -66,7 +66,7 @@ def registerRoutes(app, supporterList, stadiumBleacherList):
                     id=supporter.getId(),
                     name=supporter.getName(),
                     color=getColorOfSupporter(supporter.getId()),
-                    heartRateSensorDelay=Config.HEART_RATE_SENSOR_DELAY
+                    sensorDelay=Config.SENSOR_DELAY
                 )
 
         return render_template("supporter.html", debug=int(Config.DEBUG)), 404
@@ -88,26 +88,22 @@ def registerRoutes(app, supporterList, stadiumBleacherList):
                     id=stadiumBleacher.getId(),
                     name=stadiumBleacher.getName(),
                     color=getColorOfStadiumBleacher(stadiumBleacher.getId()),
-                    accelerometerGyroscopeSensorDelay=Config.ACCELEROMETER_GYROSCOPE_SENSOR_DELAY
+                    sensorDelay=Config.SENSOR_DELAY
                 )
 
         return render_template("stadiumBleacher.html", debug=int(Config.DEBUG)), 404
 
 
-    @app.route("/comparison/Supporter")
-    def comparisonSupporterPage():
+    @app.route("/comparison/<string:type>/<string:data>")
+    def comparisonPage(type, data):
         ##
-        # @brief Page de comparaison des données de tous les supporters.
+        # @brief Page de comparaison des données de tous les supporters ou toutes les tribunes du stade.
+        #
+        # @param type Type de comparaison extrait de l'URL. Le type <string:…> garantit la convertion automatique par Flask.
+        # @param data Type de données extrait de l'URL. Le type <string:…> garantit la convertion automatique par Flask.
         ##
-        return render_template("comparisonSupporter.html", debug=int(Config.DEBUG), color="black", heartRateSensorDelay=Config.HEART_RATE_SENSOR_DELAY)
 
-
-    @app.route("/comparison/StadiumBleacher")
-    def comparisonStadiumBleacherPage():
-        ##
-        # @brief Page de comparaison des données de toutes les tribunes.
-        ##
-        return render_template("comparisonStadiumBleacher.html", debug=int(Config.DEBUG), color="black", accelerometerGyroscopeSensorDelay=Config.ACCELEROMETER_GYROSCOPE_SENSOR_DELAY)
+        return render_template("comparison.html", debug=int(Config.DEBUG), color="black", sensorDelay=Config.SENSOR_DELAY, data=data, type=type)
 
 # ==========================================================================
 #  Gestionnaires d'erreurs HTTP

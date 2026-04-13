@@ -73,7 +73,7 @@ std::string INMP441::formatData(INMP441Data & data, int stadiumBleacherId)
     json["t"] = getMQTTTopic(SensorType::ACOUSTIC);
     json["n"] = INMP441::name;
     json["bid"] = stadiumBleacherId;
-    JsonArray array = json["db"].to<JsonArray>();
+    JsonArray array = json["a"].to<JsonArray>();
     for (int i=0; i < NB_VALUE; i++)
         array.add(data.decibel[i]);
 

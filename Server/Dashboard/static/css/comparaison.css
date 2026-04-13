@@ -68,3 +68,11 @@ header > h1
   padding: var(--sp-btn-y) var(--sp-btn-x);
   grid-column: 3; /* placé dans la troisième colonne du header */
 }
+
+/* ==============================================================
+   Contenu invisible
+   ============================================================== */
+.display-none
+{
+   display: none;
+}
