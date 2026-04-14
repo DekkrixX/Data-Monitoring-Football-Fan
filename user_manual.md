@@ -7,8 +7,8 @@
 - Désinstallation
 
 # Installation
-
-Tout d’abord il faut installer les dépendances. Pour cela, tapez la commande `make install` dans la racine du projet.
+ 
+Tout d’abord il faut installer les dépendances. Assurez vous que le paquet `make`. Si ce n'est pas le cas exécutez la commande `sudo apt install make` avant de lancer l'installation automatique avec la commande `make install` dans la racine du projet.
 Ensuite, vous devez configurer les capteurs et flasher le code sur les cartes. Tapez les commandes suivantes: `make flash TARGET=device` pour flasher le code des capteurs et `make flash TARGET=meshtastic` pour configurer les noeuds Meshtastic.
 
 # Utilisation

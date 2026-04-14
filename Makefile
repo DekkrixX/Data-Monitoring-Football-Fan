@@ -142,6 +142,8 @@ stop:
 install:
 	@echo "Package: TeXLive"
 	@sudo apt install -y texlive
+	@echo "Package: Curl"
+	@sudo apt install -y curl
 	@echo "Package: Doxygen"
 	@sudo apt install doxygen graphviz
 	@echo "Package: Mosquitto"
@@ -152,6 +154,8 @@ install:
 	@rm get-docker.sh
 	@echo "Package: Python3"
 	@sudo apt install -y python3
+	@echo "Package: Python3-venv"
+	@sudo apt install -y python3-venv
 	@echo "Création des environnements virtuels python"
 	@mkdir -p .venv
 	@echo "Environnement virtuel: PlatformIO"
@@ -192,6 +196,8 @@ install:
 remove:
 	@echo "Package: TeXLive"
 	@sudo apt remove -y texlive
+	@echo "Package: Curl"
+	@sudo apt remove -y curl
 	@echo "Package: Doxygen"
 	@sudo apt remove doxygen graphviz
 	@echo "Package: mosquitto"
@@ -204,6 +210,7 @@ remove:
 	@sudo rm /etc/apt/keyrings/docker.asc
 	@echo "Package: python3"
 	@sudo apt remove -y python3
+	@sudo apt remove -y python3-venv
 	@echo "Suppression des environnements virtuels python"
 	@rm -rf .venv
 	@echo "$(_YELLOW)Toutes les dépendances ont été supprimées$(_NO_COLOR)"

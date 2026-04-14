@@ -16,6 +16,7 @@ Cette section constitue la référence technique principale pour toute intervent
 ## Installation des dépendances
 
 Pour installer toutes les dépendances il suffit d'exécuter la commande `make install` à la racine du projet. Et pour les désinstaller il faut utiliser la commande `make remove`.
+Si `make` n'est pas installé exécutez la commande `sudo apt install make`.
 
 ## Lancement des scripts de démarrage des serveurs
 
