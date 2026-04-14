@@ -8,7 +8,7 @@ Si vous rencontrez des problèmes de permission lors de l'installation, du flash
 Pour cela utiliser les commandes suivante en remplaçant $USER par votre nom d'utilisateur.
 - `sudo usermod -aG docker $USER`
 - `sudo usermod -aG dialout $USER`
-Une fois les commandes lancées il faut relancer le terminal pour que les changements soit actif.
+Une fois les commandes lancées il faut redémarrer l'ordinateur pour que les changements soit actif.
 
 ## Problème d'installation de docker
 

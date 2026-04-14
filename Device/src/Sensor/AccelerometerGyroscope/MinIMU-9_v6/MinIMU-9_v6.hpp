@@ -10,9 +10,9 @@
  * {
  *   "t": "accelerometer_gyroscope",
  *   "n": "MinUMI-9 v6",
- *   "a": [[<int>, <int>, <int>]],
- *   "g": [[<int>, <int>, <int>]],
- *   "m": [[<int>, <int>, <int>]]
+ *   "a": [[<float>, <float>, <float>]],
+ *   "g": [[<float>, <float>, <float>]],
+ *   "m": [[<float>, <float>, <float>]]
  * }
  * @endcode
  */
@@ -57,9 +57,13 @@
 #define REGISTER_GYROSCOPE_NUMBER     0x11 ///< @brief Numéro du registre du gyroscope.
 #define REGISTER_GYROSCOPE_OUT        0x22 ///< @brief Numéro du registre de sortie du gyroscope.
 #define REGISTER_GYROSCOPE_VALUE      0x80 ///< @brief Valeur du registre du gyroscope.
-#define REGISTER_MAGNETOMETER_NUMBER  0x20 ///< @brief Numéro du registre du magnétomètre.
+#define REGISTER_MAGNETOMETER_NUMBER  0x21 ///< @brief Numéro du registre du magnétomètre.
 #define REGISTER_MAGNETOMETER_OUT     0x28 ///< @brief Numéro du registre de sortie du magnétomètre.
-#define REGISTER_MAGNETOMETER_VALUE   0x70 ///< @brief Valeur du registre du magnétomètre.
+#define REGISTER_MAGNETOMETER_VALUE   0x0  ///< @brief Valeur du registre du magnétomètre.
+
+#define ACCELEROMETER_SENSITIVITY 0.000061 ///< @brief Sensibilité de l'accéléromètre.
+#define GYROSCOPE_SENSITIVITY     0.00875  ///< @brief Sensibilité du gyroscope.
+#define MAGNETOMETER_SENSITIVITY  6842     ///< @brief Sensibilité du magnétomètre.
 
 /*
  * @}
@@ -85,10 +89,10 @@ class MinIMU_9_v6: public AccelerometerGyroscope
          */
         struct MinIMU_9_v6Data
         {
-            int dataIndex = 0;                             ///< Taille courante des buffers de données.
-            int accelerometer[NB_VALUE][3] = {-1, -1, -1}; ///< @brief Buffer de données de l'accéléromètre.
-            int gyroscope[NB_VALUE][3]     = {-1, -1, -1}; ///< @brief Buffer de données du gyroscope.
-            int magnetometer[NB_VALUE][3]  = {-1, -1, -1}; ///< @brief Buffer de données du magnétomètre.
+            int dataIndex = 0;                               ///< Taille courante des buffers de données.
+            float accelerometer[NB_VALUE][3] = {-1, -1, -1}; ///< @brief Buffer de données de l'accéléromètre.
+            float gyroscope[NB_VALUE][3]     = {-1, -1, -1}; ///< @brief Buffer de données du gyroscope.
+            float magnetometer[NB_VALUE][3]  = {-1, -1, -1}; ///< @brief Buffer de données du magnétomètre.
         };
         using MinIMU_9_v6Data = struct MinIMU_9_v6Data;
 
@@ -98,6 +102,7 @@ class MinIMU_9_v6: public AccelerometerGyroscope
 
     public:
         static const std::string name; ///< @brief Nom du capteur.
+        static const float g1;         ///< @brief Constante de gravitation.
     private:
         static Logger * logger; /// <@brief Logger qui écrit les logs dans un fichier.
 

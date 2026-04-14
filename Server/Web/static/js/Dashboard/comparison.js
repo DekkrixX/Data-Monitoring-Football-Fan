@@ -45,9 +45,9 @@ if (window.type == "Supporter" && window.data == "heart_rate")
 }
 else if (window.type == "StadiumBleacher" && window.data == "accelerometer")
 {
-    chartX = createChart(ctxX, [], "", -32768, 32767, 1000);
-    chartY = createChart(ctxY, [], "", -32768, 32767, 1000);
-    chartZ = createChart(ctxZ, [], "", -32768, 32767, 1000);
+    chartX = createChart(ctxX, [], "m/s²", -156.96, 156.96, 10);
+    chartY = createChart(ctxY, [], "m/s²", -156.96, 156.96, 10);
+    chartZ = createChart(ctxZ, [], "m/s²", -156.96, 156.96, 10);
     canvaX.parentElement.classList.remove("display-none");
     canvaY.parentElement.classList.remove("display-none");
     canvaZ.parentElement.classList.remove("display-none");
@@ -56,7 +56,7 @@ else if (window.type == "StadiumBleacher" && window.data == "accelerometer")
 }
 else if (window.type == "StadiumBleacher" && window.data == "acoustic")
 {
-    chart = createChart(ctx, [], "DB", 55, 120, 5);
+    chart = createChart(ctx, [], "DB", 0, 160, 10);
     socket.emit("getStadiumBleacherAcousticAll");
 }
 else
@@ -328,7 +328,7 @@ function _addToGraphic(chart, name, color)
         data:            [],
         borderColor:     color,
         backgroundColor: color + "33", // Couleur de fond avec opacité 20%
-        fill:            true,
+        fill:            false,
         tension:         0.4,
         pointRadius:     4,
         borderWidth:     3

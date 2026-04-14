@@ -26,7 +26,7 @@ if (window.DEBUG)
 // Création du graphique d'accélération
 const canvaAccelerometer = document.getElementById("chart_accelerometer");
 const ctxAccelerometer   = canvaAccelerometer.getContext("2d");
-const chartAccelerometer = createChart(ctxAccelerometer, [], "", -32768, 32767, 1000);
+const chartAccelerometer = createChart(ctxAccelerometer, [], "", -156.96, 156.96, 10);
 
 // Couleurs dérivées
 const colorX = color;                   // couleur originale
@@ -67,7 +67,7 @@ chartAccelerometer.data.datasets.push({
 // Création du graphique acoustic
 const canvaAcoustic = document.getElementById("chart_acoustic");
 const ctxAcoustic   = canvaAcoustic.getContext("2d");
-const chartAcoustic = createChart(ctxAcoustic, [{ title: window.name, color: window.color}], "DB", 55, 120, 5);
+const chartAcoustic = createChart(ctxAcoustic, [{ title: window.name, color: window.color}], "DB", 0, 160, 10);
 
 // Demande des données initiales de la tribune
 // window.id est utilisé explicitement pour éviter toute ambiguïté avec une

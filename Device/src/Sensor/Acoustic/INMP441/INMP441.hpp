@@ -54,7 +54,7 @@
  * @}
  */
 
-#define RMS_REFERENCE 800 ///< @brief Valeur référence pour la convertion en décibel.
+#define RMS_REFERENCE 120 ///< @brief Valeur référence pour la convertion en décibel.
 
 /**
  * @class INMP441

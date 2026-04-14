@@ -20,6 +20,7 @@
 // ============================================================================
 
 const std::string MinIMU_9_v6::name = "MinIMU-9 v6";
+const float MinIMU_9_v6::g1 = 9.81;
 Logger * MinIMU_9_v6::logger = nullptr;
 
 // ============================================================================
@@ -54,7 +55,7 @@ MinIMU_9_v6::~MinIMU_9_v6()
 std::string MinIMU_9_v6::formatData(MinIMU_9_v6Data & data, int stadiumBleacherId)
 {
 #if DEBUG == 1
-    MinIMU_9_v6::logger->info(Logger::logString("[MinIMU-9 V6] formatData - Accelerometre: [%d, %d, %d] Gyroscope: [%d, %d, %d] Magnetometre: [%d, %d, %d]\n", data.accelerometer[0], data.accelerometer[1], data.accelerometer[2], data.gyroscope[0], data.gyroscope[1], data.gyroscope[2], data.magnetometer[0], data.magnetometer[1], data.magnetometer[2]));
+    MinIMU_9_v6::logger->info(Logger::logString("[MinIMU-9 V6] formatData - Accelerometre: [%f, %f, %f] Gyroscope: [%f, %f, %f] Magnetometre: [%f, %f, %f]\n", data.accelerometer[0], data.accelerometer[1], data.accelerometer[2], data.gyroscope[0], data.gyroscope[1], data.gyroscope[2], data.magnetometer[0], data.magnetometer[1], data.magnetometer[2]));
 #endif
 
     std::string jsonString;
@@ -137,29 +138,39 @@ void MinIMU_9_v6::end()
 
 void MinIMU_9_v6::update()
 {
+    int rawData[3];
+
 #if DEBUG == 1
     MinIMU_9_v6::logger->info(Logger::logString("[MINIMU-9 V6] update - Mise à jour du capteur\n"));
 #endif
 
     // Lecture de l'accéléromètre
-    readRegister(LSM6DS33_ADDRESS, REGISTER_ACCELEROMETER_OUT, this->data.accelerometer[this->data.dataIndex]);
+    readRegister(LSM6DS33_ADDRESS, REGISTER_ACCELEROMETER_OUT, rawData);
+    // Conversion de la valeur brute
+    for (int i=0; i < 3; i++)
+        this->data.accelerometer[this->data.dataIndex][i] = rawData[i] * ACCELEROMETER_SENSITIVITY * MinIMU_9_v6::g1;
 
 #if DEBUG == 1
-    MinIMU_9_v6::logger->info(Logger::logString("[MINIMU-9 V6] update - Accelerometre: x:%d y:%d z:%d", this->data.accelerometer[this->data.dataIndex][0], this->data.accelerometer[this->data.dataIndex][1], this->data.accelerometer[this->data.dataIndex][2]));
+    MinIMU_9_v6::logger->info(Logger::logString("[MINIMU-9 V6] update - Accelerometre: x:%f y:%f z:%f", this->data.accelerometer[this->data.dataIndex][0], this->data.accelerometer[this->data.dataIndex][1], this->data.accelerometer[this->data.dataIndex][2]));
 #endif
     
     // Lecture du gyroscope
-    readRegister(LSM6DS33_ADDRESS, REGISTER_GYROSCOPE_OUT, this->data.gyroscope[this->data.dataIndex]);
+    readRegister(LSM6DS33_ADDRESS, REGISTER_GYROSCOPE_OUT, rawData);
+    // Conversion de la valeur brute
+    for (int i=0; i < 3; i++)
+        this->data.gyroscope[this->data.dataIndex][i] = rawData[i] * GYROSCOPE_SENSITIVITY;
 
 #if DEBUG == 1
-    MinIMU_9_v6::logger->info(Logger::logString("[MINIMU-9 V6] update - Gyroscope: x:%d y:%d z:%d", this->data.gyroscope[this->data.dataIndex][0], this->data.gyroscope[this->data.dataIndex][1], this->data.gyroscope[this->data.dataIndex][2]));
+    MinIMU_9_v6::logger->info(Logger::logString("[MINIMU-9 V6] update - Gyroscope: x:%f y:%f z:%f", this->data.gyroscope[this->data.dataIndex][0], this->data.gyroscope[this->data.dataIndex][1], this->data.gyroscope[this->data.dataIndex][2]));
 #endif
 
     // Lecture du magnétomètre
-    readRegister(LIS3MDL_ADDRESS, REGISTER_MAGNETOMETER_OUT, this->data.magnetometer[this->data.dataIndex]);
+    readRegister(LIS3MDL_ADDRESS, REGISTER_MAGNETOMETER_OUT, rawData);
+    for (int i=0; i < 3; i++)
+        this->data.magnetometer[this->data.dataIndex][i] = (float) (rawData[i] / MAGNETOMETER_SENSITIVITY);
 
 #if DEBUG == 1
-    MinIMU_9_v6::logger->info(Logger::logString("[MINIMU-9 V6] update - Magnetometre: x:%d y:%d z:%d", this->data.magnetometer[this->data.dataIndex][0], this->data.magnetometer[this->data.dataIndex][1], this->data.magnetometer[this->data.dataIndex][2]));
+    MinIMU_9_v6::logger->info(Logger::logString("[MINIMU-9 V6] update - Magnetometre: x:%f y:%f z:%f", this->data.magnetometer[this->data.dataIndex][0], this->data.magnetometer[this->data.dataIndex][1], this->data.magnetometer[this->data.dataIndex][2]));
 #endif
 
     // Mise à jour des données
@@ -169,7 +180,7 @@ void MinIMU_9_v6::update()
 #if DEBUG == 1
     MinIMU_9_v6::logger->info(Logger::logString("[MinIMU-9 V6] update - Nouvelle mesure sérialisée: %s", format.c_str()));
 #else
-    MinIMU_9_v6::logger->info(Logger::logString("Accéléromètre: %d,%d,%d\nGyroscope: %d,%d,%d\nMagnétomètre: %d,%d,%d\n", this->data.accelerometer[this->data.dataIndex][0], this->data.accelerometer[this->data.dataIndex][1], this->data.accelerometer[this->data.dataIndex][2], this->data.gyroscope[this->data.dataIndex][0], this->data.gyroscope[this->data.dataIndex][1], this->data.gyroscope[this->data.dataIndex][2], this->data.magnetometer[this->data.dataIndex][0], this->data.magnetometer[this->data.dataIndex][1], this->data.magnetometer[this->data.dataIndex][2]));
+    MinIMU_9_v6::logger->info(Logger::logString("Accéléromètre: %f,%f,%f\nGyroscope: %f,%f,%f\nMagnétomètre: %f,%f,%f\n", this->data.accelerometer[this->data.dataIndex][0], this->data.accelerometer[this->data.dataIndex][1], this->data.accelerometer[this->data.dataIndex][2], this->data.gyroscope[this->data.dataIndex][0], this->data.gyroscope[this->data.dataIndex][1], this->data.gyroscope[this->data.dataIndex][2], this->data.magnetometer[this->data.dataIndex][0], this->data.magnetometer[this->data.dataIndex][1], this->data.magnetometer[this->data.dataIndex][2]));
 #endif
 
     this->data.dataIndex++;

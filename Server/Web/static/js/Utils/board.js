@@ -178,7 +178,7 @@ export function createChart(ctx, list, value, min, max, step)
                 data:            [],
                 borderColor:     element.color,
                 backgroundColor: element.color + "33", // Couleur de fond avec opacité 20%
-                fill:            true,
+                fill:            false,
                 tension:         0.4,
                 pointRadius:     4,
                 borderWidth:     3
