@@ -10,8 +10,8 @@
 //  Import des bibliothèques
 // ============================================================================
 
-import { createChart } from "./Utils/board.js";
-import { subtractSeconds } from "./Utils/time.js";
+import { createChart } from "../Utils/board.js";
+import { subtractSeconds } from "../Utils/time.js";
 
 // ============================================================================
 //  Initialisation

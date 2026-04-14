@@ -10,7 +10,7 @@
 //  Import des bibliothèques
 // ============================================================================
 
-import { supporterCard, stadiumBleacherCard, comparisonCard } from "./Utils/board.js";
+import { supporterCard, stadiumBleacherCard, comparisonCard } from "../Utils/board.js";
 
 // ============================================================================
 //  Initialisation

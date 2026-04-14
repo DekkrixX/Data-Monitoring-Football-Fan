@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Préparation du match</title>
+        <link rel="stylesheet" href="{{ url_for('static, filename='css/base.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/Control/preparation.css') }}">
+    </head>
+    <body>
+        <script src="{{ url_for('static', filename='lib/socket.io.min.js') }}"></script>
+        <script>
+            // Définition des variables dynamiques
+            window.DEBUG = {{ debug }};
+        </script>
+        <script type="module" src="{{ url_for('static', filename='js/Control/preparation.js') }}"></script>
+    </body>
+</html>

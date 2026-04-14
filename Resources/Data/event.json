@@ -1,0 +1,158 @@
+[
+    {
+        "category": "Phase de jeu",
+        "event": [
+            {
+                "name": "Coup d'envoi du début du match",
+                "code": 1
+            },
+            {
+                "name": "Fin de la première mi-temps",
+                "code": 2
+            },
+            {
+                "name": "Coup d'envoi de la seconde mi-temps",
+                "code": 3
+            },
+            {
+                "name": "Fin de la seconde mi-temps",
+                "code": 4
+            },
+            {
+                "name": "Coup d'envoi de la première mi-temps des prolongations",
+                "code": 5
+            },
+            {
+                "name": "Fin de la première mi-temps des prolongations",
+                "code": 6
+            },
+            {
+                "name": "Coup d'envoi de la seconde mi-temps des prolongations",
+                "code": 7
+            },
+            {
+                "name": "Fin de la seconde mi-temps des prolongations",
+                "code": 8
+            },
+            {
+                "name": "Début de la séance de tir au but",
+                "code": 9
+            },
+            {
+                "name": "Fin de la séance de tir au but",
+                "code": 10
+            },
+            {
+                "name": "Temps additionnel",
+                "code": 11
+            },
+            {
+                "name": "Fin du match",
+                "code": 12
+            },
+        ]
+    },
+    {
+        "category": "Fait de jeu",
+        "event": [
+            {
+                "name": "Tir cadré"
+                "code": 13
+            },
+            {
+                "name": "Tir non cadré",
+                "code": 14
+            },
+            {
+                "name": "Tir sur la barre",
+                "code": 15
+            },
+            {
+                "name": "Tir sur le poteau",
+                "code": 16
+            },
+            {
+                "name": "But",
+                "code": 17
+            },
+            {
+                "name": "Arrêt du gardien",
+                "code": 18
+            },
+            {
+                "name": "Hors jeu",
+                "code": 19
+            },
+            {
+                "name": "Faute légère",
+                "code": 20
+            },
+            {
+                "name": "Faute grave",
+                "code": 21
+            },
+            {
+                "name": "Carton jaune",
+                "code": 22
+            },
+            {
+                "name": "Carton rouge",
+                "code": 23
+            },
+            {
+                "name": "Blessure",
+                "code": 24
+            }
+        ]
+    },
+    {
+        "category": "Reprise de jeu",
+        "event": [
+            {
+                "name": "Touche",
+                "code": 25
+            },
+            {
+                "name": "Corner",
+                "code": 26
+            },
+            {
+                "name": "Sortie de but",
+                "code": 27
+            },
+            {
+                "name": "Coup franc",
+                "code": 28
+            },
+            {
+                "name": "Pénalty",
+                "code": 29
+            },
+            {
+                "name": "Engagement",
+                "code": 30
+            }
+        ]
+    },
+    {
+        "category": "Intervention exterieur",
+        "event": [
+            {
+                "name": "Intervention de la VAR",
+                "code": 31
+            },
+            {
+                "name": "Fin d'intervention de la VAR",
+                "code": 32
+            },
+            {
+                "name": "Arrêt du jeu",
+                "code": 33
+            },
+            {
+                "name": "Reprise du jeu",
+                "code": 34
+            }
+        ]
+    }
+]

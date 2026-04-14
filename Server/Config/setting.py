@@ -82,13 +82,12 @@ class Config:
     }
 
 # =============================================================================
-#  Dashboard
+#  Interface Web
 # =============================================================================
 
     SECRET_KEY      = os.getenv("SECRET_KEY",      None)  ##< Clé secrète Flask.
-    DASHBOARD_HOST  = os.getenv("DASHBOARD_HOST",  None)  ##< Hôte d'écoute du dashboard.
-    DASHBOARD_PORT  = int(os.getenv("DASHBOARD_PORT", 0)) ##< Port d'écoute du dashboard.
-    MAX_DATA_POINTS = 100                                 ##< Nombre maximal de points conservés en mémoire par supporter.
+    WEB_HOST  = os.getenv("WEB_HOST",  None)              ##< Hôte d'écoute de l'interface web.
+    WEB_PORT  = int(os.getenv("WEB_PORT", 0))             ##< Port d'écoute de l'interface web.
 
 # =============================================================================
 #  MQTT
@@ -154,10 +153,10 @@ class Config:
             "IMAGE_PATH":         cls.PATH["image"],
             "LOG_PATH":           cls.PATH["log"],
 
-            # Dashboard
-            "SECRET_KEY":     cls.SECRET_KEY,
-            "DASHBOARD_HOST": cls.DASHBOARD_HOST,
-            "DASHBOARD_PORT": cls.DASHBOARD_PORT,
+            # Interface Web
+            "SECRET_KEY": cls.SECRET_KEY,
+            "WEB_HOST":   cls.WEB_HOST,
+            "WEB_PORT":   cls.WEB_PORT,
 
             # MQTT
             "MQTT_BROKER_HOST":      cls.MQTT_BROKER_HOST,

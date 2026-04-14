@@ -4,7 +4,7 @@
         <meta charset="UTF-8">
         <title>Tribune n°{{ id }}</title>
         <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/stadiumBleacher.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/Dashboard/stadiumBleacher.css') }}">
         <style>
             :root 
             {
@@ -70,6 +70,6 @@
             window.color = "{{ color }}";
             window.sensorDelay = {{ sensorDelay }};
         </script>
-        <script type="module" src="{{ url_for('static', filename='js/stadiumBleacher.js') }}"></script>
+        <script type="module" src="{{ url_for('static', filename='js/Dashboard/stadiumBleacher.js') }}"></script>
     </body>
 </html>

@@ -54,11 +54,11 @@ ifeq ($(TEST), 1)
 else
 	@gnome-terminal -- bash -c ".venv/server-env/bin/python3 -m Server.Bridge.bridge_Meshtastic_MQTT"
 	@gnome-terminal -- bash -c ".venv/server-env/bin/python3 -m Server.Bridge.bridge_MQTT_InfluxDB"
-	@gnome-terminal -- bash -c ".venv/server-env/bin/python3 -m Server.Dashboard.app"
+	@gnome-terminal -- bash -c ".venv/server-env/bin/python3 -m Server.Web.app"
 	@echo "Liste des interfaces de visualisation des données :"
-	@echo "   - Dashboard : http://localhost:$(DASHBOARD_PORT)"
-	@echo "   - Grafana   : http://localhost:$(GRAFANA_PORT)"
-	@echo "   - InfluxDB  : http://localhost:$(INFLUXDB_PORT)"
+	@echo "   - Interface Web : http://localhost:$(WEB_PORT)"
+	@echo "   - Grafana       : http://localhost:$(GRAFANA_PORT)"
+	@echo "   - InfluxDB      : http://localhost:$(INFLUXDB_PORT)"
 endif
 
 ################################################################################

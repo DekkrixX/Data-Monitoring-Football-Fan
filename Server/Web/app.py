@@ -1,7 +1,7 @@
 ##
 # @file app.py
 #
-# @brief Point d'entrée principal du dashboard web.
+# @brief Point d'entrée principal de l'interface web.
 #
 # Initialise l'application Flask, la WebSocket SocketIO et le client MQTT, puis démarre le serveur. Les messages MQTT reçus créent ou mettent à jour les supporters et poussent les données aux clients web en temps réel.
 ##
@@ -21,8 +21,8 @@ from Server.Core.StadiumBleacher.stadiumBleacher import StadiumBleacher
 from Server.Utils.display import printBanner
 from Server.Utils.data import createSupporterHeartRateForClient, getNameOfSupporter, getColorOfSupporter, createStadiumBleacherAccelerometerForClient, createStadiumBleacherAcousticForClient, getNameOfStadiumBleacher, getColorOfStadiumBleacher
 from Server.Core.mqtt import MQTTClientWrapper
-from Server.Dashboard.routes import registerRoutes
-from Server.Dashboard.socketioHandlers import registerSocketioHandlers
+from Server.Web.routes import registerRoutes
+from Server.Web.socketioHandlers import registerSocketioHandlers
 from Server.Utils.logger import Logger
 
 # =============================================================================
@@ -49,19 +49,19 @@ socketio = None
 
 def main():
     ##
-    # @brief Initialise et démarre le dashboard web.
+    # @brief Initialise et démarre l'interface web.
     #
     # @throws RuntimeError Si le démarrage du serveur SocketIO échoue.
     ##
 
     global socketio
 
-    printBanner("   Dashboard Web")
+    printBanner("   Interface Web")
 
     if Config.DEBUG:
-        print("\nDashboard Web:")
-        print(f"   Host: {Config.DASHBOARD_HOST}")
-        print(f"   Port: {Config.DASHBOARD_PORT}")
+        print("\nInterface Web:")
+        print(f"   Host: {Config.WEB_HOST}")
+        print(f"   Port: {Config.WEB_PORT}")
         print()
 
     app      = _createFlaskApp()
@@ -72,7 +72,7 @@ def main():
 
     # Connexion au broker MQTT pour recevoir les données des supporters en temps réel
     mqttClient = MQTTClientWrapper(
-        "dashboard",
+        "interface web",
         Config.MQTT_BROKER_HOST,
         Config.MQTT_BROKER_PORT,
         Config.MQTT_BROKER_KEEPALIVE,
@@ -87,10 +87,10 @@ def main():
     mqttClient.start(blocking=False)
 
     try:
-        socketio.run(app, host=Config.DASHBOARD_HOST, port=Config.DASHBOARD_PORT, use_reloader=False)
+        socketio.run(app, host=Config.WEB_HOST, port=Config.WEB_PORT, use_reloader=False)
 
     except Exception as e:
-        message = "[Dashboard] Erreur lors du démarrage du serveur SocketIO"
+        message = "[APP] Erreur lors du démarrage du serveur SocketIO"
         logger.error(message)
         raise RuntimeError(message) from e
 
@@ -113,11 +113,11 @@ def _onMqttMessage(message):
     # @param message Message paho-mqtt reçu (topic, payload, qos, retain).
     ##
 
-    logger.info(f"[Dashboard] Message MQTT brut reçu : {message}")
+    logger.info(f"[APP] Message MQTT brut reçu : {message}")
 
     data = json.loads(message.payload.decode())
 
-    logger.info(f"[Dashboard] Données décodées : {data}")
+    logger.info(f"[APP] Données décodées : {data}")
 
     # Message de supporter
     if "sid" in data:
@@ -153,7 +153,7 @@ def _createFlaskApp():
     # @return Flask Instance Flask configurée.
     ##
 
-    logger.info("[Dashboard] Création de l'application Flask")
+    logger.info("[APP] Création de l'application Flask")
 
     app = Flask(__name__)
     app.config["SECRET_KEY"]            = Config.SECRET_KEY
@@ -194,7 +194,7 @@ def _createSupporter(supporterId, topic):
 
     global socketio
 
-    logger.info(f"[Dashboard] Nouveau supporter détecté (id={supporterId})")
+    logger.info(f"[APP] Nouveau supporter détecté (id={supporterId})")
 
     name  = getNameOfSupporter(supporterId)
     color = getColorOfSupporter(supporterId)
@@ -205,7 +205,7 @@ def _createSupporter(supporterId, topic):
         # heartRate=None: valeur initiale avant la première mesure
         payload = createSupporterHeartRateForClient(supporterId, name, color, None)
     else:
-        logger.warning(f"[Dashboard] Topic MQTT inconnu (topic={topic})")
+        logger.warning(f"[APP] Topic MQTT inconnu (topic={topic})")
         return
     
     socketio.emit("supporterConnection", payload)
@@ -236,7 +236,7 @@ def _addSupporterHeartRate(data):
             socketio.emit("newSupporterHeartRate", payload)
             return
 
-    logger.warning(f"[Dashboard] Données reçues pour un supporter inconnu (id={supporterId}), message ignoré")
+    logger.warning(f"[APP] Données reçues pour un supporter inconnu (id={supporterId}), message ignoré")
 
 
 # =============================================================================
@@ -269,7 +269,7 @@ def _createStadiumBleacher(stadiumBleacherId, topic):
 
     global socketio
 
-    logger.info(f"[Dashboard] Nouvelle tribune détecté (id={stadiumBleacherId})")
+    logger.info(f"[APP] Nouvelle tribune détecté (id={stadiumBleacherId})")
 
     name  = getNameOfStadiumBleacher(stadiumBleacherId)
     color = getColorOfStadiumBleacher(stadiumBleacherId)
@@ -283,7 +283,7 @@ def _createStadiumBleacher(stadiumBleacherId, topic):
         # acoustic=None: valeur initiale avant la première mesure
         payload = createStadiumBleacherAcousticForClient(stadiumBleacherId, name, color, None)
     else:
-        logger.warning(f"[Dashboard] Topic MQTT inconnu (topic={topic})")
+        logger.warning(f"[APP] Topic MQTT inconnu (topic={topic})")
         return
 
     socketio.emit("stadiumBleacherConnection", payload)
@@ -314,7 +314,7 @@ def _addStadiumBleacherAccelerometer(data):
             socketio.emit("newStadiumBleacherAccelerometer", payload)
             return
 
-    logger.warning(f"[Dashboard] Données reçues pour une tribune inconnu (id={stadiumBleacherId}), message ignoré")
+    logger.warning(f"[APP] Données reçues pour une tribune inconnu (id={stadiumBleacherId}), message ignoré")
 
 
 def _addStadiumBleacherAcoustic(data):
@@ -341,7 +341,7 @@ def _addStadiumBleacherAcoustic(data):
             socketio.emit("newStadiumBleacherAcoustic", payload)
             return
 
-    logger.warning(f"[Dashboard] Données reçues pour une tribune inconnu (id={stadiumBleacherId}), message ignoré")
+    logger.warning(f"[APP] Données reçues pour une tribune inconnu (id={stadiumBleacherId}), message ignoré")
 
 
 # =============================================================================

@@ -38,16 +38,16 @@ def registerRoutes(app, supporterList, stadiumBleacherList):
 
     logger.info("[Routes] Enregistrement des routes et gestionnaires d'erreurs")
 
-# ==========================================================================
+# =============================================================================
 #  Pages principales
-# ==========================================================================
+# =============================================================================
 
     @app.route("/")
     def index():
         ##
         # @brief Page d'accueil : liste tous les supporters actifs.
         ##
-        return render_template("index.html", debug=int(Config.DEBUG))
+        return render_template("Dashboard/index.html", debug=int(Config.DEBUG))
 
 
     @app.route("/supporter/<int:supporter_id>")
@@ -61,7 +61,7 @@ def registerRoutes(app, supporterList, stadiumBleacherList):
         for supporter in supporterList:
             if supporter.getId() == supporter_id:
                 return render_template(
-                    "supporter.html",
+                    "Dashboard/supporter.html",
                     debug=int(Config.DEBUG),
                     id=supporter.getId(),
                     name=supporter.getName(),
@@ -69,7 +69,7 @@ def registerRoutes(app, supporterList, stadiumBleacherList):
                     sensorDelay=Config.SENSOR_DELAY
                 )
 
-        return render_template("supporter.html", debug=int(Config.DEBUG)), 404
+        return render_template("Dashboard/supporter.html", debug=int(Config.DEBUG)), 404
 
 
     @app.route("/stadiumBleacher/<int:stadium_bleacher_id>")
@@ -83,7 +83,7 @@ def registerRoutes(app, supporterList, stadiumBleacherList):
         for stadiumBleacher in stadiumBleacherList:
             if stadiumBleacher.getId() == stadium_bleacher_id:
                 return render_template(
-                    "stadiumBleacher.html",
+                    "Dashboard/stadiumBleacher.html",
                     debug=int(Config.DEBUG),
                     id=stadiumBleacher.getId(),
                     name=stadiumBleacher.getName(),
@@ -91,7 +91,7 @@ def registerRoutes(app, supporterList, stadiumBleacherList):
                     sensorDelay=Config.SENSOR_DELAY
                 )
 
-        return render_template("stadiumBleacher.html", debug=int(Config.DEBUG)), 404
+        return render_template("Dashboard/stadiumBleacher.html", debug=int(Config.DEBUG)), 404
 
 
     @app.route("/comparison/<string:type>/<string:data>")
@@ -103,32 +103,53 @@ def registerRoutes(app, supporterList, stadiumBleacherList):
         # @param data Type de données extrait de l'URL. Le type <string:…> garantit la convertion automatique par Flask.
         ##
 
-        return render_template("comparison.html", debug=int(Config.DEBUG), color="black", sensorDelay=Config.SENSOR_DELAY, data=data, type=type)
+        return render_template("Dashboard/comparison.html", debug=int(Config.DEBUG), color="black", sensorDelay=Config.SENSOR_DELAY, data=data, type=type)
 
-# ==========================================================================
+# =============================================================================
+#  Pages de contrôle
+# =============================================================================
+
+    @app.route("/event")
+    def eventPage():
+        ##
+        # @brief Page de conrôle des évènements.
+        ##
+
+        return render_template("Control/event.html", debug=int(Config.DEBUG))
+
+
+    @app.route("/event/preparation")
+    def preparationPage():
+        ##
+        # @brief Page de préparation d'avant match.
+        ##
+
+        return render_template("Control/preparation.html", debug=int(Config.DEBUG))
+
+# =============================================================================
 #  Gestionnaires d'erreurs HTTP
-# ==========================================================================
+# =============================================================================
 
     @app.errorhandler(400)
     def badRequest(error):
-        return render_template("error.html", code=400), 400
+        return render_template("Control/error.html", code=400), 400
 
     @app.errorhandler(401)
     def unauthorized(error):
-        return render_template("error.html", code=401), 401
+        return render_template("Control/error.html", code=401), 401
 
     @app.errorhandler(403)
     def forbidden(error):
-        return render_template("error.html", code=403), 403
+        return render_template("Control/error.html", code=403), 403
 
     @app.errorhandler(404)
     def pageNotFound(error):
-        return render_template("error.html", code=404), 404
+        return render_template("Control/error.html", code=404), 404
 
     @app.errorhandler(408)
     def timeout(error):
-        return render_template("error.html", code=408), 408
+        return render_template("Control/error.html", code=408), 408
 
     @app.errorhandler(500)
     def internalError(error):
-        return render_template("error.html", code=500), 500
+        return render_template("Control/error.html", code=500), 500

@@ -1,7 +1,7 @@
 ##
 # @file socketioHandlers.py
 #
-# @brief Enregistrement des gestionnaires d'événements SocketIO du dashboard.
+# @brief Enregistrement des gestionnaires d'événements SocketIO de l'interface web.
 #
 # Déclare les handlers pour les événements "getSupporter", "getSupporterData" et "getSupporterDataAll" émis par les clients web.
 ##

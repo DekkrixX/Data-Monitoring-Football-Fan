@@ -10,9 +10,9 @@
 //  Import des bibliothèques
 // ============================================================================
 
-import { createChart } from "./Utils/board.js";
-import { subtractSeconds } from "./Utils/time.js";
-import { dataToString, typeToString } from "./Utils/stringConversion.js";
+import { createChart } from "../Utils/board.js";
+import { subtractSeconds } from "../Utils/time.js";
+import { dataToString, typeToString } from "../Utils/stringConversion.js";
 
 // ============================================================================
 //  Initialisation

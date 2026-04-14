@@ -4,7 +4,7 @@
         <meta charset="UTF-8">
         <title>Dashboard</title>
         <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/Dashboard/index.css') }}">
     </head>
     <body>
         <header>
@@ -21,6 +21,6 @@
             // Définition des variables dynamiques
             const DEBUG = {{ debug }};
         </script>
-        <script type="module" src="{{ url_for('static', filename='js/index.js') }}"></script>
+        <script type="module" src="{{ url_for('static', filename='js/Dashboard/index.js') }}"></script>
     </body>
 </html>
