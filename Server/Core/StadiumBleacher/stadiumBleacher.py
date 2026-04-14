@@ -75,14 +75,13 @@ class StadiumBleacher:
 #  Ajout de données
 # =============================================================================
 
-    def addData(self, data):
+    def addData(self, data, dataType):
         ##
         # @brief Distribue une nouvelle mesure vers le bon objet de données selon son type.
         #
-        # @param data Dictionnaire contenant au minimum les clés "type" et la valeur associée.
+        # @param data     Dictionnaire contenant au minimum les clés "type" et la valeur associée.
+        # @param dataType Type de la données à ajouter.
         ##
-
-        dataType = data.get("t")
 
         if dataType == "accelerometer_gyroscope":
             self.accelerometer.addData(data["a"])

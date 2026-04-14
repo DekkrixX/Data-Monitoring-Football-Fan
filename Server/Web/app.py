@@ -119,27 +119,24 @@ def _onMqttMessage(message):
 
     logger.info(f"[APP] Données décodées : {data}")
 
-    # Message de supporter
-    if "sid" in data:
-        supporterId = data["sid"]
+    topic = message.topic.split("/")
+    dataType = topic[1]
+    idf = int(topic[2])
 
-        if not _supporterExists(supporterId):
-            _createSupporter(supporterId, data["t"])
-
-        if data["t"] == "heart_rate":
-            _addSupporterHeartRate(data)
-
-    # Message de tribune du stade
-    if "bid" in data:
-        stadiumBleacherId = data["bid"]
-
-        if not _stadiumBleacherExists(stadiumBleacherId):
-            _createStadiumBleacher(stadiumBleacherId, data["t"])
-
-        if data["t"] == "accelerometer_gyroscope":
-            _addStadiumBleacherAccelerometer(data)
-        elif data["t"] == "acoustic":
-            _addStadiumBleacherAcoustic(data)
+    if dataType == "heart_rate":
+        if not _supporterExists(idf):
+            _createSupporter(idf, dataType)
+        _addSupporterHeartRate(idf, data)
+    elif dataType == "accelerometer_gyroscope":
+        if not _stadiumBleacherExists(idf):
+            _createStadiumBleacher(idf, dataType)
+        _addStadiumBleacherAccelerometer(idf, data)
+    elif dataType == "acoustic":
+        if not _stadiumBleacherExists(idf):
+            _createStadiumBleacher(idf, dataType)
+        _addStadiumBleacherAcoustic(idf, data)
+    else:
+        logger.warning(f"[APP] Topic MQTT non reconnu : {message.topic}")
 
 
 # =============================================================================
@@ -211,20 +208,20 @@ def _createSupporter(supporterId, topic):
     socketio.emit("supporterConnection", payload)
 
 
-def _addSupporterHeartRate(data):
+def _addSupporterHeartRate(supporterId, data):
     ##
     # @brief Enregistre une nouvelle mesure pour le supporter correspondant et pousse la mise à jour aux clients web via SocketIO.
     #
-    # @param data Dictionnaire de données reçu depuis le broker MQTT.
+    # @param supporterId Identifiant du nouveau supporter.
+    # @param data        Dictionnaire de données reçu depuis le broker MQTT.
     ##
 
-    supporterId = data["sid"]
     name        = getNameOfSupporter(supporterId)
     color       = getColorOfSupporter(supporterId)
 
     for supporter in supporterList:
         if supporter.getId() == supporterId:
-            supporter.addData(data)
+            supporter.addData(data, "heart_rate")
 
             payload = createSupporterHeartRateForClient(supporter.getId(), name, color, data["hr"])
             payload.update({
@@ -289,20 +286,20 @@ def _createStadiumBleacher(stadiumBleacherId, topic):
     socketio.emit("stadiumBleacherConnection", payload)
 
 
-def _addStadiumBleacherAccelerometer(data):
+def _addStadiumBleacherAccelerometer(stadiumBleacherId, data):
     ##
     # @brief Enregistre une nouvelle mesure pour la tribune correspondant et pousse la mise à jour aux clients web via SocketIO.
     #
-    # @param data Dictionnaire de données reçu depuis le broker MQTT.
+    # @param stadiumBleacherId Identifiant de la nouvelle tribune.
+    # @param data              Dictionnaire de données reçu depuis le broker MQTT.
     ##
 
-    stadiumBleacherId = data["bid"]
     name              = getNameOfStadiumBleacher(stadiumBleacherId)
     color             = getColorOfStadiumBleacher(stadiumBleacherId)
 
     for stadiumBleacher in stadiumBleacherList:
         if stadiumBleacher.getId() == stadiumBleacherId:
-            stadiumBleacher.addData(data)
+            stadiumBleacher.addData(data, "accelerometer_gyroscope")
 
             payload = createStadiumBleacherAccelerometerForClient(stadiumBleacher.getId(), name, color, data["a"])
             payload.update({
@@ -317,20 +314,20 @@ def _addStadiumBleacherAccelerometer(data):
     logger.warning(f"[APP] Données reçues pour une tribune inconnu (id={stadiumBleacherId}), message ignoré")
 
 
-def _addStadiumBleacherAcoustic(data):
+def _addStadiumBleacherAcoustic(stadiumBleacherId, data):
     ##
     # @brief Enregistre une nouvelle mesure pour la tribune correspondant et pousse la mise à jour aux clients web via SocketIO.
     #
+    # @param stadiumBleacherId Identifiant de la nouvelle tribune.
     # @param data Dictionnaire de données reçu depuis le broker MQTT.
     ##
 
-    stadiumBleacherId = data["bid"]
     name              = getNameOfStadiumBleacher(stadiumBleacherId)
     color             = getColorOfStadiumBleacher(stadiumBleacherId)
 
     for stadiumBleacher in stadiumBleacherList:
         if stadiumBleacher.getId() == stadiumBleacherId:
-            stadiumBleacher.addData(data)
+            stadiumBleacher.addData(data, "acoustic")
 
             payload = createStadiumBleacherAcousticForClient(stadiumBleacher.getId(), name, color, data["a"])
             payload.update({

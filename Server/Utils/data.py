@@ -127,7 +127,7 @@ def _getStadiumBleacherField(stadiumBleacherId, field):
         if item["id"] == stadiumBleacherId:
             return item[field]
 
-    message = f"[Data] Aucune tribune de stade trouvé avec l'id '{supporterId}'"
+    message = f"[Data] Aucune tribune de stade trouvé avec l'id '{stadiumBleacherId}'"
     logger.error(message)
     raise RuntimeError(message)
 
