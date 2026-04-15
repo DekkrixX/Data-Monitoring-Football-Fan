@@ -12,6 +12,7 @@
 # =============================================================================
 
 import time
+import glob
 import meshtastic
 import meshtastic.serial_interface
 from pubsub import pub

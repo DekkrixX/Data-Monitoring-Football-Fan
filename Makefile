@@ -1,25 +1,6 @@
-################################################################################
-#	Makefile écrit par Quentin GUILLEMOD                                       #
-################################################################################
-
-# Nom de la documentation
-DOCNAME = DOCUMENTATION
-
-# Chemin de la documentation
-DOCPATH = Documentation/
-
-# Fichiers de documentation
-DOCFILES = $(DOCPATH)/main.md $(DOCPATH)/architecture.md $(DOCPATH)/equipment.md $(DOCPATH)/test.md $(DOCPATH)/debug.md $(DOCPATH)/development.md
-
-# Dossier des scripts de flash
-DFLASH = .Flash
-DFLASH_TEST = Tests/Distance/Flash
-# Script flash à exécuter
-ifeq ($(TEST), 1)
-	FLASH_SCRIPT = $(DFLASH_TEST)/$(TARGET).sh
-else
-	FLASH_SCRIPT = $(DFLASH)/$(TARGET).sh
-endif
+# =============================================================================
+#  Makefile écrit par Quentin GUILLEMOD
+# =============================================================================
 
 # Définition des variables d'environnement
 include .env
@@ -27,8 +8,11 @@ export
 export APP_DEVICE = $(APP) - Device
 export APP_SERVER = $(APP) - Server
 
+# Fichiers générés
+GEN_FILES = Device/doc Server/doc Device/pio Device/data
+
 # Définition des couleurs
-_NO_COLOR = \033[m
+_RESET	 = \033[m
 _BLACK = \033[1;30m
 _RED = \033[1;31m
 _GREEN = \033[1;32m
@@ -38,120 +22,112 @@ _MAGENTA = \033[1;35m
 _CYAN = \033[1;36m
 _WHITE = \033[1;37m
 
-# Fichiers générés
-GEN_FILES = $(DOCNAME).md Device/.pio Device/data Device/doc Server/**/__pycache__ Server/doc Tests/Distance/Device/.pio Tests/Distance/__pycache__
+.PHONY: build run stop logs clean help
+.DEFAULT_GOAL := help
 
+# =============================================================================
+#  Construction des conteneurs Docker
+# =============================================================================
+build:
+	@echo "$(_YELLOW)Construction des conteneurs Docker$(_RESET)"
+	@docker compose build
 
-.PHONY: server doc load run stop install remove clean help
-.DEFAULT_GOAL = help
+# =============================================================================
+#  Lancement des conteneurs Docker
+# =============================================================================
+run:
+	@echo "$(_YELLOW)Lancement des conteneurs Docker$(_RESET)"
+	@docker compose up -d
 
-################################################################################
-#	Mise en route des serveurs												   #
-################################################################################
-server: 
-ifeq ($(TEST), 1)
-	@gnome-terminal -- bash -c ".venv/server-env/bin/python3 -m Tests.Distance.log"
-else
-	@gnome-terminal -- bash -c ".venv/server-env/bin/python3 -m Server.Bridge.bridge_Meshtastic_MQTT"
-	@gnome-terminal -- bash -c ".venv/server-env/bin/python3 -m Server.Bridge.bridge_MQTT_InfluxDB"
-	@gnome-terminal -- bash -c ".venv/server-env/bin/python3 -m Server.Web.app"
-	@echo "Liste des interfaces de visualisation des données :"
-	@echo "   - Interface Web : http://localhost:$(WEB_PORT)"
-	@echo "   - Grafana       : http://localhost:$(GRAFANA_PORT)"
-	@echo "   - InfluxDB      : http://localhost:$(INFLUXDB_PORT)"
-endif
+# =============================================================================
+#  Arrêt des conteneurs Docker
+# =============================================================================
+stop:
+	@echo "$(_YELLOW)Arrêt des conteneurs Docker$(_RESET)"
+	@docker compose down
 
-################################################################################
-#	Création de la documentation                                               #
-################################################################################
-doc: doc-markdown doc-device doc-server
-	@echo "$(_YELLOW)La documentation à été créée$(_NO_COLOR)"
-doc-markdown:
-	@pandoc $(DOCFILES) --from markdown --to markdown -o $(DOCNAME).md
-doc-device:
+# =============================================================================
+#  Affichage des logs des conteneurs Docker
+# =============================================================================
+log:
+	@if [ -z "$(TARGET)" ]; \
+	then \
+		echo "$(_YELLOW)Logs de tous les conteneurs Docker$(_RESET)"; \
+	else \
+		echo "$(_YELLOW)Logs du conteneurs Docker: $(TARGET)$(_RESET)"; \
+	fi
+	@docker compose logs -f $(TARGET)
+
+# =============================================================================
+#  Suppression des volumes Docker
+# =============================================================================
+clear:
+	@echo "$(_YELLOW)Suppression des volumes Docker$(_RESET)"
+	@docker compose down -v
+
+# =============================================================================
+#  Création de la documentation
+# =============================================================================
+doc:
+	@echo "$(_YELLOW)Création de la documentation du Device$(_RESET)"
 	@doxygen Device/Doxyfile
-doc-server:
+	@echo "$(_YELLOW)Création de la documentation du Server$(_RESET)"
 	@doxygen Server/Doxyfile
 
-################################################################################
-#	Flash le code sur la carte                                                 #
-################################################################################
-flash:
-	@if [ -z "$(TARGET)" ]; then \
-		echo "$(_WHITE)Usage du flash:$(_NO_COLOR)"; \
-		echo "   $(_MAGENTA)make flash TARGET=<cible>$(_NO_COLOR)"; \
-		echo ""; \
-		echo "$(_WHITE)Cibles:$(_NO_COLOR)"; \
-		echo "   - device : Flash le programme du device"; \
-		echo "   - meshtastic : Flash la configuration Meshtastic"; \
+# =============================================================================
+#  Nettoyage l'environnement
+# =============================================================================
+clean:
+	@echo "$(_YELLOW)Nettoyage de l'environnement$(_RESET)"
+	@rm -rf $(GEN_FILES)
+
+# =============================================================================
+#  Affichage de l'usage des scripts
+# =============================================================================
+script:
+	@if [ -z "$(TARGET)" ]; \
+	then \
+		echo "Liste des scripts"; \
+		echo " - envcrypt"; \
+		echo " - flash"; \
+		echo " - logviewer"; \
+		echo " - readSerialLog"; \
 	else \
-		bash $(FLASH_SCRIPT); \
+		if [ "$(TARGET)" = "envcrypt" ]; \
+		then \
+			echo "$(_YELLOW)Menu d'aide du script envcrypt$(_RESET)"; \
+			bash "$(SCRIPT_PATH)envcrypt.sh" "--help"; \
+		elif [ "$(TARGET)" = "flash" ]; \
+		then \
+			echo "$(_YELLOW)Menu d'aide du script flash$(_RESET)"; \
+			bash "$(SCRIPT_PATH)flash.sh" "--help"; \
+		elif [ "$(TARGET)" = "logviewer" ]; \
+		then \
+			echo "$(_YELLOW)Menu d'aide du script logviewer$(_RESET)"; \
+			bash "$(SCRIPT_PATH)logviewer.sh" "--help"; \
+		elif [ "$(TARGET)" = "readSerialLog" ]; \
+		then \
+			echo "$(TARGET)Menu d'aide du script readSerialLog$(_RESET)"; \
+			bash "$(SCRIPT_PATH)readSerialLog.sh" "--help"; \
+		else \
+			echo "$(_RED)Aucun menu d'aide n'est disponible pour le script $(TARGET)$(_RESET)"; \
+		fi; \
 	fi
 
-################################################################################
-#	Lance les serveurs locaux                                                  #
-################################################################################
-run:
-	@echo "Lancement du broker MQTT"
-	@systemctl start mosquitto
-	@echo "Lancement de Docker"
-	@systemctl start docker
-	@echo "Lancement de InfluxDB"
-	@docker run -d \
-	--name influxdb \
-	--restart unless-stopped \
-	-p $(INFLUXDB_PORT):$(INFLUXDB_PORT) \
-	-v influxdb-data:/var/lib/influxdb2 \
-	-e DOCKER_INFLUXDB_INIT_MODE=setup \
-	-e DOCKER_INFLUXDB_INIT_USERNAME=$(INFLUXDB_USERNAME) \
-	-e DOCKER_INFLUXDB_INIT_PASSWORD=$(INFLUXDB_PASSWORD) \
-	-e DOCKER_INFLUXDB_INIT_ORG=$(INFLUXDB_ORG) \
-	-e DOCKER_INFLUXDB_INIT_BUCKET=$(INFLUXDB_BUCKET) \
-	-e DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=$(INFLUXDB_TOKEN) \
-	influxdb:2.7
-	@echo "Lancement de Grafana"
-	@docker run -d \
-	--name grafana \
-	--restart unless-stopped \
-	-p $(GRAFANA_PORT):$(GRAFANA_PORT) \
-	-v grafana-storage:/var/lib/grafana \
-	-e GF_SECURITY_ADMIN_USER=$(GRAFANA_USERNAME) \
-	-e GF_SECURITY_ADMIN_PASSWORD=$(GRAFANA_PASSWORD) \
-	grafana/grafana:latest
-
-################################################################################
-#	Arrête les serveurs locaux                                                 #
-################################################################################
-stop:
-	@echo "Arrêt du broker MQTT"
-	@systemctl stop mosquitto
-	@echo "Arrêt de InfluxDB"
-	@docker stop influxdb
-	@docker rm influxdb
-	@docker volume rm influxdb-data
-	@echo "Arrêt de Grafana"
-	@docker stop grafana
-	@docker rm grafana
-	@docker volume rm grafana-storage
-	@echo "Arrêt de Docker"
-	@systemctl stop docker
-
-################################################################################
-#	Installe toutes les dépendances                                            #
-################################################################################
+# =============================================================================
+#  Installation des dépendances
+# =============================================================================
 install:
-	@echo "Package: TeXLive"
-	@sudo apt install -y texlive
+	@echo "$(_YELLOW)Installation des dépendances$(_RESET)"
 	@echo "Package: Curl"
 	@sudo apt install -y curl
 	@echo "Package: Doxygen"
-	@sudo apt install doxygen graphviz
-	@echo "Package: Mosquitto"
-	@sudo apt install -y mosquitto mosquitto-clients
+	@sudo apt install -y doxygen graphviz
 	@echo "Package: Docker"
 	@curl -fsSL https://get.docker.com -o get-docker.sh
 	@sudo sh ./get-docker.sh
 	@rm get-docker.sh
+
 	@echo "Package: Python3"
 	@sudo apt install -y python3
 	@echo "Package: Python3-venv"
@@ -162,80 +138,55 @@ install:
 	@python3 -m venv .venv/platformio-env
 	@echo "Package: PlatformIO"
 	@.venv/platformio-env/bin/pip install platformio
-	@echo "Environement virtuel: Serveur"
-	@python3 -m venv .venv/server-env
-	@echo "Package: PySerial"
-	@.venv/server-env/bin/pip install pyserial
-	@echo "Package: MQTT"
-	@.venv/server-env/bin/pip install paho-mqtt
-	@echo "Package: InfluxDB"
-	@.venv/server-env/bin/pip install influxdb-client
-	@echo "Package: Meshtastic"
-	@.venv/server-env/bin/pip install meshtastic
-	@echo "Package: Pypubsub"
-	@.venv/server-env/bin/pip install pypubsub
-	@echo "Package: Flask"
-	@.venv/server-env/bin/pip install flask flask-socketio
-	@echo "Package: Matplotlib"
-	@.venv/server-env/bin/pip install matplotlib
-	@echo "Package: Numpy"
-	@.venv/server-env/bin/pip install numpy
-	@echo "Package: dotenv"
-	@.venv/server-env/bin/pip install python-dotenv
 	@echo "Environement virtuel: Meshtastic"
 	@python3 -m venv .venv/meshtastic-env
 	@echo "Package: Meshtastic"
 	@.venv/meshtastic-env/bin/pip install meshtastic
 	@echo "Package: ESPtool"
 	@.venv/meshtastic-env/bin/pip install esptool
-	@echo "$(_YELLOW)Toutes les dépendances ont été installées$(_NO_COLOR)"
+	@echo "$(_YELLOW)Les dépendances ont été installées$(_NO_COLOR)"
 
-################################################################################
-#	Supprime toutes les dépendances                                            #
-################################################################################
+# =============================================================================
+#  Suppression des dépendances
+# =============================================================================
 remove:
-	@echo "Package: TeXLive"
-	@sudo apt remove -y texlive
+	@echo "$(_YELLOW)Suppression des dépendances$(_RESET)"
 	@echo "Package: Curl"
 	@sudo apt remove -y curl
 	@echo "Package: Doxygen"
-	@sudo apt remove doxygen graphviz
-	@echo "Package: mosquitto"
-	@sudo apt remove -y mosquitto mosquitto-clients
-	@echo "Package: docker"
+	@sudo apt remove -y doxygen graphviz
+	@echo "Package: Docker"
 	@sudo apt purge docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-ce-rootless-extras
 	@sudo rm -rf /var/lib/docker
 	@sudo rm -rf /var/lib/containerd
 	@sudo rm /etc/apt/sources.list.d/docker.sources
 	@sudo rm /etc/apt/keyrings/docker.asc
-	@echo "Package: python3"
-	@sudo apt remove -y python3
+
+	@echo "Package: Python3-venv"
 	@sudo apt remove -y python3-venv
+	@echo "Package: Python3"
+	@sudo apt remove -y python3
 	@echo "Suppression des environnements virtuels python"
 	@rm -rf .venv
-	@echo "$(_YELLOW)Toutes les dépendances ont été supprimées$(_NO_COLOR)"
+	@sudo apt autoremove -y
+	@echo "$(_YELLOW)Les dépendances ont été supprimées$(_NO_COLOR)"
 
-################################################################################
-#	Nettoie l'environnement de dévelopement                                     #
-################################################################################
-clean:
-	@bash -c "shopt -s globstar && rm -rf $(GEN_FILES) Logs/*"
-	@echo "$(_YELLOW)L'environnement de dévelopement a été nettoyé$(_NO_COLOR)"
-
-################################################################################
-#	Affiche l'usage du Makefile                                                #
-################################################################################
+# =============================================================================
+#  Affichage de l'usage du Makefile
+# =============================================================================
 help:
 	@echo "$(_WHITE)Usage du Makefile:$(_NO_COLOR)"
 	@echo "   $(_MAGENTA)make <cible>$(_NO_COLOR)"
 	@echo ""
 	@echo "$(_WHITE)Cibles:$(_NO_COLOR)"
-	@echo "   - server : Lance la communication serveur."
-	@echo "   - doc : Créer la documentation."
-	@echo "   - flash : Flash la carte."
-	@echo "   - run : Lance les serveurs locaux."
-	@echo "   - stop : Arrête les serveurs locaux."
+	@echo "   - build   : Construit les conteneurs Docker."
+	@echo "   - run     : Lance les conteneurs Docker."
+	@echo "   - stop    : Arrête les conteneurs Docker."
+	@echo "   - log     : Affiche les logs des conteneurs Docker. (TARGET=<conteneur>)"
+	@echo "   - clear   : Supprime les volumes Docker."
+	@echo "   - doc     : Créer la documentation."
+	@echo "   - clean   : Nettoie l'environnement."
+	@echo "   - script  : Affiche le menu d'aide des scripts. (TARGET=<script>)"
 	@echo "   - install : Installe les dépendances."
-	@echo "   - remove : Supprime les dépendances."
-	@echo "   - clean : Nettoie l'environnement de dévelopement."
-	@echo "   - help : Affiche le menu d'aide."
+	@echo "   - remove  : Supprime les dépendances."
+	@echo "   - help    : Affiche le menu d'aide."

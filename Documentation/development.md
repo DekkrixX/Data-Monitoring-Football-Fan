@@ -20,7 +20,8 @@ Si `make` n'est pas installé exécutez la commande `sudo apt install make`.
 
 ## Lancement des scripts de démarrage des serveurs
 
-Pour démarrer les différents serveurs nécessaire à la communication et visualisation des données il faut exécuter la commande `make server` à la racine du projet. Cette commande va lancer chaque serveur dans un terminal séparé et restera actif jusqu'à fermeture manuel du serveur. Le terminal reste ouvert pour permettre la visualisation des logs. Attention pour que cela fonctionne correctement il est primordial d'avoir tapper la commande `make run` pour lancer les conteneurs Docker si il ne sont pas déjà lancés. Pour les arrêter utilisez la commande `make stop`.
+Pour démarrer les différents serveurs nécessaire à la communication et visualisation des données il faut exécuter la commande `make run` à la racine du projet. Cette commande va lancer les conteneurs Docker et éxécuter les srcipts. Pour les arrêter utilisez la commande `make stop`.
+Attention seul le premier lancement du serveur nécessite une connexion à internet pour le téléchargement des images Docker.
 
 ## Procédure de flash
 

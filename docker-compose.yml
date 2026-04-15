@@ -1,0 +1,81 @@
+services:
+  influxdb:
+    image: influxdb:2.7
+    container_name: influxdb
+    ports:
+      - "${INFLUXDB_PORT}:${INFLUXDB_PORT}"
+    volumes:
+      - influxdb-data:/var/lib/influxdb2
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: ${INFLUXDB_USERNAME}
+      DOCKER_INFLUXDB_INIT_PASSWORD: ${INFLUXDB_PASSWORD}
+      DOCKER_INFLUXDB_INIT_ORG: ${INFLUXDB_ORG}
+      DOCKER_INFLUXDB_INIT_BUCKET: ${INFLUXDB_BUCKET}
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: ${INFLUXDB_TOKEN}
+
+  grafana:
+    image: grafana/grafana:12.4.2
+    container_name: grafana
+    ports:
+      - "${GRAFANA_PORT}:${GRAFANA_PORT}"
+    volumes:
+      - grafana-storage:/var/lib/grafana
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_USERNAME}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD}
+
+  mqtt:
+    image: eclipse-mosquitto
+    container_name: mosquitto
+    ports:
+      - "${MQTT_BROKER_PORT}:${MQTT_BROKER_PORT}"
+
+  bridge-meshtastic-mqtt:
+    build:
+      context: .
+      dockerfile: Server/Dockerfile
+    container_name: bridge-meshtastic-mqtt
+    env_file:
+      - .env
+    depends_on:
+      - mqtt
+    volumes:
+      - /dev:/dev
+    device_cgroup_rules:
+      - 'c 188:* rmw'
+      - 'c 166:* rmw'
+    command: python -m Server.Bridge.bridge_Meshtastic_MQTT
+
+  bridge-mqtt-influxdb:
+    build:
+      context: .
+      dockerfile: Server/Dockerfile
+    container_name: bridge-mqtt-influxdb
+    env_file:
+      - .env
+    depends_on:
+      - mqtt
+      - influxdb
+      - bridge-meshtastic-mqtt
+    command: python -m Server.Bridge.bridge_MQTT_InfluxDB
+
+  server:
+    build:
+      context: .
+      dockerfile: Server/Dockerfile
+    container_name: server
+    depends_on:
+      - mqtt
+      - influxdb
+      - bridge-meshtastic-mqtt
+      - bridge-mqtt-influxdb
+    env_file:
+      - .env
+    command: python -m Server.Web.app
+    ports:
+      - "${WEB_PORT}:${WEB_PORT}"
+
+volumes:
+  influxdb-data:
+  grafana-storage:

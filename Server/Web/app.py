@@ -87,7 +87,7 @@ def main():
     mqttClient.start(blocking=False)
 
     try:
-        socketio.run(app, host=Config.WEB_HOST, port=Config.WEB_PORT, use_reloader=False)
+        socketio.run(app, host=Config.WEB_HOST, port=Config.WEB_PORT, use_reloader=False, allow_unsafe_werkzeug=True)
 
     except Exception as e:
         message = "[APP] Erreur lors du démarrage du serveur SocketIO"
