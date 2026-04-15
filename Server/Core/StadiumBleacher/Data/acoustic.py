@@ -57,7 +57,7 @@ class AcousticData:
         if not self._history:
             return None
 
-        return self._total // len(self._history)
+        return round(self._total / len(self._history), 1)
 
 
     def getMinimum(self):

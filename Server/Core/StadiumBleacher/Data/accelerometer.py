@@ -57,7 +57,7 @@ class AccelerometerData:
         if not self._history:
             return None
 
-        return tuple(self._total[i] // len(self._history) for i in range(3))
+        return tuple(round(self._total[i] / len(self._history), 3) for i in range(3))
 
 
     def getMinimum(self):

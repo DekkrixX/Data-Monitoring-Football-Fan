@@ -76,6 +76,21 @@ services:
     ports:
       - "${WEB_PORT}:${WEB_PORT}"
 
+  test:
+    build:
+      context: .
+      dockerfile: Tests/DataSimulationServer/Dockerfile
+    container_name: test
+    depends_on:
+      - mqtt
+      - server
+    env_file:
+      - .env
+    restart: "no"
+    profiles:
+      - test
+    command: python -m Tests.DataSimulationServer.run
+
 volumes:
   influxdb-data:
   grafana-storage:

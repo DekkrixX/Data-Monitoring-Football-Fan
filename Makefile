@@ -9,7 +9,7 @@ export APP_DEVICE = $(APP) - Device
 export APP_SERVER = $(APP) - Server
 
 # Fichiers générés
-GEN_FILES = Device/doc Server/doc Device/pio Device/data
+GEN_FILES = Device/doc Server/doc Device/.pio Device/data
 
 # Définition des couleurs
 _RESET	 = \033[m
@@ -57,6 +57,13 @@ log:
 		echo "$(_YELLOW)Logs du conteneurs Docker: $(TARGET)$(_RESET)"; \
 	fi
 	@docker compose logs -f $(TARGET)
+
+# =============================================================================
+#  Lancement des conteneurs Docker de test
+# =============================================================================
+test:
+	@echo "${_YELLOW}Lancement des conteneurs Docker de test${_RESET}"
+	@docker compose --profile test up -d
 
 # =============================================================================
 #  Suppression des volumes Docker
