@@ -6,7 +6,6 @@
 # Fournit les accesseurs getNameOfSupporter() et getColorOfSupporter() qui lisent le fichier supporter.json, ainsi que createDataForClient() qui formate les données pour l'envoi via SocketIO.
 ##
 
-
 # =============================================================================
 #  Import des bibliothèques
 # =============================================================================
@@ -26,15 +25,14 @@ logger = Logger("Serveur/Data")
 #  Lecture du fichier supporter.json
 # =============================================================================
 
+##
+# @brief Charge et retourne le contenu du fichier supporter.json.
+#
+# @return list Liste de dictionnaires représentant les supporters.
+#
+# @throws RuntimeError Si le fichier est absent ou malformé.
+##
 def _loadSupporterFile():
-    ##
-    # @brief Charge et retourne le contenu du fichier supporter.json.
-    #
-    # @return list Liste de dictionnaires représentant les supporters.
-    #
-    # @throws RuntimeError Si le fichier est absent ou malformé.
-    ##
-
     filePath = Config.PATH["data"] + "supporter.json"
 
     try:
@@ -53,19 +51,21 @@ def _loadSupporterFile():
         logger.error(message)
         raise RuntimeError(message) from e
 
+    return
 
+
+
+##
+# @brief Retourne la valeur d'un champ donné pour le supporter identifié.
+#
+# @param supporterId Identifiant du supporter recherché.
+# @param field       Nom du champ à retourner (ex : "name", "color").
+#
+# @return Valeur du champ pour le supporter correspondant.
+#
+# @throws RuntimeError Si aucun supporter ne correspond à l'identifiant.
+##
 def _getSupporterField(supporterId, field):
-    ##
-    # @brief Retourne la valeur d'un champ donné pour le supporter identifié.
-    #
-    # @param supporterId Identifiant du supporter recherché.
-    # @param field       Nom du champ à retourner (ex : "name", "color").
-    #
-    # @return Valeur du champ pour le supporter correspondant.
-    #
-    # @throws RuntimeError Si aucun supporter ne correspond à l'identifiant.
-    ##
-
     supporters = _loadSupporterFile()
 
     for item in supporters:
@@ -76,20 +76,20 @@ def _getSupporterField(supporterId, field):
     logger.error(message)
     raise RuntimeError(message)
 
+    return
 
 # =============================================================================
 #  Lecture du fichier stadiumBleacher.json
 # =============================================================================
 
+##
+# @brief Charge et retourne le contenu du fichier stadiumBleacher.json.
+#
+# @return list Liste de dictionnaires représentant les tribunes.
+#
+# @throws RuntimeError Si le fichier est absent ou malformé.
+##
 def _loadStadiumBleacherFile():
-    ##
-    # @brief Charge et retourne le contenu du fichier stadiumBleacher.json.
-    #
-    # @return list Liste de dictionnaires représentant les tribunes.
-    #
-    # @throws RuntimeError Si le fichier est absent ou malformé.
-    ##
-
     filePath = Config.PATH["data"] + "stadiumBleacher.json"
 
     try:
@@ -108,19 +108,21 @@ def _loadStadiumBleacherFile():
         logger.error(message)
         raise RuntimeError(message) from e
 
+    return
 
+
+
+##
+# @brief Retourne la valeur d'un champ donné pour la tribune identifié.
+#
+# @param stadiumBleacherId Identifiant de la tribune recherché.
+# @param field             Nom du champ à retourner.
+#
+# @return Valeur du champ pour la tribune correspondant.
+#
+# @throws RuntimeError Si aucune tribune ne correspond à l'identifiant.
+##
 def _getStadiumBleacherField(stadiumBleacherId, field):
-    ##
-    # @brief Retourne la valeur d'un champ donné pour la tribune identifié.
-    #
-    # @param stadiumBleacherId Identifiant de la tribune recherché.
-    # @param field             Nom du champ à retourner (ex : "name", "color").
-    #
-    # @return Valeur du champ pour la tribune correspondant.
-    #
-    # @throws RuntimeError Si aucune tribune ne correspond à l'identifiant.
-    ##
-
     stadiumBleachers = _loadStadiumBleacherFile()
 
     for item in stadiumBleachers:
@@ -131,62 +133,64 @@ def _getStadiumBleacherField(stadiumBleacherId, field):
     logger.error(message)
     raise RuntimeError(message)
 
+    return
 
 # =============================================================================
 #  Accesseurs publics
 # =============================================================================
 
+##
+# @brief Retourne le nom du supporter correspondant à l'identifiant donné.
+#
+# @param supporterId Identifiant numérique du supporter.
+#
+# @return str Nom du supporter.
+#
+# @throws RuntimeError Si aucun supporter ne correspond à l'identifiant.
+##
 def getNameOfSupporter(supporterId):
-    ##
-    # @brief Retourne le nom du supporter correspondant à l'identifiant donné.
-    #
-    # @param supporterId Identifiant numérique du supporter.
-    #
-    # @return str Nom du supporter.
-    #
-    # @throws RuntimeError Si aucun supporter ne correspond à l'identifiant.
-    ##
     return _getSupporterField(supporterId, "name")
 
 
+
+##
+# @brief Retourne la couleur du supporter correspondant à l'identifiant donné.
+#
+# @param supporterId Identifiant numérique du supporter.
+#
+# @return str Couleur du supporter.
+#
+# @throws RuntimeError Si aucun supporter ne correspond à l'identifiant.
+##
 def getColorOfSupporter(supporterId):
-    ##
-    # @brief Retourne la couleur du supporter correspondant à l'identifiant
-    #        donné.
-    #
-    # @param supporterId Identifiant numérique du supporter.
-    #
-    # @return str Couleur du supporter (ex : "#FF0000").
-    #
-    # @throws RuntimeError Si aucun supporter ne correspond à l'identifiant.
-    ##
     return _getSupporterField(supporterId, "color")
 
 
+
+##
+# @brief Retourne le nom de la tribune correspondant à l'identifiant donné.
+#
+# @param stadiumBleacherId Identifiant numérique de la tribune.
+#
+# @return str Nom de la tribune.
+#
+# @throws RuntimeError Si aucune tribune ne correspond à l'identifiant.
+##
 def getNameOfStadiumBleacher(stadiumBleacherId):
-    ##
-    # @brief Retourne le nom de la tribune correspondant à l'identifiant donné.
-    #
-    # @param stadiumBleacherId Identifiant numérique de la tribune.
-    #
-    # @return str Nom de la tribune.
-    #
-    # @throws RuntimeError Si aucune tribune ne correspond à l'identifiant.
-    ##
     return _getStadiumBleacherField(stadiumBleacherId, "name")
 
 
+
+##
+# @brief Retourne la couleur de la tribune correspondant à l'identifiant donné.
+#
+# @param stadiumBleacher Identifiant numérique de la tribune.
+#
+# @return str Couleur de la tribune.
+#
+# @throws RuntimeError Si aucune tribune ne correspond à l'identifiant.
+##
 def getColorOfStadiumBleacher(stadiumBleacherId):
-    ##
-    # @brief Retourne la couleur de la tribune correspondant à l'identifiant
-    #        donné.
-    #
-    # @param stadiumBleacher Identifiant numérique de la tribune.
-    #
-    # @return str Couleur de la tribune (ex : "#FF0000").
-    #
-    # @throws RuntimeError Si aucune tribune ne correspond à l'identifiant.
-    ##
     return _getStadiumBleacherField(stadiumBleacherId, "color")
 
 
@@ -194,18 +198,17 @@ def getColorOfStadiumBleacher(stadiumBleacherId):
 #  Formatage pour le client web
 # =============================================================================
 
+##
+# @brief Construit le dictionnaire de données envoyé au client web via SocketIO.
+#
+# @param supporterId Identifiant du supporter.
+# @param name        Nom du supporter.
+# @param color       Couleur associée au supporter.
+# @param heartRate   Dernière fréquence cardiaque en bpm.
+#
+# @return dict Données formatées pour le client. Format : { "id": …, "name": …, "color": …, "heartRate": … }
+##
 def createSupporterHeartRateForClient(supporterId, name, color, heartRate):
-    ##
-    # @brief Construit le dictionnaire de données envoyé au client web via SocketIO.
-    #
-    # @param supporterId Identifiant du supporter.
-    # @param name        Nom du supporter.
-    # @param color       Couleur associée au supporter.
-    # @param heartRate   Dernière fréquence cardiaque en bpm.
-    #
-    # @return dict Données formatées pour le client. Format : { "id": …, "name": …, "color": …, "heartRate": … }
-    ##
-
     return {
         "id":        supporterId,
         "name":      name,
@@ -213,18 +216,19 @@ def createSupporterHeartRateForClient(supporterId, name, color, heartRate):
         "heartRate": heartRate,
     }
 
-def createStadiumBleacherAccelerometerForClient(stadiumBleacherId, name, color, accelerometer):
-    ##
-    # @brief Construit le dictionnaire de données envoyé au client web via SocketIO.
-    #
-    # @param stadiumBleacherId Identifiant de la tribune.
-    # @param name              Nom de la tribune.
-    # @param color             Couleur associée à la tribune.
-    # @param accelerometer     Dernière mesure de l'accéléromètre.
-    #
-    # @return dict Données formatées pour le client. Format : { "id": …, "name": …, "color": …, "accelerometer": … }
-    ##
 
+
+##
+# @brief Construit le dictionnaire de données envoyé au client web via SocketIO.
+#
+# @param stadiumBleacherId Identifiant de la tribune.
+# @param name              Nom de la tribune.
+# @param color             Couleur associée à la tribune.
+# @param accelerometer     Dernière mesure de l'accéléromètre.
+#
+# @return dict Données formatées pour le client. Format : { "id": …, "name": …, "color": …, "accelerometer": … }
+##
+def createStadiumBleacherAccelerometerForClient(stadiumBleacherId, name, color, accelerometer):
     return {
         "id":        stadiumBleacherId,
         "name":      name,
@@ -232,18 +236,19 @@ def createStadiumBleacherAccelerometerForClient(stadiumBleacherId, name, color, 
         "accelerometer": accelerometer,
     }
 
-def createStadiumBleacherAcousticForClient(stadiumBleacherId, name, color, acoustic):
-    ##
-    # @brief Construit le dictionnaire de données envoyé au client web via SocketIO.
-    #
-    # @param stadiumBleacherId Identifiant de la tribune.
-    # @param name              Nom de la tribune.
-    # @param color             Couleur associée à la tribune.
-    # @param acostic           Dernière mesure acoustic.
-    #
-    # @return dict Données formatées pour le client. Format : { "id": …, "name": …, "color": …, "acoustic": … }
-    ##
 
+
+##
+# @brief Construit le dictionnaire de données envoyé au client web via SocketIO.
+#
+# @param stadiumBleacherId Identifiant de la tribune.
+# @param name              Nom de la tribune.
+# @param color             Couleur associée à la tribune.
+# @param acostic           Dernière mesure acoustic.
+#
+# @return dict Données formatées pour le client. Format : { "id": …, "name": …, "color": …, "acoustic": … }
+##
+def createStadiumBleacherAcousticForClient(stadiumBleacherId, name, color, acoustic):
     return {
         "id":        stadiumBleacherId,
         "name":      name,

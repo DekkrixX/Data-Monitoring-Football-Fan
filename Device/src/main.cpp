@@ -37,10 +37,10 @@
 //  Variable globale
 // ============================================================================
 
-Sensor * sensor = nullptr; ///< @brief Pointeur vers le capteur actif. Initialisé dans setup().
+Sensor * sensor           = nullptr; ///< @brief Pointeur vers le capteur actif. Initialisé dans setup().
 UARTManager * uartManager = nullptr; ///< @brief Pointeur vers le gestionnaire UART externe. Initialisé dans setup().
-unsigned long lastSendMs = 0; ///< @brief Temps du dernier envoi de données
-Logger * logger = nullptr; ///< @brief Logger qui écrit les logs dans un fichier
+unsigned long lastSendMs  = 0;       ///< @brief Temps du dernier envoi de données
+Logger * logger           = nullptr; ///< @brief Logger qui écrit les logs dans un fichier
 
 // ============================================================================
 //  Fonction setup

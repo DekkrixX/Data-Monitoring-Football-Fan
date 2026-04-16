@@ -69,15 +69,15 @@ class AccelerometerGyroscope: public Sensor
         /**
          * @copydoc Sensor::begin()
          */
-        virtual void begin() = 0;
+        virtual void begin() = 0 override;
         /**
          * @copydoc Sensor::end()
          */
-        virtual void end() = 0;
+        virtual void end() = 0 override;
         /**
          * @copydoc Sensor::update()
          */
-        virtual void update() = 0;
+        virtual void update() = 0 override;
 
 };
 

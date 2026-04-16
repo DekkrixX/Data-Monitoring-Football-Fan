@@ -27,24 +27,20 @@ from Server.Utils.logger import Logger
 logger = Logger("Serveur/Bridge_MQTT-InfluxDB")
 
 # =============================================================================
-#  Variables globales
+#  Variable globale
 # =============================================================================
 
-## @brief Client InfluxDB partagé entre main() et le callback _onMessage().
-influxdbClient = None
-## @brief Client MQTT partagé entre main() et le callback _onConnect().
-mqttClient     = None
-
+influxdbClient = None ##< @brief Client InfluxDB partagé entre main() et le callback _onMessage().
+mqttClient     = None ##< @brief Client MQTT partagé entre main() et le callback _onConnect().
 
 # =============================================================================
 #  Programme principal
 # =============================================================================
 
+##
+# @brief Initialise le bridge MQTT vers InfluxDB et démarre la boucle d'écoute MQTT bloquante.
+##
 def main():
-    ##
-    # @brief Initialise le bridge MQTT vers InfluxDB et démarre la boucle d'écoute MQTT bloquante.
-    ##
-
     global influxdbClient, mqttClient
 
     printBanner("   Bridge MQTT → InfluxDB")
@@ -62,24 +58,9 @@ def main():
         print(f"   Bucket  : {Config.INFLUXDB_BUCKET}")
         print()
 
-    mqttClient = MQTTClientWrapper(
-        "bridge_MQTT_InfluxDB",
-        Config.MQTT_BROKER_HOST,
-        Config.MQTT_BROKER_PORT,
-        Config.MQTT_BROKER_KEEPALIVE,
-        qos=Config.MQTT_BROKER_QOS,
-        onMessageCallback=_onMessage,
-        onConnectCallback=_onConnect
-    )
+    mqttClient = MQTTClientWrapper("bridge_MQTT_InfluxDB", Config.MQTT_BROKER_HOST, Config.MQTT_BROKER_PORT, Config.MQTT_BROKER_KEEPALIVE, qos=Config.MQTT_BROKER_QOS, onMessageCallback=_onMessage, onConnectCallback=_onConnect)
 
-    influxdbClient = InfluxDBClientWrapper(
-        Config.INFLUXDB_HOST,
-        Config.INFLUXDB_PORT,
-        Config.INFLUXDB_ADRESS,
-        Config.INFLUXDB_TOKEN,
-        Config.INFLUXDB_ORG,
-        Config.INFLUXDB_BUCKET
-    )
+    influxdbClient = InfluxDBClientWrapper(Config.INFLUXDB_HOST, Config.INFLUXDB_PORT, Config.INFLUXDB_ADRESS, Config.INFLUXDB_TOKEN, Config.INFLUXDB_ORG, Config.INFLUXDB_BUCKET)
 
     try:
         mqttClient.connect()
@@ -96,23 +77,23 @@ def main():
         mqttClient.stop()
         influxdbClient.close()
 
+    return
 
 # =============================================================================
 #  Callbacks MQTT
 # =============================================================================
 
+##
+# @brief Arrête le client et lève une RuntimeError si la connexion est refusée. Appelé lors de l'établissement de la connexion au broker MQTT.
+#
+# @param client   Instance paho-mqtt.
+# @param userdata Données utilisateur (non utilisé).
+# @param flags    Flags de connexion.
+# @param rc       Code de retour (0 = succès).
+#
+# @throws RuntimeError Si rc != 0 (connexion refusée par le broker).
+##
 def _onConnect(client, userdata, flags, rc):
-    ##
-    # @brief Arrête le client et lève une RuntimeError si la connexion est refusée. Appelé lors de l'établissement de la connexion au broker MQTT.
-    #
-    # @param client   Instance paho-mqtt.
-    # @param userdata Données utilisateur (non utilisé).
-    # @param flags    Flags de connexion.
-    # @param rc       Code de retour (0 = succès).
-    #
-    # @throws RuntimeError Si rc != 0 (connexion refusée par le broker).
-    ##
-
     global mqttClient
 
     if rc != 0:
@@ -121,14 +102,16 @@ def _onConnect(client, userdata, flags, rc):
         logger.error(message)
         raise RuntimeError(message)
 
+    return
 
+
+
+##
+# @brief Décode le payload JSON, construit le point InfluxDB (tags et fields) et l'écrit dans la base de données. Le champ "type" est utilisé comme nom de mesure InfluxDB. Appelé à chaque message reçu depuis le broker MQTT.
+#
+# @param message Message paho-mqtt reçu (topic, payload, qos, retain).
+##
 def _onMessage(message):
-    ##
-    # @brief Décode le payload JSON, construit le point InfluxDB (tags et fields) et l'écrit dans la base de données. Le champ "type" est utilisé comme nom de mesure InfluxDB. Appelé à chaque message reçu depuis le broker MQTT.
-    #
-    # @param message Message paho-mqtt reçu (topic, payload, qos, retain).
-    ##
-
     global influxdbClient
 
     logger.info(f"[Bridge MQTT-InfluxDB] Message brut reçu : {message}")
@@ -142,6 +125,7 @@ def _onMessage(message):
 
     influxdbClient.send(data["t"], fields, tags)
 
+    return
 
 # =============================================================================
 #  Point d'entrée

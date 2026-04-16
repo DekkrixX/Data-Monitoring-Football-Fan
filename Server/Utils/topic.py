@@ -25,18 +25,17 @@ logger = Logger("Serveur/Topic")
 #  Résolution du topic MQTT
 # =============================================================================
 
+##
+# @brief Retourne le topic MQTT correspondant à un type de données et à un identifiant de supporter.
+#
+# @param dataType    Type de données.
+# @param supporterId Identifiant numérique du supporter.
+#
+# @return str Topic MQTT résolu.
+#
+# @throws RuntimeError Si le fichier est absent, invalide ou si le type est inconnu.
+##
 def getMQTTTopic(dataType, supporterId):
-    ##
-    # @brief Retourne le topic MQTT correspondant à un type de données et à un identifiant de supporter.
-    #
-    # @param dataType   Type de données (ex : "heart_rate").
-    # @param supporterId Identifiant numérique du supporter.
-    #
-    # @return str Topic MQTT résolu.
-    #
-    # @throws RuntimeError Si le fichier est absent, invalide ou si le type est inconnu.
-    ##
-
     filePath = Config.PATH["data"] + "topicMQTT.json"
 
     try:
@@ -67,20 +66,20 @@ def getMQTTTopic(dataType, supporterId):
     logger.error(message)
     raise RuntimeError(message)
 
+    return ""
 
 # =============================================================================
 #  Construction du point InfluxDB
 # =============================================================================
 
+##
+# @brief Sépare les champs d'un message en tags et fields pour InfluxDB.
+#
+# @param data Dictionnaire de données (modifié en place : "type" retiré).
+#
+# @return tuple (tags, fields) où tags et fields sont des dictionnaires.
+##
 def buildPointInfluxDB(data):
-    ##
-    # @brief Sépare les champs d'un message en tags et fields pour InfluxDB.
-    #
-    # @param data Dictionnaire de données (modifié en place : "type" retiré).
-    #
-    # @return tuple (tags, fields) où tags et fields sont des dictionnaires.
-    ##
-
     tags   = {}
     fields = {}
 

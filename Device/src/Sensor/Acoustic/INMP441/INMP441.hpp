@@ -76,7 +76,7 @@ class INMP441: public Acoustic
          */
         struct INMP441Data
         {
-            int decibelIndex = 0;  ///< @brief Taille courante du buffer de décibel.
+            int decibelIndex = 0;    ///< @brief Taille courante du buffer de décibel.
             float decibel[NB_VALUE]; ///< @brief Buffer de décibel en db.
         };
         using INMP441Data = struct INMP441Data;
@@ -140,16 +140,19 @@ class INMP441: public Acoustic
 
     public:
         /**
+         * @copydoc Sensor::begin()
          */
-        void begin();
+        void begin() override;
         
         /**
+         * @copydoc Sensor::update()
          */
-        void update();
+        void update() override;
         
         /**
+         * @copydoc Sensor::end()
          */
-        void end();
+        void end() override;
 
         /**
          * NOT USE

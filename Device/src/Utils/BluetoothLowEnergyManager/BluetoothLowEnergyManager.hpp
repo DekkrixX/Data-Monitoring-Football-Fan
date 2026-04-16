@@ -53,22 +53,22 @@ class BluetoothLowEnergyManager
 // ============================================================================
 
     protected:
-        static Logger * logger;///< @brief Logger qui écrit les logs dans un fichier
+        static Logger * logger; ///< @brief Logger qui écrit les logs dans un fichier
 
 // ============================================================================
 //  Attribut
 // ============================================================================
 
     protected:
-        const std::string macAddress;       ///< Adresse MAC cible du périphérique Bluetooth Low Energy.
+        const std::string macAddress;       ///< @brief Adresse MAC cible du périphérique Bluetooth Low Energy.
 
-        volatile bool deviceFound;          ///< Indique si le périphérique cible a été détecté.
+        volatile bool deviceFound;          ///< @brief Indique si le périphérique cible a été détecté.
         
-        NimBLEScan * scan;                  ///< Pointeur vers l'objet de scan NimBLE.
-        NimBLEClient * client;              ///< Pointeur vers le client GATT NimBLE.
-        NimBLEAdvertisedDevice * device;    ///< Périphérique trouvé lors du scan.
-        ScanCallbacks * scanCallbacks;      ///< Callbacks du scan Bluetooth Low Energy.
-        ClientCallbacks * clientCallbacks;  ///< Callbacks de connexion/déconnexion.
+        NimBLEScan * scan;                  ///< @brief Pointeur vers l'objet de scan NimBLE.
+        NimBLEClient * client;              ///< @brief Pointeur vers le client GATT NimBLE.
+        NimBLEAdvertisedDevice * device;    ///< @brief Périphérique trouvé lors du scan.
+        ScanCallbacks * scanCallbacks;      ///< @brief Callbacks du scan Bluetooth Low Energy.
+        ClientCallbacks * clientCallbacks;  ///< @brief Callbacks de connexion/déconnexion.
 
 // ============================================================================
 //  Constructeur
@@ -115,8 +115,7 @@ class BluetoothLowEnergyManager
         /**
          * @brief Initialise la pile NimBLE, crée le client et démarre le scan.
          *
-         * @throws std::runtime_error Si l'initialisation NimBLE ou la création
-         *         du client échoue.
+         * @throws std::runtime_error Si l'initialisation NimBLE ou la création du client échoue.
          */
         void begin();
         /**
@@ -144,8 +143,7 @@ class BluetoothLowEnergyManager
          * @return NimBLEAttValue    Valeur brute retournée par le périphérique.
          * 
          * @throws std::runtime_error    Si le client n'est pas connecté.
-         * @throws std::invalid_argument Si le service ou la caractéristique est
-         *         introuvable, ou si elle n'est pas lisible.
+         * @throws std::invalid_argument Si le service ou la caractéristique est introuvable, ou si elle n'est pas lisible.
          */
         NimBLEAttValue getValue(const std::string & uuidService, const std::string & uuidCharacteristic);
         /**
@@ -154,10 +152,8 @@ class BluetoothLowEnergyManager
          * @param uuidService        UUID du service GATT cible.
          * @param uuidCharacteristic UUID de la caractéristique à surveiller.
          * 
-         * @throws std::runtime_error    Si le client n'est pas connecté ou si la
-         *         souscription échoue.
-         * @throws std::invalid_argument Si le service ou la caractéristique est
-         *         introuvable, ou si elle ne supporte pas les notifications.
+         * @throws std::runtime_error    Si le client n'est pas connecté ou si la souscription échoue.
+         * @throws std::invalid_argument Si le service ou la caractéristique est introuvable, ou si elle ne supporte pas les notifications.
          */
         void subscribe(const std::string & uuidService, const std::string & uuidCharacteristic);
 
@@ -243,7 +239,7 @@ class BluetoothLowEnergyManager
         class ClientCallbacks: public NimBLEClientCallbacks
         {
             private:
-                BluetoothLowEnergyManager * bleManager; ///< Référence vers le gestionnaire parent.
+                BluetoothLowEnergyManager * bleManager; ///< @brief Référence vers le gestionnaire parent.
 
             public:
                 /**

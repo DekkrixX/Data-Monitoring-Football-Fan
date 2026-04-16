@@ -6,7 +6,6 @@
 # Regroupe l'identité d'une tribune du stade et l'ensemble de ses données collectées en temps réel.
 ##
 
-
 # =============================================================================
 #  Import des bibliothèques
 # =============================================================================
@@ -26,63 +25,64 @@ logger = Logger("Serveur/Stadium_Bleacher")
 #  Tribune du stade
 # =============================================================================
 
+##
+# @class StadiumBleacher
+#
+# @brief Représente une tribune du stade identifié et ses données.
+##
 class StadiumBleacher:
-    ##
-    # @class StadiumBleacher
-    #
-    # @brief Représente une tribune du stade identifié et ses données.
-    ##
 
 # =============================================================================
 #  Constructeur
 # ==============================================================================
 
+    ##
+    # @brief Construit une tribune de stade avec son identifiant et son nom.
+    #
+    # @param stadiumBleacherId  Identifiant unique de la tribune du stade.
+    # @param name               Nom d'affichage de la tribune du stade.
+    ##
     def __init__(self, stadiumBleacherId, name):
-        ##
-        # @brief Construit une tribune de stade avec son identifiant et son nom.
-        #
-        # @param stadiumBleacherId  Identifiant unique de la tribune du stade (correspond à l'id dans stadiumBleacher.json).
-        # @param name        Nom d'affichage de la tribune du stade.
-        ##
-
         self.stadiumBleacherId = stadiumBleacherId   ##< @brief Identifiant unique de la tribune du stade.
         self.name              = name                ##< @brief Nom d'affichage de la tribune du stade.
         self.accelerometer     = AccelerometerData() ##< @brief Données d'accélération de la tribune.
         self.acoustic          = AcousticData()      ##< @brief Données acoustic de la tribune.
 
+        return
+
 # =============================================================================
 #  Accesseurs
 # =============================================================================
 
+    ##
+    # @brief Retourne l'identifiant unique de la tribune du stade.
+    #
+    # @return int Identifiant de la tribune du stade.
+    ##
     def getId(self):
-        ##
-        # @brief Retourne l'identifiant unique de la tribune du stade.
-        #
-        # @return int Identifiant de la tribune du stade.
-        ##
         return self.stadiumBleacherId
 
 
+
+    ##
+    # @brief Retourne le nom d'affichage de la tribune du stade.
+    #
+    # @return str Nom de la tribune du stade.
+    ##
     def getName(self):
-        ##
-        # @brief Retourne le nom d'affichage de la tribune du stade.
-        #
-        # @return str Nom de la tribune du stade.
-        ##
         return self.name
 
 # ==============================================================================
 #  Ajout de données
 # =============================================================================
 
+    ##
+    # @brief Distribue une nouvelle mesure vers le bon objet de données selon son type.
+    #
+    # @param data     Dictionnaire contenant au minimum les clés "type" et la valeur associée.
+    # @param dataType Type de la données à ajouter.
+    ##
     def addData(self, data, dataType):
-        ##
-        # @brief Distribue une nouvelle mesure vers le bon objet de données selon son type.
-        #
-        # @param data     Dictionnaire contenant au minimum les clés "type" et la valeur associée.
-        # @param dataType Type de la données à ajouter.
-        ##
-
         if dataType == "accelerometer_gyroscope":
             self.accelerometer.addData(data["a"])
         elif dataType == "acoustic":
@@ -90,3 +90,5 @@ class StadiumBleacher:
         else:
             # Type inconnu : logué mais non bloquant
             logger.warning(f"[StadiumBleacher] Type de données inconnu ignoré : '{dataType}'")
+
+        return

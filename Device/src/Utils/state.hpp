@@ -20,11 +20,11 @@
  */
 enum class ConnectionState
 {
-    DISCONNECTED,   ///< Aucune connexion active.
-    CONNECTING,     ///< Tentative de connexion en cours.
-    CONNECTED,      ///< Connexion établie et opérationnelle.
-    RECONNECTING,   ///< Reconnexion en cours après une perte de liaison.
-    ERROR           ///< Erreur irrémédiable sur la connexion.
+    DISCONNECTED,   ///< @brief Aucune connexion active.
+    CONNECTING,     ///< @brief Tentative de connexion en cours.
+    CONNECTED,      ///< @brief Connexion établie et opérationnelle.
+    RECONNECTING,   ///< @brief Reconnexion en cours après une perte de liaison.
+    ERROR           ///< @brief Erreur irrémédiable sur la connexion.
 };
 
 #endif // _STATE_HPP_

@@ -151,8 +151,6 @@ function flashConfiguration()
 
 ##
 # @brief Affiche la boîte de dialogue pour la sélection du port série.
-#
-# @return Le port série sélectionné.
 ##
 function selectPort()
 {
@@ -195,8 +193,6 @@ function selectPort()
 
 ##
 # @brief Affiche la boîte de dialogue pour la sélection du choix.
-#
-# @return Le port série sélectionné.
 ##
 function selectChoice()
 {
@@ -213,11 +209,15 @@ function selectChoice()
 
 ##
 # @brief Affiche la boîte de dialogue pour la sélection du type de noeud Meshtastic.
-#
-# @return Le type de noeud Meshtastic sélectionné.
 ##
 function selectNodeType()
 {
+    echo "Quelle est le type de noeud à configurer (gateway/sensor) ?" >&2
+    echo -n "> " >&2
+    read nodeType
+
+    echo "${nodeType}"
+
     return
 }
 

@@ -6,7 +6,6 @@
 # Initialise l'application Flask, la WebSocket SocketIO et le client MQTT, puis démarre le serveur. Les messages MQTT reçus créent ou mettent à jour les supporters et poussent les données aux clients web en temps réel.
 ##
 
-
 # =============================================================================
 #  Import des bibliothèques
 # =============================================================================
@@ -35,25 +34,20 @@ logger = Logger("Serveur/App")
 #  Variables globales
 # =============================================================================
 
-## @brief Liste des supporters actifs, alimentée par les messages MQTT.
-supporterList = []
-## @brief Liste des tribunes du stade actives, alimentée par les messages MQTT.
-stadiumBleacherList = []
-## @brief Instance SocketIO partagée entre main() et les callbacks MQTT.
-socketio = None
-
+supporterList = []       ##< @brief Liste des supporters actifs, alimentée par les messages MQTT.
+stadiumBleacherList = [] ##< @brief Liste des tribunes du stade actives, alimentée par les messages MQTT.
+socketio = None          ##< @brief Instance SocketIO partagée entre main() et les callbacks MQTT.
 
 # =============================================================================
 #  Programme principal
 # =============================================================================
 
+##
+# @brief Initialise et démarre l'interface web.
+#
+# @throws RuntimeError Si le démarrage du serveur SocketIO échoue.
+##
 def main():
-    ##
-    # @brief Initialise et démarre l'interface web.
-    #
-    # @throws RuntimeError Si le démarrage du serveur SocketIO échoue.
-    ##
-
     global socketio
 
     printBanner("   Interface Web")
@@ -71,14 +65,7 @@ def main():
     registerSocketioHandlers(socketio, supporterList, stadiumBleacherList)
 
     # Connexion au broker MQTT pour recevoir les données des supporters en temps réel
-    mqttClient = MQTTClientWrapper(
-        "interface web",
-        Config.MQTT_BROKER_HOST,
-        Config.MQTT_BROKER_PORT,
-        Config.MQTT_BROKER_KEEPALIVE,
-        qos=Config.MQTT_BROKER_QOS,
-        onMessageCallback=_onMqttMessage
-    )
+    mqttClient = MQTTClientWrapper("interface web", Config.MQTT_BROKER_HOST, Config.MQTT_BROKER_PORT, Config.MQTT_BROKER_KEEPALIVE, qos=Config.MQTT_BROKER_QOS, onMessageCallback=_onMqttMessage)
 
     mqttClient.connect()
     mqttClient.subscribe(Config.MQTT_BROKER_TOPICS)
@@ -101,18 +88,18 @@ def main():
         if mqttClient.isConnected():
             mqttClient.stop()
 
+    return
 
 # =============================================================================
 #  Callback MQTT
 # =============================================================================
 
+##
+# @brief Crée le supporter s'il n'existe pas encore dans supporterList, puis enregistre la nouvelle mesure et notifie les clients web. Appelé à chaque message reçu depuis le broker MQTT.
+#
+# @param message Message paho-mqtt reçu (topic, payload, qos, retain).
+##
 def _onMqttMessage(message):
-    ##
-    # @brief Crée le supporter s'il n'existe pas encore dans supporterList, puis enregistre la nouvelle mesure et notifie les clients web. Appelé à chaque message reçu depuis le broker MQTT.
-    #
-    # @param message Message paho-mqtt reçu (topic, payload, qos, retain).
-    ##
-
     logger.info(f"[APP] Message MQTT brut reçu : {message}")
 
     data = json.loads(message.payload.decode())
@@ -138,18 +125,18 @@ def _onMqttMessage(message):
     else:
         logger.warning(f"[APP] Topic MQTT non reconnu : {message.topic}")
 
+    return
 
 # =============================================================================
 #  Initialisation Flask
 # =============================================================================
 
+##
+# @brief Crée et configure l'instance Flask.
+#
+# @return Flask Instance Flask configurée.
+##
 def _createFlaskApp():
-    ##
-    # @brief Crée et configure l'instance Flask.
-    #
-    # @return Flask Instance Flask configurée.
-    ##
-
     logger.info("[APP] Création de l'application Flask")
 
     app = Flask(__name__)
@@ -165,30 +152,29 @@ def _createFlaskApp():
 #  Gestion des supporters
 # =============================================================================
 
+##
+# @brief Indique si un Supporter avec cet identifiant est déjà présent dans supporterList.
+#
+# @param supporterId Identifiant du supporter recherché.
+#
+# @return bool True si le supporter existe.
+# @return bool False sinon.
+##
 def _supporterExists(supporterId):
-    ##
-    # @brief Indique si un Supporter avec cet identifiant est déjà présent
-    #        dans supporterList.
-    #
-    # @param supporterId Identifiant du supporter recherché.
-    #
-    # @return bool True si le supporter existe, False sinon.
-    ##
-
     for supporter in supporterList:
         if supporter.getId() == supporterId:
             return True
     return False
 
 
-def _createSupporter(supporterId, topic):
-    ##
-    # @brief Crée un nouveau Supporter, l'ajoute à supporterList et notifie les clients web de sa connexion via SocketIO.
-    #
-    # @param supporterId Identifiant du nouveau supporter.
-    # @param topic       Topic MQTT
-    ##
 
+##
+# @brief Crée un nouveau Supporter, l'ajoute à supporterList et notifie les clients web de sa connexion via SocketIO.
+#
+# @param supporterId Identifiant du nouveau supporter.
+# @param topic       Topic MQTT
+##
+def _createSupporter(supporterId, topic):
     global socketio
 
     logger.info(f"[APP] Nouveau supporter détecté (id={supporterId})")
@@ -207,15 +193,17 @@ def _createSupporter(supporterId, topic):
     
     socketio.emit("supporterConnection", payload)
 
+    return
 
+
+
+##
+# @brief Enregistre une nouvelle mesure pour le supporter correspondant et pousse la mise à jour aux clients web via SocketIO.
+#
+# @param supporterId Identifiant du nouveau supporter.
+# @param data        Dictionnaire de données reçu depuis le broker MQTT.
+##
 def _addSupporterHeartRate(supporterId, data):
-    ##
-    # @brief Enregistre une nouvelle mesure pour le supporter correspondant et pousse la mise à jour aux clients web via SocketIO.
-    #
-    # @param supporterId Identifiant du nouveau supporter.
-    # @param data        Dictionnaire de données reçu depuis le broker MQTT.
-    ##
-
     name        = getNameOfSupporter(supporterId)
     color       = getColorOfSupporter(supporterId)
 
@@ -235,35 +223,36 @@ def _addSupporterHeartRate(supporterId, data):
 
     logger.warning(f"[APP] Données reçues pour un supporter inconnu (id={supporterId}), message ignoré")
 
+    return
 
 # =============================================================================
 #  Gestion des tribunes du stade
 # =============================================================================
 
+##
+# @brief Indique si un StadiumBleacher avec cet identifiant est déjà présent dans stadiumBleacherList.
+#
+# @param stadiumeBleacherId Identifiant de la tribune recherché.
+#
+# @return bool True si la tribune existe.
+# @return bool False sinon.
+##
 def _stadiumBleacherExists(stadiumBleacherId):
-    ##
-    # @brief Indique si un StadiumBleacher avec cet identifiant est déjà présent
-    #        dans stadiumBleacherList.
-    #
-    # @param stadiumeBleacherId Identifiant de la tribune recherché.
-    #
-    # @return bool True si la tribune existe, False sinon.
-    ##
-
     for stadiumBleacher in stadiumBleacherList:
         if stadiumBleacher.getId() == stadiumBleacherId:
             return True
     return False
 
 
-def _createStadiumBleacher(stadiumBleacherId, topic):
-    ##
-    # @brief Crée un nouveau StadiumBleacher, l'ajoute à stadiumBleacherList et notifie les clients web de sa connexion via SocketIO.
-    #
-    # @param stadiumBleacher Identifiant de la nouvelle tribune.
-    # @param topic           Topic MQTT.
-    ##
 
+
+##
+# @brief Crée un nouveau StadiumBleacher, l'ajoute à stadiumBleacherList et notifie les clients web de sa connexion via SocketIO.
+#
+# @param stadiumBleacher Identifiant de la nouvelle tribune.
+# @param topic           Topic MQTT.
+##
+def _createStadiumBleacher(stadiumBleacherId, topic):
     global socketio
 
     logger.info(f"[APP] Nouvelle tribune détecté (id={stadiumBleacherId})")
@@ -285,15 +274,17 @@ def _createStadiumBleacher(stadiumBleacherId, topic):
 
     socketio.emit("stadiumBleacherConnection", payload)
 
+    return
 
+
+
+##
+# @brief Enregistre une nouvelle mesure pour la tribune correspondant et pousse la mise à jour aux clients web via SocketIO.
+#
+# @param stadiumBleacherId Identifiant de la nouvelle tribune.
+# @param data              Dictionnaire de données reçu depuis le broker MQTT.
+##
 def _addStadiumBleacherAccelerometer(stadiumBleacherId, data):
-    ##
-    # @brief Enregistre une nouvelle mesure pour la tribune correspondant et pousse la mise à jour aux clients web via SocketIO.
-    #
-    # @param stadiumBleacherId Identifiant de la nouvelle tribune.
-    # @param data              Dictionnaire de données reçu depuis le broker MQTT.
-    ##
-
     name              = getNameOfStadiumBleacher(stadiumBleacherId)
     color             = getColorOfStadiumBleacher(stadiumBleacherId)
 
@@ -313,15 +304,17 @@ def _addStadiumBleacherAccelerometer(stadiumBleacherId, data):
 
     logger.warning(f"[APP] Données reçues pour une tribune inconnu (id={stadiumBleacherId}), message ignoré")
 
+    return
 
+
+
+##
+# @brief Enregistre une nouvelle mesure pour la tribune correspondant et pousse la mise à jour aux clients web via SocketIO.
+#
+# @param stadiumBleacherId Identifiant de la nouvelle tribune.
+# @param data Dictionnaire de données reçu depuis le broker MQTT.
+##
 def _addStadiumBleacherAcoustic(stadiumBleacherId, data):
-    ##
-    # @brief Enregistre une nouvelle mesure pour la tribune correspondant et pousse la mise à jour aux clients web via SocketIO.
-    #
-    # @param stadiumBleacherId Identifiant de la nouvelle tribune.
-    # @param data Dictionnaire de données reçu depuis le broker MQTT.
-    ##
-
     name              = getNameOfStadiumBleacher(stadiumBleacherId)
     color             = getColorOfStadiumBleacher(stadiumBleacherId)
 
@@ -340,6 +333,7 @@ def _addStadiumBleacherAcoustic(stadiumBleacherId, data):
 
     logger.warning(f"[APP] Données reçues pour une tribune inconnu (id={stadiumBleacherId}), message ignoré")
 
+    return
 
 # =============================================================================
 #  Point d'entrée

@@ -83,8 +83,8 @@ class PolarH10: public HeartRate
          */
         struct PolarH10Data
         {
-            int heartRateIndex = 0;  ///< Taille courante du buffer de fréquence cardiaque.
-            int heartRate[NB_VALUE]; ///< Buffer de fréquence cardiaque en bpm.
+            int heartRateIndex = 0;  ///< @brief Taille courante du buffer de fréquence cardiaque.
+            int heartRate[NB_VALUE]; ///< @brief Buffer de fréquence cardiaque en bpm.
         };
         using PolarH10Data = struct PolarH10Data;
 
@@ -102,12 +102,12 @@ class PolarH10: public HeartRate
 // ============================================================================
 
     private:
-        const int supporterId;                  ///< Identifiant du porteur du capteur.
+        const int supporterId;                  ///< @brief Identifiant du porteur du capteur.
 
-        bool isSubscribed;                      ///< Indique si la souscription GATT est active.
-        std::atomic<bool> isNotify;             ///< Drapeau indiquant une nouvelle notification reçue.
-        PolarH10Data data;                      ///< Dernières données collectées.
-        BluetoothLowEnergyManager * bleManager; ///< Gestionnaire Bluetooth Low Energy associé.
+        bool isSubscribed;                      ///< @brief Indique si la souscription GATT est active.
+        std::atomic<bool> isNotify;             ///< @brief Drapeau indiquant une nouvelle notification reçue.
+        PolarH10Data data;                      ///< @brief Dernières données collectées.
+        BluetoothLowEnergyManager * bleManager; ///< @brief Gestionnaire Bluetooth Low Energy associé.
 
 // ============================================================================
 //  Constructeur
@@ -152,15 +152,15 @@ class PolarH10: public HeartRate
 
     public:
         /**
-         * @brief Initialise le gestionnaire Bluetooth Low Energy.
+         * @copydoc Sensor::begin()
          */
         void begin() override;
         /**
-         * @brief Arrête le gestionnaire Bluetooth Low Energy.
+         * @copydoc Sensor::end()
          */
         void end() override;
         /**
-         * @brief Met à jour l'état Bluetooth Low Energy, gère la souscription et la sérialisation.
+         * @copydoc Sensor::update()
          */
         void update() override;
         /**

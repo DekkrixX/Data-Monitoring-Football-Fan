@@ -38,11 +38,11 @@ class Sensor
 // ============================================================================
 
     protected:
-        const std::string name;                                ///< Nom identifiant le capteur.
-        const SensorType type;                                 ///< Type fonctionnel du capteur.
+        const std::string name;                                ///< @brief Nom identifiant le capteur.
+        const SensorType type;                                 ///< @brief Type fonctionnel du capteur.
         
-        ConnectionState state = ConnectionState::DISCONNECTED; ///< État courant de la connexion.
-        std::string data;                                      ///< Dernière mesure sérialisée (JSON).
+        ConnectionState state = ConnectionState::DISCONNECTED; ///< @brief État courant de la connexion.
+        std::string data;                                      ///< @brief Dernière mesure sérialisée (JSON).
 
 // ============================================================================
 //  Constructeur

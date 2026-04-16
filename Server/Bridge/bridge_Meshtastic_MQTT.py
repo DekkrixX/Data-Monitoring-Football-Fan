@@ -30,19 +30,16 @@ logger = Logger("Serveur/Bridge_Meshtastic-MQTT")
 #  Variable globale
 # =============================================================================
 
-## @brief Client MQTT partagé entre main() et le callback _onReceive().
-mqttClient = None
-
+mqttClient = None ##< @brief Client MQTT partagé entre main() et le callback _onReceive().
 
 # =============================================================================
 #  Programme principal
 # =============================================================================
 
+##
+# @brief Initialise le bridge Meshtastic vers MQTT et démarre la boucle d'attente de paquets.
+##
 def main():
-    ##
-    # @brief Initialise le bridge Meshtastic vers MQTT et démarre la boucle d'attente de paquets.
-    ##
-
     global mqttClient
 
     printBanner("   Bridge Meshtastic → MQTT")
@@ -58,19 +55,9 @@ def main():
         print(f"   QoS       : {Config.MQTT_BROKER_QOS}")
         print()
 
-    meshtasticClient = MeshtasticClientWrapper(
-        Config.MESHTASTIC_HOST,
-        Config.MESHTASTIC_TOPIC,
-        onReceiveCallback=_onReceive
-    )
+    meshtasticClient = MeshtasticClientWrapper(Config.MESHTASTIC_HOST, Config.MESHTASTIC_TOPIC, onReceiveCallback=_onReceive)
 
-    mqttClient = MQTTClientWrapper(
-        "bridge_Meshtastic_MQTT",
-        Config.MQTT_BROKER_HOST,
-        Config.MQTT_BROKER_PORT,
-        Config.MQTT_BROKER_KEEPALIVE,
-        qos=Config.MQTT_BROKER_QOS
-    )
+    mqttClient = MQTTClientWrapper("bridge_Meshtastic_MQTT", Config.MQTT_BROKER_HOST, Config.MQTT_BROKER_PORT, Config.MQTT_BROKER_KEEPALIVE, qos=Config.MQTT_BROKER_QOS)
 
     try:
         meshtasticClient.connect()
@@ -87,19 +74,19 @@ def main():
         meshtasticClient.close()
         mqttClient.stop()
 
+    return
 
 # =============================================================================
 #  Callback Meshtastic
 # =============================================================================
 
+##
+# @brief Décode le payload JSON du champ "text", détermine le topic MQTT correspondant au type de données et publie le message. Appelé à chaque paquet reçu depuis le nœud Meshtastic.
+#
+# @param packet    Paquet Meshtastic reçu (dict).
+# @param interface Interface série source.
+##
 def _onReceive(packet, interface):
-    ##
-    # @brief Décode le payload JSON du champ "text", détermine le topic MQTT correspondant au type de données et publie le message. Appelé à chaque paquet reçu depuis le nœud Meshtastic.
-    #
-    # @param packet    Paquet Meshtastic reçu (dict).
-    # @param interface Interface série source.
-    ##
-
     global mqttClient
 
     logger.info(f"[Bridge Meshtastic-MQTT] Paquet brut reçu : {packet}")
@@ -122,6 +109,7 @@ def _onReceive(packet, interface):
     if not mqttClient.publish(topic, json.dumps(data)):
         logger.warning(f"[Bridge Meshtastic-MQTT] Échec de la publication sur le topic '{topic}'")
 
+    return
 
 # =============================================================================
 #  Point d'entrée

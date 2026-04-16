@@ -67,8 +67,7 @@ class Logger
          * @brief Initialise le logger avec son nom de module.
          *
          * @param name        Nom du module affiché en préfixe (ex : "MQTT").
-         * @param fileEnabled Active l'écriture dans LittleFS si true.
-         *                    Désactivé par défaut.
+         * @param fileEnabled Active l'écriture dans LittleFS si true. Désactivé par défaut.
          */
         Logger(const char * name, bool fileEnabled);
 
@@ -136,17 +135,14 @@ class Logger
         void write(Level level, const char * message);
 
         /**
-         * @brief Écrit une entrée dans le fichier LittleFS.
-         *        Déclenche un trim si le fichier est plein.
+         * @brief Écrit une entrée dans le fichier LittleFS. Déclenche un trim si le fichier est plein.
          *
          * @param entry Ligne complète formatée à écrire.
          */
         void writeFile(const char * entry);
 
         /**
-         * @brief Supprime les premières lignes du fichier jusqu'à ce que
-         *        la taille courante + entrySize <= LOGGER_MAX_FILE_SIZE.
-         *        Réécrit intégralement le fichier après trim.
+         * @brief Supprime les premières lignes du fichier jusqu'à ce que la taille courante + entrySize <= LOGGER_MAX_FILE_SIZE. Réécrit intégralement le fichier après trim.
          *
          * @param entrySize Taille en octets de l'entrée à insérer (avec '\n').
          */
@@ -162,10 +158,7 @@ class Logger
         const char * levelToString(Level level) const;
 
         /**
-         * @brief Retourne l'horodatage courant sous forme de chaîne.
-         *
-         * Utilise millis() si aucun RTC n'est disponible, ou la date/heure
-         * réelle si un RTC est configuré.
+         * @brief Retourne l'horodatage courant sous forme de chaîne. Utilise millis() si aucun RTC n'est disponible, ou la date/heure réelle si un RTC est configuré.
          *
          * @return Chaîne formatée de l'horodatage.
          */

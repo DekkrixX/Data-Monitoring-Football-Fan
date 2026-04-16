@@ -20,48 +20,46 @@ from Server.Config.setting import Config
 #  Classe
 # =============================================================================
 
+##
+# @class Logger
+#
+# @brief Journaliseur horodaté avec sortie fichier et console colorée.
+##
 class Logger:
-    ##
-    # @class Logger
-    #
-    # @brief Journaliseur horodaté avec sortie fichier et console colorée.
-    ##
 
 # =============================================================================
 #  Constructeur
 # =============================================================================
 
+    ##
+    # @brief Initialise le logger avec son nom et son fichier de sortie.
+    #
+    # @param name  Nom du logger, utilisé comme nom de fichier de log
+    ##
     def __init__(self, name):
-        ##
-        # @brief Initialise le logger avec son nom et son fichier de sortie.
-        #
-        # @param name  Nom du logger, utilisé comme nom de fichier de log
-        ##
+        self._name  = name                               ##< @brief Nom du logger.
+        self._file  = Config.PATH["log"] + name + ".log" ##< @brief Chemin complet du fichier de log.
+        self._lock  = threading.Lock()                   ##< @brief Mutex garantissant l'exclusivité des écritures fichier entre threads.
 
-        self._name  = name                                ##< @brief Nom du logger.
-        self._file  = Config.PATH["log"] + name + ".log"  ##< @brief Chemin complet du fichier de log.
-        self._lock  = threading.Lock()                    ##< @brief Mutex garantissant l'exclusivité des écritures fichier entre threads.
-
-        self._reset  = "\033[0m"                          ##< @brief Code ANSI de réinitialisation de couleur.
-        self._white  = "\033[37m"                         ##< @brief Code ANSI couleur blanche (niveau INFO).
-        self._yellow = "\033[33m"                         ##< @brief Code ANSI couleur jaune (niveau WARNING).
-        self._red    = "\033[31m"                         ##< @brief Code ANSI couleur rouge (niveau ERROR).
+        self._reset  = "\033[0m"                         ##< @brief Code ANSI de réinitialisation de couleur.
+        self._white  = "\033[37m"                        ##< @brief Code ANSI couleur blanche (niveau INFO).
+        self._yellow = "\033[33m"                        ##< @brief Code ANSI couleur jaune (niveau WARNING).
+        self._red    = "\033[31m"                        ##< @brief Code ANSI couleur rouge (niveau ERROR).
 
         return
 
 # =============================================================================
-#  Méthodes privées
+#  Méthode privée
 # =============================================================================
 
+    ##
+    # @brief Écrit une entrée de log dans le fichier de façon thread-safe.
+    #
+    # @param timestamp Horodatage formaté de l'entrée.
+    # @param level     Niveau de sévérité ("INFO", "WARNING", "ERROR").
+    # @param message   Corps du message à journaliser.
+    ##
     def _logIn(self, timestamp, level, message):
-        ##
-        # @brief Écrit une entrée de log dans le fichier de façon thread-safe.
-        #
-        # @param timestamp Horodatage formaté de l'entrée.
-        # @param level     Niveau de sévérité ("INFO", "WARNING", "ERROR").
-        # @param message   Corps du message à journaliser.
-        ##
-
         log = f"[{timestamp}] [{level}] {message}.\n"
 
         # Création du répertoire de log si inexistant
@@ -76,16 +74,17 @@ class Logger:
 
         return
 
-    def _writeDebug(self, timestamp, level, message):
-        ##
-        # @brief Affiche un message en console avec coloration ANSI selon le niveau.
-        #
-        #
-        # @param timestamp Horodatage formaté du message.
-        # @param level     Niveau de sévérité ("INFO", "WARNING", "ERROR").
-        # @param message   Corps du message à afficher.
-        ##
 
+
+    ##
+    # @brief Affiche un message en console avec coloration ANSI selon le niveau.
+    #
+    #
+    # @param timestamp Horodatage formaté du message.
+    # @param level     Niveau de sévérité ("INFO", "WARNING", "ERROR").
+    # @param message   Corps du message à afficher.
+    ##
+    def _writeDebug(self, timestamp, level, message):
         match level:
             case "WARNING":
                 color = self._yellow
@@ -99,16 +98,15 @@ class Logger:
         return
 
 # =============================================================================
-#  Méthodes publiques
+#  Méthode publique
 # =============================================================================
 
+    ##
+    # @brief Journalise un message de niveau INFO.
+    #
+    # @param message Message informatif à journaliser.
+    ##
     def info(self, message):
-        ##
-        # @brief Journalise un message de niveau INFO.
-        #
-        # @param message Message informatif à journaliser.
-        ##
-
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         self._logIn(timestamp, "INFO", message)
@@ -118,13 +116,14 @@ class Logger:
 
         return
 
-    def warning(self, message):
-        ##
-        # @brief Journalise un message de niveau WARNING.
-        #
-        # @param message Message d'avertissement à journaliser.
-        ##
 
+
+    ##
+    # @brief Journalise un message de niveau WARNING.
+    #
+    # @param message Message d'avertissement à journaliser.
+    ##
+    def warning(self, message):
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         self._logIn(timestamp, "WARNING", message)
@@ -134,13 +133,14 @@ class Logger:
 
         return
 
-    def error(self, message):
-        ##
-        # @brief Journalise un message de niveau ERROR.
-        #
-        # @param message Message d'erreur à journaliser.
-        ##
 
+
+    ##
+    # @brief Journalise un message de niveau ERROR.
+    #
+    # @param message Message d'erreur à journaliser.
+    ##
+    def error(self, message):
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         self._logIn(timestamp, "ERROR", message)
