@@ -1,58 +1,71 @@
-# =============================================================================
-# logviewer.sh - Visualisation colorisée de fichiers de log
+##
+# @file logviewer.sh
 #
-# Dépendances : less
-# Usage       : voir la fonction usage() ci-dessous ou lancer avec --help
-# =============================================================================
+# @brief Visualisation colorisée de fichiers de log.
+#
+# @see out.sh
+# @see Fonction usage() ou lancer le script avec --help
+##
 
 # =============================================================================
-#  Codes de couleur ANSI
+#  Import
 # =============================================================================
 
-_RESET="\033[1;0m"
-_RED="\033[1;31m"
-_YELLOW="\033[1;33m"
-_CYAN="\033[1;36m"
-_WHITE="\033[1m"
-_MAGENTA="\033[1;35m"
-_DIM="\033[2m"
+source "$(dirname "${BASH_SOURCE[0]}")/out.sh"
+
+# =============================================================================
+#  Code de sortie
+# =============================================================================
+
+argumentErrorCode=1     ##< @brief Arguments manquants ou invalides.
+fileNotFoundErrorCode=2 ##< @brief Fichier source introuvable.
+
+# =============================================================================
+#  Flag
+# =============================================================================
+
+VERBOSE=0 ##< @brief Mode verbeux (désactivé par défaut, activé par -v / --verbose).
 
 # =============================================================================
 #  Fonctions utilitaires
 # =============================================================================
 
+##
+# @brief Affiche le manuel d'usage du script.
+#
+# @param name Nom du script.
+##
 function usage()
 {
-    local name=$(basename "$0")
+    local name=$(basename "${0}")
 
-    echo -e $_WHITE"COMMANDE"$_RESET
-    echo -e "\t$_MAGENTA$name <fichier.log>"$_RESET
+    echo -e "${_WHITE}COMMANDE${_RESET}"
+    echo -e "\t${_MAGENTA}${name} <fichier.log>"${_RESET}
     echo ""
-    echo -e $_WHITE"DESCRIPTION"$_RESET
+    echo -e "${_WHITE}DESCRIPTION${_RESET}"
     echo -e "\tVisualise un fichier de log avec coloration syntaxique par niveau."
-    echo -e "\tLes niveaux reconnus sont [INFO], [WARNING] et [ERROR]."
-    echo -e "\tLe fichier est affiché dans less avec numérotation et barre de progression."
     echo ""
-    echo -e $_WHITE"OPTIONS"$_RESET
+    echo -e "${_WHITE}OPTIONS${_RESET}"
     echo -e "\t-h | --help"
     echo -e "\t\tAffiche cette aide."
-    echo -e "\t\tExemple: $name --help"
+    echo -e "\t\tExemple: ${name} --help"
+    echo -e "\t-v | --verbose"
+    echo -e "\t\tActive les messages de debug détaillés."
+    echo -e "\t\tExemple: ${name} --verbose file.log"
     echo -e "\t-d | --data"
     echo -e "\t\tActive la lecture de log de données."
-    echo -e "\t\tExemple: $name --data data.log"
+    echo -e "\t\tExemple: ${name} --data data.log"
     echo ""
-    echo -e $_WHITE"ARGUMENTS"$_RESET
+    echo -e "${_WHITE}ARGUMENTS${_RESET}"
     echo -e "\t<fichier.log>"
     echo -e "\t\tChemin vers le fichier de log à visualiser."
-    echo -e "\t\tDoit être un fichier régulier, lisible, avec l'extension .log."
-    echo -e "\t\tDoit contenir au moins une entrée [INFO], [WARNING] ou [ERROR]."
-    echo -e "\t\tExemple: $name app.log"
+    echo -e "\t\tExemple: ${name} app.log"
     echo ""
-    echo -e $_WHITE"NAVIGATION (less)"$_RESET
-    echo -e "\t${_DIM}Flèches / j / k$_RESET    Défiler ligne par ligne"
-    echo -e "\t${_DIM}Space / b$_RESET          Page suivante / précédente"
-    echo -e "\t${_DIM}g / G$_RESET              Aller au début / à la fin"
-    echo -e "\t${_DIM}q$_RESET                  Quitter"
+    echo -e ${_WHITE}"NAVIGATION (less)"${_RESET}
+    echo -e "\t${_DIM}Flèches / j / k${_RESET}    Défiler ligne par ligne"
+    echo -e "\t${_DIM}Space / b${_RESET}          Page suivante / précédente"
+    echo -e "\t${_DIM}g / G${_RESET}              Aller au début / à la fin"
+    echo -e "\t${_DIM}q${_RESET}                  Quitter"
 
     return
 }
@@ -61,44 +74,14 @@ function usage()
 #  Fonctions métier
 # =============================================================================
 
-function checkLogFile()
-{
-    local file="$1"
-
-    # Vérification de l'existence du fichier
-    if [[ ! -e "$file" ]]
-    then
-        echo -e $_RED"[ERREUR] Le fichier '$file' n'existe pas."$_RESET >&2
-        exit 1
-    fi
-
-    # Vérification que c'est un fichier régulier (pas un répertoire, lien, etc.)
-    if [[ ! -f "$file" ]]
-    then
-        echo -e $_RED"[ERREUR] '$file' n'est pas un fichier régulier."$_RESET >&2
-        exit 1
-    fi
-
-    # Vérification de l'extension .log
-    if [[ "${file##*.}" != "log" ]]
-    then
-        echo -e $_RED"[ERREUR] '$file' n'est pas un fichier .log."$_RESET >&2
-        exit 1
-    fi
-
-    # Vérification des permissions de lecture
-    if [[ ! -r "$file" ]]
-    then
-        echo -e $_RED"[ERREUR] Permission refusée pour '$file'."$_RESET >&2
-        exit 1
-    fi
-
-    return
-}
-
+##
+# @brief Parse le fichier de logs.
+#
+# @param file Nom du fichier de logs.
+##
 function parseLogFile()
 {
-    local file="$1"
+    local file="${1}"
 
     # Compteurs par niveau
     local countInfo=0
@@ -107,110 +90,115 @@ function parseLogFile()
     local countTotal=0
 
     # En-tête avec le nom du fichier
-    echo -e "$_WHITE╔══════════════════════════════════════════════════════════════╗$_RESET"
-    echo -e "$_WHITE║  $(printf "%-60s" "Fichier : $(basename "$file")")║$_RESET"
-    echo -e "$_WHITE╚══════════════════════════════════════════════════════════════╝$_RESET"
+    echo -e "${_WHITE}╔══════════════════════════════════════════════════════════════╗${_RESET}"
+    echo -e "${_WHITE}║  $(printf "%-60s" "Fichier : $(basename "${file}")")║${_RESET}"
+    echo -e "${_WHITE}╚══════════════════════════════════════════════════════════════╝${_RESET}"
     echo ""
 
     # Lecture et colorisation ligne par ligne
     while IFS= read -r line
     do
-        countTotal=$((countTotal + 1))
+        (( countTotal++ ))
 
-        if echo "$line" | grep -q "\[INFO\]"
+        if echo "${line}" | grep -q "\[INFO\]"
         then
-            countInfo=$((countInfo + 1))
-            echo -e "$_CYAN$line$_RESET"
+            (( countInfo++ ))
+            echo -e "${_CYAN}${line}${_RESET}"
 
-        elif echo "$line" | grep -q "\[WARNING\]"
+        elif echo "${line}" | grep -q "\[WARNING\]"
         then
-            countWarning=$((countWarning + 1))
-            echo -e "$_YELLOW$line$_RESET"
+            (( countWarning++ ))
+            echo -e "${_YELLOW}${line}${_RESET}"
 
-        elif echo "$line" | grep -q "\[ERROR\]"
+        elif echo "${line}" | grep -q "\[ERROR\]"
         then
-            countError=$((countError + 1))
-            echo -e "$_RED$line$_RESET"
+            (( countError++ ))
+            echo -e "${_RED}${line}${_RESET}"
 
         else
             # Ligne sans niveau reconnu
-            echo "$line"
+            echo "${line}"
         fi
 
-    done < "$file"
+    done < "${file}"
 
     # Pied de page avec les statistiques de parsing
     echo ""
-    echo -e "$_WHITE╔══════════════════════════════════════════════════════════════╗$_RESET"
-    echo -e "$_WHITE║  Résumé                                                      ║$_RESET"
-    echo -e "$_WHITE╠══════════════════════════════════════════════════════════════╣$_RESET"
-    echo -e "$_WHITE║  $(printf "%-60s" "Total   : ${countTotal}")║${_RESET}"
-    echo -e "$_WHITE║  $(printf "%-86s" "${_CYAN}INFO$_RESET$_WHITE    : $countInfo")║$_RESET"
-    echo -e "$_WHITE║  $(printf "%-86s" "${_YELLOW}WARNING$_RESET$_WHITE : ${countWarning}")║$_RESET"
-    echo -e "$_WHITE║  $(printf "%-86s" "${_RED}ERROR$_RESET$_WHITE   : ${countError}")║$_RESET"
-    echo -e "$_WHITE╚══════════════════════════════════════════════════════════════╝$_RESET"
+    echo -e "${_WHITE}╔══════════════════════════════════════════════════════════════╗${_RESET}"
+    echo -e "${_WHITE}║  Résumé                                                      ║${_RESET}"
+    echo -e "${_WHITE}╠══════════════════════════════════════════════════════════════╣${_RESET}"
+    echo -e "${_WHITE}║  $(printf "%-60s" "Total   : ${countTotal}")║${_RESET}"
+    echo -e "${_WHITE}║  $(printf "%-86s" "${_CYAN}INFO${_RESET}${_WHITE}    : ${countInfo}")║${_RESET}"
+    echo -e "${_WHITE}║  $(printf "%-86s" "${_YELLOW}WARNING${_RESET}${_WHITE} : ${countWarning}")║$_RESET"
+    echo -e "${_WHITE}║  $(printf "%-86s" "${_RED}ERROR${_RESET}${_WHITE}   : ${countError}")║${_RESET}"
+    echo -e "${_WHITE}╚══════════════════════════════════════════════════════════════╝${_RESET}"
 
     return
 }
 
 
 
+##
+# @brief Parse un fichier de logs de données.
+#
+# @param file Nom du fichier de logs.
+##
 function parseDataFile()
 {
-    local file="$1"
+    local file="${1}"
  
     # Déclarer un tableau associatif
     declare -A keyCounts
  
-    echo -e "$_WHITE╔══════════════════════════════════════════════════════════════╗$_RESET"
-    echo -e "$_WHITE║  $(printf "%-60s" "Fichier : $(basename "$file")")║$_RESET"
-    echo -e "$_WHITE╚══════════════════════════════════════════════════════════════╝$_RESET"
+    echo -e "${_WHITE}╔══════════════════════════════════════════════════════════════╗${_RESET}"
+    echo -e "${_WHITE}║  $(printf "%-60s" "Fichier : $(basename "${file}")")║${_RESET}"
+    echo -e "${_WHITE}╚══════════════════════════════════════════════════════════════╝${_RESET}"
     echo ""
 
     # Lire le fichier ligne par ligne
     while IFS= read -r line; do
         # Extraire la clé (entre "] " et ":")
-        local key=$(echo "$line" | sed -E 's/^.*\] ([^:]+):.*$/\1/')
+        local key="$(echo "${line}" | sed -E 's/^.*\] ([^:]+):.*$/\1/')"
 
         # Incrémenter le compteur si clé non vide
-        if [[ -n "$key" ]]; then
-            ((keyCounts["$key"]++))
+        if [[ -n "${key}" ]]; then
+            (( keyCounts["${key}"]++ ))
         fi
 
-        if echo "$line" | grep -q "\[INFO\]"
+        if echo "${line}" | grep -q "\[INFO\]"
         then
-            countInfo=$((countInfo + 1))
-            echo -e "$_CYAN$line$_RESET"
+            (( countInfo++ ))
+            echo -e "${_CYAN}${line}${_RESET}"
 
-        elif echo "$line" | grep -q "\[WARNING\]"
+        elif echo "${line}" | grep -q "\[WARNING\]"
         then
-            countWarning=$((countWarning + 1))
-            echo -e "$_YELLOW$line$_RESET"
+            (( countWarning++ ))
+            echo -e "${_YELLOW}${line}${_RESET}"
 
-        elif echo "$line" | grep -q "\[ERROR\]"
+        elif echo "${line}" | grep -q "\[ERROR\]"
         then
-            countError=$((countError + 1))
-            echo -e "$_RED$line$_RESET"
+            (( countError++ ))
+            echo -e "${_RED}${line}${_RESET}"
 
         else
             # Ligne sans niveau reconnu
-            echo "$line"
+            echo "${line}"
         fi
-    done < "$file"
+    done < "${file}"
  
     # Résumé : nombre de lignes par clé
     echo ""
-    echo -e "$_WHITE╔══════════════════════════════════════════════════════════════╗$_RESET"
-    echo -e "$_WHITE║  Résumé des données                                          ║$_RESET"
-    echo -e "$_WHITE╠══════════════════════════════════════════════════════════════╣$_RESET"
+    echo -e "${_WHITE}╔══════════════════════════════════════════════════════════════╗${_RESET}"
+    echo -e "${_WHITE}║  Résumé des données                                          ║${_RESET}"
+    echo -e "${_WHITE}╠══════════════════════════════════════════════════════════════╣${_RESET}"
 
     printf "%s\n" "${!keyCounts[@]}" | sort | while IFS= read -r key
     do
-        local count=${keyCounts["$key"]}
-        echo -e "$_WHITE║  $(printf "%-87s" "${_MAGENTA}${key}${_RESET}${_WHITE} : ${count} entrée(s)")║$_RESET"
+        local count="${keyCounts["${key}"]}"
+        echo -e "${_WHITE}║  $(printf "%-87s" "${_MAGENTA}${key}${_RESET}${_WHITE} : ${count} entrée(s)")║${_RESET}"
     done
  
-    echo -e "$_WHITE╚══════════════════════════════════════════════════════════════╝$_RESET"
+    echo -e "${_WHITE}╚══════════════════════════════════════════════════════════════╝${_RESET}"
  
     return
 }
@@ -219,56 +207,74 @@ function parseDataFile()
 #  Point d'entrée du script
 # =============================================================================
 
+##
+# @brief Parsing des arguments et exécution du script.
+#
+# @param $@ Tous les arguments du script.
+##
 function main()
 {
     # Affichage de l'aide si demandé ou si aucun argument n'est fourni
-    if [[ "$1" == "-h" || "$1" == "--help" || $# -eq 0 ]]
+    if [[ "${1}" == "-h" || "${1}" == "--help" ]]
     then
         usage
         exit 0
     fi
+    # Parsing de l'option -v/--verbose en première position
+    if [ "${1}" = "-v" ] || [ "${1}" = "--verbose" ]
+    then
+        VERBOSE=1
+        debug "Mode verbeux activé."
+        shift  # Retire -v/--verbose de la liste des arguments
+    fi
 
     # Vérification du nombre d'arguments
-    if [[ $# -gt 2 ]]
+    if [[ "${#}" -gt 2 ]]
     then
-        usage
-        exit 1
+        error "${argumentErrorCode}" "Nombre d'arguments insuffisant. Au moins 1 argument est requis: <file>."
     fi
 
     local file=""
     local mode="log"
- 
-    for arg in "$@"
+
+    for arg in "${@}"
     do
-        if [[ "$arg" == "-d" || "$arg" == "--data" ]]
+        if [[ "${arg}" == "-d" || "${arg}" == "--data" ]]
         then
             mode="data"
         else
-            file="$arg"
+            file="${arg}"
         fi
     done
 
     # Validation du fichier avant parsing
-    if [[ -z "$file" ]]
+    if [[ -z "${file}" ]]
     then
-        echo -e $_RED"[ERREUR] Aucun fichier spécifié."$_RESET >&2
-        usage
-        exit 1
+        error "${argumentErrorCode}" "Aucun fichier spécifié."
     fi
-    checkLogFile "$file"
+    # Vérification de l'existence du fichier
+    if [[ ! -f "$file" ]]
+    then
+        error "${fileNotFoundErrorCode}" "Le fichier '${file}' n'existe pas."
+    fi
 
     # Affichage paginé via less
     # -R : interprète les codes couleur ANSI
     # -S : désactive le retour à la ligne automatique
     # -N : affiche les numéros de ligne
     # -M : affiche le pourcentage de progression en bas
-    if [[ "$mode" == "data" ]]
+    if [[ "${mode}" == "data" ]]
     then
-        parseDataFile "$file" | less -R -S -N -M --prompt=" Navigation : [Flèches/j/k] Défiler  [Space/b] Page  [g/G] Début/Fin  [q] Quitter  --"
+        debug "Lecture de fichier de logs de données."
+        parseDataFile "${file}" | less -R -S -N -M --prompt=" Navigation : [Flèches/j/k] Défiler  [Space/b] Page  [g/G] Début/Fin  [q] Quitter  --"
     else
-        parseLogFile "$file" | less -R -S -N -M --prompt=" Navigation : [Flèches/j/k] Défiler  [Space/b] Page  [g/G] Début/Fin  [q] Quitter  --"
+        debug "Lecture de fichier de logs global."
+        parseLogFile "${file}" | less -R -S -N -M --prompt=" Navigation : [Flèches/j/k] Défiler  [Space/b] Page  [g/G] Début/Fin  [q] Quitter  --"
     fi
 }
 
 # Lancement du script avec tous les arguments
-main "$@"
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
+then
+    main "${@}"
+fi

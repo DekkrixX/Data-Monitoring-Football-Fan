@@ -134,23 +134,6 @@ install:
 	@curl -fsSL https://get.docker.com -o get-docker.sh
 	@sudo sh ./get-docker.sh
 	@rm get-docker.sh
-
-	@echo "Package: Python3"
-	@sudo apt install -y python3
-	@echo "Package: Python3-venv"
-	@sudo apt install -y python3-venv
-	@echo "Création des environnements virtuels python"
-	@mkdir -p .venv
-	@echo "Environnement virtuel: PlatformIO"
-	@python3 -m venv .venv/platformio-env
-	@echo "Package: PlatformIO"
-	@.venv/platformio-env/bin/pip install platformio
-	@echo "Environement virtuel: Meshtastic"
-	@python3 -m venv .venv/meshtastic-env
-	@echo "Package: Meshtastic"
-	@.venv/meshtastic-env/bin/pip install meshtastic
-	@echo "Package: ESPtool"
-	@.venv/meshtastic-env/bin/pip install esptool
 	@echo "$(_YELLOW)Les dépendances ont été installées$(_NO_COLOR)"
 
 # =============================================================================
@@ -168,7 +151,6 @@ remove:
 	@sudo rm -rf /var/lib/containerd
 	@sudo rm /etc/apt/sources.list.d/docker.sources
 	@sudo rm /etc/apt/keyrings/docker.asc
-
 	@echo "Package: Python3-venv"
 	@sudo apt remove -y python3-venv
 	@echo "Package: Python3"

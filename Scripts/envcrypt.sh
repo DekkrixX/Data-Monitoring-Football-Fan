@@ -4,117 +4,16 @@
 # @brief Chiffrement/déchiffrement de fichiers d'environnement via SOPS.
 # @details Le script permet de chiffrer ou déchiffrer un fichier mais aussi d'aujouter ou retirer des clés publiques au fichier chiffrer.
 #
+# @see out.sh
 # @see sops (https://github.com/getsops/sops)
 # @see Fonction usage() ou lancer le script avec --help
-#
-#
-# @since 1.0.0
-# @date 11 avril 2026
-# @author DekkrixX
 ##
 
 # =============================================================================
 #  Import
 # =============================================================================
 
-# =============================================================================
-#  Code de couleur ANSI
-# =============================================================================
-
-_RESET="\033[1;0m"    ##< @brief Réinitialise le style et la couleur du texte.
-_BLACK="\033[1;30m"   ##< @brief Texte noir.
-_RED="\033[1;31m"     ##< @brief Texte rouge.
-_GREEN="\033[1;32m"   ##< @brief Texte vert.
-_YELLOW="\033[1;33m"  ##< @brief Texte jaune.
-_BLUE="\033[1;34m"    ##< @brief Texte bleu.
-_MAGENTA="\033[1;35m" ##< @brief Texte magenta.
-_CYAN="\033[1;36m"    ##< @brief Texte cyan.
-_GRAY="\033[1;37m"    ##< @brief Texte gris clair.
-_WHITE="\033[1m"      ##< @brief Texte blanc.
-
-# =============================================================================
-#  Fonction métier
-# =============================================================================
-
-##
-# @brief Affiche un message de debug.
-#
-# @brief message Message de debug.
-#
-# @since 1.0.0
-# @date 11 avril 2026
-# @author DekkrixX
-##
-function debug()
-{
-    local message=$1
-
-    if [ "$VERBOSE" -eq 1 ]
-    then
-        echo -e $_WHITE"[DEBUG] $message"$_RESET >&2
-    fi
-
-    return
-}
-
-
-##
-# @brief Affiche un message d'information
-#
-# @param message Message d'information
-#
-# @since 1.0.0
-# @date 11 avril 2026
-# @author DekkrixX
-##
-function info()
-{
-    local message=$1
-
-    echo -e $_CYAN"[INFO] $message"$_RESET >&2
-
-    return
-}
-
-
-##
-# @brief Affiche un message d'avertissement.
-#
-# @param message Message d'avertissement.
-#
-# @since 1.0.0
-# @date 11 avril 2026
-# @author DekkrixX
-##
-function warning()
-{
-    local message=$1
-
-    echo -e $_YELLOW"[AVERTISSEMENT] $message"$_RESET >&2
-
-    return
-}
-
-
-##
-# @brief Affiche un message d'erreur et termine le programme avec un code d'erreur.
-#
-# @param code    Code d'erreur.
-# @param message Message d'erreur.
-#
-# @since 1.0.0
-# @date 11 avril 2026
-# @author DekkrixX
-##
-function error()
-{
-    local code=$1
-    local message=$2
-
-    echo -e $_RED"[ERREUR:$code] $message"$_RESET >&2
-
-    exit "$code"
-}
+source "$(dirname "${BASH_SOURCE[0]}")/out.sh"
 
 # =============================================================================
 #  Code de sortie
