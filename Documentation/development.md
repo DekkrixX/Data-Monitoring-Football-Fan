@@ -25,7 +25,7 @@ Attention seul le premier lancement du serveur nécessite une connexion à inter
 
 ## Procédure de flash
 
-Pour flash une carte utiliser la commande `make flash` à la racine du projet. Attention à bien entrer le bon port série USB pour ne pas flasher malencontreusement la mauvaise carte.
+Pour flash une carte utiliser la commande `bash Scripts/flash.sh` à la racine du projet. Attention à bien entrer le bon port série USB pour ne pas flasher malencontreusement la mauvaise carte.
 
 ## Tests
 

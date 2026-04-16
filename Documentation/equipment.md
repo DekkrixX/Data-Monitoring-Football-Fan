@@ -20,7 +20,7 @@ Description :
 
 ## Capteur MinIMU-9 v6
 
-Description du capteur MinIMU-9 v6 :
+Description :
 - Capteur combiné IMU 9 axes : Accéléromètre 3 axes + Gyroscope 3 axes + Magnétomètre 3 axes
 - Mesures : Accélération linéaire, vitesse angulaire (rotation), orientation absolue par rapport au champ magnétique terrestre
 - Puce intégrée : LSM6DS3 (accéléro/gyro) + LIS3MDL (magnétomètre) de STMicroelectronics
@@ -34,6 +34,21 @@ Description du capteur MinIMU-9 v6 :
 - Format : Module PCB 15,75 x 25,4 mm (taille compacte)
 - Connecteurs : Broches 0,1" espacées pour breadboard ou soudure directe
 - Consommation : ~1 mA (typique) en mode actif
+
+## Capteur INMP441
+
+Description:
+- Capteur audio numérique : Microphone MEMS omnidirectionnel avec convertisseur analogique-numérique intégré
+- Mesures : Captation du son  et conversion directe en signal numérique
+- Puce intégrée : Microphone MEMS avec ADC et interface numérique I2S intégrés
+- Interface de communication : I2S pour transmission audio numérique
+- Tension d'alimentation : 1,8V à 3,3V
+- Sensibilité : Typiquement -26 dBFS (±3 dB)
+- Rapport signal/bruit : Environ 61 dB
+- Réponse en fréquence : ~60 Hz à 15 kHz
+- Fréquence d'échantillonnage : Jusqu’à ~48 kHz
+- Directivité : Omnidirectionnelle
+- Consommation : ~1,4 mA
 
 ## Noeuds LoRa
 
