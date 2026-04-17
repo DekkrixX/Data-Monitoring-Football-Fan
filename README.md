@@ -2,9 +2,9 @@
 
 Installation des dépendances `make install`.
 
-Flash de la carte ESP32 `make flash TARGET=device`.
+Flash des cartes ESP32 utilisez le script flash.sh `make script TARGET=flash`.
 
-Lancement des serveurs `make run` et `make server`.
+Lancement des serveurs `make run`.
 
 ---
 
