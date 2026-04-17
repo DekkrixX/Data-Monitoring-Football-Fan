@@ -2,8 +2,8 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>Contrôle d'évènement</title>
-        <link rel="stylesheet" href="{{ url_for('static, filename='css/base.css') }}">
+        <title>Contrôle d'évènements</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
         <link rel="stylesheet" href="{{ url_for('static', filename='css/Control/event.css') }}">
     </head>
     <body>
@@ -13,10 +13,14 @@
         <button>Préparation d'avant match</button>
         <button>Récapitulatif des évènements du match</button>
         <div id="panel">
+            {% for category in events %}
             <div class="category">
-                <div class="button">
-                </div>
+                <h2>{{ category.category }}</h2>
+                {% for event in category.event %}
+                <button>{{ event.name }}</button>
+                {% endfor %}
             </div>
+            {% endfor %}
         </div>
         <script src="{{ url_for('static', filename='lib/socket.io.min.js') }}"></script>
         <script>

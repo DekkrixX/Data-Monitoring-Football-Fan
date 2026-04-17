@@ -9,10 +9,10 @@ export APP_DEVICE = $(APP) - Device
 export APP_SERVER = $(APP) - Server
 
 # Fichiers générés
-GEN_FILES = Device/doc Server/doc Device/.pio Device/data
+GEN_FILES = Device/doc Server/doc Device/.pio Device/data .venv
 
 # Définition des couleurs
-_RESET	 = \033[m
+_RESET = \033[m
 _BLACK = \033[1;30m
 _RED = \033[1;31m
 _GREEN = \033[1;32m
@@ -62,6 +62,10 @@ log:
 #  Lancement des conteneurs Docker de test
 # =============================================================================
 test:
+	@if docker ps -a --format "{{.Names}}" | grep -w test > /dev/null; \
+	then \
+		docker rm -f test; \
+	fi
 	@echo "${_YELLOW}Lancement des conteneurs Docker de test${_RESET}"
 	@docker compose --profile test up -d
 

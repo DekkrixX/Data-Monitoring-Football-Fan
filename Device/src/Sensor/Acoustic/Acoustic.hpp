@@ -69,15 +69,15 @@ class Acoustic: public Sensor
         /**
          * @copydoc Sensor::begin()
          */
-        virtual void begin() = 0 override;
+        virtual void begin() = 0;
         /**
          * @copydoc Sensor::end()
          */
-        virtual void end() = 0 override;
+        virtual void end() = 0;
         /**
          * @copydoc Sensor::update()
          */
-        virtual void update() = 0 override;
+        virtual void update() = 0;
 
 };
 

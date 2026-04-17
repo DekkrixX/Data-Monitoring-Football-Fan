@@ -81,7 +81,7 @@ function usage()
 function mesh()
 {
     # Execute le commande meshtastic
-    $("${path}".venv/meshtastic-env/bin/meshtastic --port "${port}" "${@}" || true)
+    "${path}"/.venv/meshtastic-env/bin/meshtastic --port "${port}" "${@}" || true
 
     # Attend l'ouverture du port
     while [ ! -e "${port}" ]
@@ -176,15 +176,13 @@ function selectPort()
     else
         # Sinon au moins un port série est ouvert
         echo "Liste des ports série USB" >&2
-        [ "${foundACM}" -gt 0 ] && ls /dev/ttyACM* 2>/dev/null
-        [ "${foundUSB}" -gt 0 ] && ls /dev/ttyUSB* 2>/dev/null
+        [ "${foundACM}" -gt 0 ] && ls /dev/ttyACM*
+        [ "${foundUSB}" -gt 0 ] && ls /dev/ttyUSB*
     fi
 
     echo "Sélectionner le port série USB correspondant à la carte à flasher" >&2
     echo -n "> " >&2
     read port
-
-    echo "${port}"
 
     return
 }
@@ -257,7 +255,7 @@ function main()
     case "${target}" in
         # Flash du device
         device)
-            port="$(selectPort)"
+            selectPort
 
             # Vérifie l'installation de l'environnement virtuel
             if [ ! -e "${path}/.venv/platformio-env" ]
@@ -272,7 +270,7 @@ function main()
                 debug "Environnement virtuel: PlatformIO"
                 python3 -m venv "${path}/.venv/platformio-env"
                 debug "Package: PlatformIO"
-                $("${path}".venv/platformio-env/bin/pip install platformio)
+                "${path}"/.venv/platformio-env/bin/pip install platformio
             fi
 
             # Vérifie que le port série sélectionné est ouvert
@@ -281,12 +279,12 @@ function main()
                 debug "Flash du device."
 
                 # Efface la mémoire flash
-                .venv/platformio-env/bin/pio run -t erase --upload-port "${port}" --project-dir Device;
+                "${path}"/.venv/platformio-env/bin/pio run -t erase --upload-port "${port}" --project-dir Device
                 # Montage du système de fichier LittleFS
-                mkdir -p Device/data;
-                .venv/platformio-env/bin/pio run -t uploadfs --upload-port "${port}" --project-dir Device;
+                mkdir -p "${path}/Device/data"
+                "${path}"/.venv/platformio-env/bin/pio run -t uploadfs --upload-port "${port}" --project-dir Device
                 # Flash de la carte
-                .venv/platformio-env/bin/pio run -t upload --upload-port "${port}" --project-dir Device;
+                "${path}"/.venv/platformio-env/bin/pio run -t upload --upload-port "${port}" --project-dir Device
             else
                 error "${portNotFoundErrorCode}" "Le port série '${port}' sélectionné n'est pas ouvert."
             fi
@@ -295,10 +293,10 @@ function main()
         # Flash de Meshtastic
         meshtastic)
             local chip="esp32s3" # Chip de la carte à flasher
-            port="$(selectPort)"
+            selectPort
 
             # Vérifie l'installation de l'environnement virtuel
-            if [ ! -e "${path}/.venv/platformio-env" ]
+            if [ ! -e "${path}/.venv/meshtastic-env" ]
             then
                 info "Installation de l'environnement virtuel 'platformio-env'"
                 debug "Package: Python3"
@@ -310,9 +308,9 @@ function main()
                 debug "Environement virtuel: Meshtastic"
                 python3 -m venv "${path}/.venv/meshtastic-env"
                 debug "Package: Meshtastic"
-                $("${path}"/.venv/meshtastic-env/bin/pip install meshtastic)
+                "${path}"/.venv/meshtastic-env/bin/pip install meshtastic
                 debug "Package: ESPtool"
-                $("${path}"/.venv/meshtastic-env/bin/pip install esptool)
+                "${path}"/.venv/meshtastic-env/bin/pip install esptool
             fi
 
             # Vérifie que le port série sélectionné est ouvert
@@ -325,7 +323,7 @@ function main()
                     # Flash le firmware Meshtastic
                     firmware)
                         info "Flash du firmware"
-                        $("${path}".venv/meshtastic-env/bin/esptool --chip "${chip}" --port "${port}" --baud 921600 write-flash -z 0x0 "${path}.Flash/firmware-seeed-xiao-s3-2.7.15.567b8ea.bin")
+                        "${path}"/.venv/meshtastic-env/bin/esptool --chip "${chip}" --port "${port}" --baud 921600 write-flash -z 0x0 "${path}/.Flash/firmware-seeed-xiao-s3-2.7.15.567b8ea.bin"
                         ;;
 
                     # Flash de la configuration Meshtastic

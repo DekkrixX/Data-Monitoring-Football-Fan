@@ -42,10 +42,7 @@
 #error "Erreur de configuration: Aucun capteur n'est initialisé"
 #endif // SENSOR
 
-#if POLARH10
-  + MINIMU_9_V6 
-  + _INMP441_
- != 1
+#if (defined(POLARH10) + defined(MINIMU_9_V6) + defined(_INMP441_)) != 1
 #error "Erreur de configuration: Plusieurs capteurs sont définis"
 #endif
 

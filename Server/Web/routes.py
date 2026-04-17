@@ -10,6 +10,8 @@
 #  Import des bibliothèques
 # =============================================================================
 
+import os
+import json
 from flask import render_template
 
 from Server.Config.setting import Config
@@ -98,7 +100,11 @@ def registerRoutes(app, supporterList, stadiumBleacherList):
     ##
     @app.route("/event")
     def eventPage():
-        return render_template("Control/event.html", debug=int(Config.DEBUG))
+        json_path = os.path.join(app.root_path, "..", "..", "Resources", "Data", "event.json")
+        with open(json_path, "r", encoding="utf-8") as f:
+            events = json.load(f)
+
+        return render_template("Control/event.html", debug=int(Config.DEBUG), events=events)
 
 
 

@@ -49,14 +49,14 @@
             {
                 "name": "Fin du match",
                 "code": 12
-            },
+            }
         ]
     },
     {
         "category": "Fait de jeu",
         "event": [
             {
-                "name": "Tir cadré"
+                "name": "Tir cadré",
                 "code": 13
             },
             {
