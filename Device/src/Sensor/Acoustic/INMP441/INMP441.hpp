@@ -10,7 +10,7 @@
  * {
  *   "t": "acoustic",
  *   "n": "INMP441",
- *   "bid": <int>,
+ *   "id": <int>,
  *   "db": [<float>]
  * }
  * @endcode

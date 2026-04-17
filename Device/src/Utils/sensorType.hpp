@@ -10,12 +10,6 @@
 #define _SENSORTYPE_HPP_
 
 // ============================================================================
-//  Import des headers externes
-// ============================================================================
-
-#include <string>
-
-// ============================================================================
 //  Type de capteurs
 // ============================================================================
 
@@ -42,9 +36,9 @@ enum class SensorType
  *
  * @param type Type du capteur.
  * 
- * @return std::string Topic MQTT associé. Retourne "default" si le type est inconnu.
+ * @return int Topic MQTT associé. Retourne "default" si le type est inconnu.
  */
-std::string getMQTTTopic(SensorType type);
+int getMQTTTopic(SensorType type);
 
 
 

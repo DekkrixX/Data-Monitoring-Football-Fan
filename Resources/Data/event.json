@@ -138,20 +138,36 @@
         "category": "Intervention exterieur",
         "event": [
             {
-                "name": "Intervention de la VAR",
+                "name": "Changement",
                 "code": 31
             },
             {
-                "name": "Fin d'intervention de la VAR",
+                "name": "Intervention de la VAR",
                 "code": 32
             },
             {
-                "name": "Arrêt du jeu",
+                "name": "Fin d'intervention de la VAR",
                 "code": 33
             },
             {
-                "name": "Reprise du jeu",
+                "name": "Arrêt du jeu",
                 "code": 34
+            },
+            {
+                "name": "Reprise du jeu",
+                "code": 35
+            },
+            {
+                "name": "Début de l'échauffement des joueurs",
+                "code": 36
+            },
+            {
+                "name": "Fin de l'échauffement des joueurs",
+                "code": 37
+            },
+            {
+                "name": "Entrée des joueurs sur le terrain",
+                "code": 38
             }
         ]
     }

@@ -19,29 +19,23 @@
 //  Association du type au topic MQTT
 // ============================================================================
 
-std::string getMQTTTopic(SensorType type)
+int getMQTTTopic(SensorType type)
 {
-    std::string topic;
-
     switch (type)
     {
-        case SensorType::HEART_RATE:
-            topic = "heart_rate";
-            break;
-        case SensorType::ACCELEROMETER_GYROSCOPE:
-            topic = "accelerometer_gyroscope";
-            break;
-        case SensorType::ACOUSTIC:
-            topic = "acoustic";
-            break;
         case SensorType::SYSTEM:
-            topic = "system";
-            break;
+            return 1;
+        case SensorType::HEART_RATE:
+            return 2;
+        case SensorType::ACCELEROMETER_GYROSCOPE:
+            return 3;
+        case SensorType::ACOUSTIC:
+            return 4;
         default:
-            topic = "default";
+            return 0;
     }
 
-    return topic;
+    return -1;
 }
 
 

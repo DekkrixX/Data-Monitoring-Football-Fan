@@ -17,11 +17,12 @@ source "$(dirname "${BASH_SOURCE[0]}")/out.sh"
 #  Code de sortie
 # =============================================================================
 
-argumentErrorCode=1           ##< @brief Arguments manquants ou invalides.
-portNotFoundErrorCode=2       ##< @brief Port série introuvable.
-targetNotSupportErrorCode=3   ##< @brief Cible non supporté.
-choiceNotSupportErrorCode=4   ##< @brief Choix non supporté.
-nodeTypeNotSupportErrorCode=5 ##< @brief Type de noeud non supporté.
+argumentErrorCode=1             ##< @brief Arguments manquants ou invalides.
+portNotFoundErrorCode=2         ##< @brief Port série introuvable.
+targetNotSupportErrorCode=3     ##< @brief Cible non supporté.
+choiceNotSupportErrorCode=4     ##< @brief Choix non supporté.
+nodeTypeNotSupportErrorCode=5   ##< @brief Type de noeud non supporté.
+sensorTypeNotSupportErrorCode=6 ##< @brief Type de capteur non supporté.
 
 # =============================================================================
 #  Flag
@@ -81,7 +82,12 @@ function usage()
 function mesh()
 {
     # Execute le commande meshtastic
-    "${path}"/.venv/meshtastic-env/bin/meshtastic --port "${port}" "${@}" || true
+    until "${path}/.venv/meshtastic-env/bin/meshtastic" --port "${port}" "$@"
+    do
+        debug "Échec de la commande."
+        debug "Nouvelle tentative."
+        sleep 2
+    done
 
     # Attend l'ouverture du port
     while [ ! -e "${port}" ]
@@ -98,48 +104,56 @@ function mesh()
 ##
 # @brief Flash la configuration Meshtastic.
 #
-# @param nodeType Type de noeud à configurer.
+# @param nodeType   Type de noeud à configurer.
+# @param sensorType Type de capteur à configurer.
 ##
 function flashConfiguration()
 {
     local nodeType="${1}"
+    local sensorType="${2}"
 
-    mesh --set bluetooth.enabled true # Bluetooth
+    debug "Configuration Bluetooth."
+    mesh --set bluetooth.enabled false # Bluetooth
+    debug "Configuration WiFi."
     mesh --set network.wifi_enabled false # WiFi
+    debug "Configuration des tests."
     mesh --set range_test.enabled false # Test de porté
     #mesh --set range_test.save true # Sauvegarde des tests de porté
     #mesh --set range_test.sender 60 # Interval de test en seconde
+    debug "Configuration GPS."
     mesh --set position.gps_enabled false # GPS
     mesh --set position.gps_mode DISABLED # Mode du GPS
+    debug "Configuration série"
     mesh --set serial.enabled true # Communication série
     mesh --set serial.baud BAUD_115200 # Baudrate
     mesh --set serial.rxd 44 # Pin RX
     mesh --set serial.txd 43 # Pin TX
     mesh --set serial.echo false # Renvoi des packets reçu
     mesh --set serial.mode TEXTMSG # Transmission de text par UART
+    debug "Configuration LoRa."
     mesh --set lora.region EU_868 # Bande de fréquence
     mesh --set lora.modem_preset LONG_FAST # Porté et débit
     mesh --set lora.use_preset true # Utilisation du preset
     mesh --set lora.tx_power 14 # Puissance de transmission en dBm
     mesh --set lora.hop_limit 3 # Limite du nombre de retransmission d'un message par les autres noeuds
     mesh --set lora.override_duty_cycle false # Dépassement du duty cycle
-    # Cannal de communication
-    mesh --ch-index 1 --ch-set name "monitoring"
-    mesh --ch-index 1 --ch-set psk default
+    debug "Configuration des channels."
+    mesh --ch-index 0 --ch-set name "monitoring"
+    mesh --ch-index 0 --ch-set psk default
+    debug "Configuration du device"
     if [ "${nodeType}" = "gateway" ]
     then
-        # Cannal de communication
-        mesh --ch-index 1 --ch-set uplink_enabled false
-        mesh --ch-index 1 --ch-set downlink_enabled true
+        mesh --ch-index 0 --ch-set uplink_enabled false
+        mesh --ch-index 0 --ch-set downlink_enabled true
         mesh --set device.role CLIENT_MUTE # Rôle du noeud
     fi
     if [ "${nodeType}" = "sensor" ]
     then
-        # Cannal de communication
-        mesh --ch-index 1 --ch-set uplink_enabled true
-        mesh --ch-index 1 --ch-set downlink_enabled false
+        mesh --ch-index 0 --ch-set uplink_enabled true
+        mesh --ch-index 0 --ch-set downlink_enabled false
         mesh --set device.role CLIENT # Rôle du noeud
     fi
+    debug "Configuration de l'économie d'énergie."
     mesh --set power.is_power_saving true # Économie d'énergie
 
     return
@@ -175,7 +189,7 @@ function selectPort()
         echo "Aucun port série USB n'est ouvert." >&2
     else
         # Sinon au moins un port série est ouvert
-        echo "Liste des ports série USB" >&2
+        echo "Liste des ports série USB :" >&2
         [ "${foundACM}" -gt 0 ] && ls /dev/ttyACM*
         [ "${foundUSB}" -gt 0 ] && ls /dev/ttyUSB*
     fi
@@ -335,13 +349,13 @@ function main()
                             # Flash de la configuration de la gateway Meshtastic
                             gateway)
                                 info "Flash de la configuration de la gateway."
-                                flashConfiguration "gateway"
+                                flashConfiguration "gateway" ""
                                 ;;
 
                             # Flash de la configuration d'un capteur Meshtastic
                             sensor)
                                 info "Flash de la configuration d'un capteur."
-                                flashConfiguration "sensor"
+                                flashConfiguration "sensor" "${sensorType}"
                                 ;;
 
                             *)

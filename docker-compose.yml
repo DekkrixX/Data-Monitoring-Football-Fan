@@ -38,6 +38,8 @@ services:
     container_name: bridge-meshtastic-mqtt
     env_file:
       - .env
+    environment:
+      PYTHONUNBUFFERED: 1
     depends_on:
       - mqtt
     volumes:

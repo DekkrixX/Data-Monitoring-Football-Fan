@@ -8,11 +8,12 @@
  * Format JSON produit:
  * @code{.json}
  * {
- *   "t": "accelerometer_gyroscope",
- *   "n": "MinUMI-9 v6",
- *   "a": [[<float>, <float>, <float>]],
- *   "g": [[<float>, <float>, <float>]],
- *   "m": [[<float>, <float>, <float>]]
+ *   "t" : "accelerometer_gyroscope",
+ *   "n" : "MinUMI-9 v6",
+ *   "id": <int>,
+ *   "a" : [[<float>, <float>, <float>]],
+ *   "g" : [[<float>, <float>, <float>]],
+ *   "m" : [[<float>, <float>, <float>]]
  * }
  * @endcode
  */

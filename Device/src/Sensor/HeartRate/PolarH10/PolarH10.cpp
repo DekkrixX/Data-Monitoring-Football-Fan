@@ -83,7 +83,7 @@ std::string PolarH10::formatData(PolarH10Data & data, int supporterId)
     // Construction de l'objet JSON avec les données du capteur
     json["t"] = getMQTTTopic(SensorType::HEART_RATE);
     json["n"] = PolarH10::name;
-    json["sid"] = supporterId;
+    json["id"] = supporterId;
     JsonArray array = json["hr"].to<JsonArray>();
     for (int i=0; i < NB_VALUE; i++)
         array.add(data.heartRate[i]);

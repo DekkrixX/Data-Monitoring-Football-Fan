@@ -74,6 +74,9 @@ def main():
         meshtasticClient.close()
         mqttClient.stop()
 
+    except Exception as e:
+        logger.error(f"Erreur fatale: {e}", exc_info=True)
+
     return
 
 # =============================================================================
@@ -103,8 +106,8 @@ def _onReceive(packet, interface):
         logger.warning("[Bridge Meshtastic-MQTT] Champ 'text' absent ou non-JSON, paquet ignoré")
         return
 
-    dataType = data.get("t")
-    topic    = getMQTTTopic(dataType, data.get("id"))
+    channelIndex = data.get("t")
+    topic        = getMQTTTopic(channelIndex, data.get("id"))
 
     if not mqttClient.publish(topic, json.dumps(data)):
         logger.warning(f"[Bridge Meshtastic-MQTT] Échec de la publication sur le topic '{topic}'")
