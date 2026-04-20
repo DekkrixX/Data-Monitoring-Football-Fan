@@ -68,20 +68,12 @@ std::string MinIMU_9_v6::formatData(MinIMU_9_v6Data & data, int stadiumBleacherI
     JsonArray arrayA = json["a"].to<JsonArray>();
     for (int index=0; index < NB_VALUE; index++)
     {
-        for (int i=0; i < 3; i++)
-            arrayA.add(data.accelerometer[index][i]);
-    }
-    JsonArray arrayG = json["g"].to<JsonArray>();
-    for (int index=0; index < NB_VALUE; index++)
-    {
-        for (int i=0; i < 3; i++)
-            arrayG.add(data.gyroscope[index][i]);
-    }
-    JsonArray arrayM = json["m"].to<JsonArray>();
-    for (int index=0; index < NB_VALUE; index++)
-    {
-        for (int i=0; i < 3; i++)
-            arrayM.add(data.magnetometer[index][i]);
+        // Calcul de la norme du vecteur accélération
+        float ax2 = data.accelerometer[index][0] * data.accelerometer[index][0];
+        float ay2 = data.accelerometer[index][1] * data.accelerometer[index][1];
+        float az2 = data.accelerometer[index][2] * data.accelerometer[index][2];
+        float a = sqrt(ax2 + ay2 + az2);
+        arrayA.add(a);
     }
 
     // Sérialisation en chaîne JSON + ajout d'un saut de ligne comme délimiteur de message

@@ -25,11 +25,11 @@ class AccelerometerData:
     # @brief Initialise une instance AccelerometerData sans aucune mesure.
     ##
     def __init__(self):
-        self._history  = []        ##< @brief Historique complet des mesures.
-        self._lastData = []        ##< @brief Dernier envoi de données par le capteur.
-        self._total    = (0, 0, 0) ##< @brief Somme cumulée des mesures pour le calcul de la moyenne.
-        self._minimum  = None      ##< @brief Valeur minimale enregistrée (None si aucune mesure).
-        self._maximum  = None      ##< @brief Valeur maximale enregistrée (None si aucune mesure).
+        self._history  = []   ##< @brief Historique complet des mesures.
+        self._lastData = []   ##< @brief Dernier envoi de données par le capteur.
+        self._total    = 0    ##< @brief Somme cumulée des mesures pour le calcul de la moyenne.
+        self._minimum  = None ##< @brief Valeur minimale enregistrée (None si aucune mesure).
+        self._maximum  = None ##< @brief Valeur maximale enregistrée (None si aucune mesure).
 
         return
 
@@ -40,7 +40,7 @@ class AccelerometerData:
     ##
     # @brief Retourne la dernière mesure reçue.
     #
-    # @return (int, int, int) La dernière mesure de l'accélération sur les trois axes.
+    # @return float La dernière mesure de l'accélération sur les trois axes.
     # @return None Si aucune mesure n'a encore été reçue.
     ##
     def getLasted(self):
@@ -51,21 +51,21 @@ class AccelerometerData:
     ##
     # @brief Retourne la moyenne de toutes les mesures, arrondie à l'entier inférieur.
     #
-    # @return (int, int, int) La moyenne de l'accélération sur les trois axes.
+    # @return float La moyenne de l'accélération sur les trois axes.
     # @return None Si aucune mesure n'a encore été reçue.
     ##
     def getAverage(self):
         if not self._history:
             return None
 
-        return tuple(round(self._total[i] / len(self._history), 3) for i in range(3))
+        return round(self._total / len(self._history), 1)
 
 
 
     ##
     # @brief Retourne la valeur minimale enregistrée.
     #
-    # @return (int, int, int) Le minimum de l'accélération sur les trois axes.
+    # @return float Le minimum de l'accélération sur les trois axes.
     # @return None Si aucune mesure n'a encore été reçue.
     ##
     def getMinimum(self):
@@ -76,7 +76,7 @@ class AccelerometerData:
     ##
     # @brief Retourne la valeur maximale enregistrée.
     #
-    # @return (int, int, int) Le maximum de l'accélération sur les trois axes.
+    # @return float Le maximum de l'accélération sur les trois axes.
     # @return None Si aucune mesure n'a encore été reçue.
     ##
     def getMaximum(self):
@@ -87,7 +87,7 @@ class AccelerometerData:
     ##
     # @brief Retourne le dernier envoi de donnée du capteur.
     #
-    # @return [(int, int, int)] Dernier envoi de l'accélération.
+    # @return [float] Dernier envoi de l'accélération.
     ##
     def getAccelerometer(self):
         return self._lastData
@@ -105,17 +105,13 @@ class AccelerometerData:
         for a in accelerometer:
             if a != None:
                 self._history.append(a)
-                self._total = tuple(self._total[i] + a[i] for i in range(3))
+                self._total += a
 
-                if self._minimum is None:
+                if self._minimum is None or a < self._minimum:
                     self._minimum = a
-                else:
-                    self._minimum = tuple(min(self._minimum[i], a[i]) for i in range(3))
 
-                if self._maximum is None:
+                if self._maximum is None or a > self._maximum:
                     self._maximum = a
-                else:
-                    self._maximum = tuple(max(self._maximum[i], a[i]) for i in range(3))
 
         self._lastData = accelerometer
 

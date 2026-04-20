@@ -20,12 +20,10 @@ Format d'envoi: JSON
 
 Format d'envoi: JSON
 {
-    "t" : <string>,                             # Type de capteur
-    "n" : <string>,                             # Nom du capteur
-    "id": <int>,                                # Identifiant de la tribune du stade
-    "a" : [[<float>, <float>, <float>], ...],   # Liste de valeurs x,y,z de l'accéléromètre
-    "g" : [[<float>, <float>, <float>], ...],   # Liste de valeurs x,y,z du gyroscope
-    "m" : [[<float>, <float>, <float>], ...]    # Liste de Valeurs x,y,z du magnétomètre
+    "t" : <string>,      # Type de capteur
+    "n" : <string>,      # Nom du capteur
+    "id": <int>,         # Identifiant de la tribune du stade
+    "a" : [<float>, ...] # Liste de valeur de la norme de vecteur accélération
 }
 
 ### INMP441
