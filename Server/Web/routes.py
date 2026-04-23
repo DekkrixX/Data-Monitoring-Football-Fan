@@ -12,7 +12,7 @@
 
 import os
 import json
-from flask import render_template
+from flask import render_template, request, redirect, url_for, session
 
 from Server.Config.setting import Config
 from Server.Utils.data import getColorOfSupporter, getColorOfStadiumBleacher
@@ -35,8 +35,9 @@ logger = Logger("Serveur/Routes")
 # @param app                 Instance Flask de l'application.
 # @param supporterList       Liste partagée des objets Supporter actifs.
 # @param stadiumBleacherList Liste partagée des objets StadiumBleacher actifs.
+# @param matchInformation    Enregistrement des informations d'avant match.
 ##
-def registerRoutes(app, supporterList, stadiumBleacherList):
+def registerRoutes(app, supporterList, stadiumBleacherList, matchInformation):
     logger.info("[Routes] Enregistrement des routes et gestionnaires d'erreurs")
 
 # =============================================================================
@@ -101,7 +102,7 @@ def registerRoutes(app, supporterList, stadiumBleacherList):
     ##
     @app.route("/event")
     def eventPage():
-        config = loadConfiguration("default");
+        config = loadConfiguration(matchInformation["config"]);
         return render_template("Control/event.html", debug=int(Config.DEBUG), events=config)
 
 
@@ -111,7 +112,7 @@ def registerRoutes(app, supporterList, stadiumBleacherList):
     ##
     @app.route("/event/preparation")
     def preparationPage():
-        return render_template("Control/preparation.html", debug=int(Config.DEBUG), configurationList=getConfigurationList(), matchInformation={"config": "Default"}, lastInfomation=False)
+        return render_template("Control/preparation.html", debug=int(Config.DEBUG), configurationList=getConfigurationList(), matchInformation=matchInformation, lastInfomation=False)
 
 
 
@@ -120,7 +121,7 @@ def registerRoutes(app, supporterList, stadiumBleacherList):
     ##
     @app.route("/event/configuration")
     def configurationPage():
-        config = loadConfiguration("default");
+        config = loadConfiguration(matchInformation["config"])
         return render_template("Control/configuration.html", debug=int(Config.DEBUG), events=config)
 
 # =============================================================================

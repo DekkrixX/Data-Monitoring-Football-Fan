@@ -14,6 +14,7 @@ from flask_socketio import emit
 
 from Server.Config.setting import Config
 from Server.Utils.data import createSupporterHeartRateForClient, getNameOfSupporter, getColorOfSupporter, createStadiumBleacherAccelerometerForClient, createStadiumBleacherAcousticForClient, getNameOfStadiumBleacher, getColorOfStadiumBleacher
+from Server.Utils.event import createNewEventConfiguration
 from Server.Utils.logger import Logger
 
 # =============================================================================
@@ -32,8 +33,9 @@ logger = Logger("Serveur/SocketIO")
 # @param socketio            Instance SocketIO de l'application.
 # @param supporterList       Liste partagée des objets Supporter actifs.
 # @param stadiumBleacherList Liste partagée des objets StadiumBleacher actifs.
+# @param matchInformation    Enregistrement des informations d'avant match.
 ##
-def registerSocketioHandlers(socketio, supporterList, stadiumBleacherList):
+def registerSocketioHandlers(socketio, supporterList, stadiumBleacherList, matchInformation):
 
 # =============================================================================
 #  Liste des supporters
@@ -233,6 +235,25 @@ def registerSocketioHandlers(socketio, supporterList, stadiumBleacherList):
     def handleMathInformation():
         logger.info("[SocketIO] Réception de 'matchInfomation'")
         return
+
+
+
+    ##
+    # @brief Réception d'une nouvelle configuration d'évènements.
+    #
+    # @param config Configuration à enregistrer.
+    ##
+    @socketio.on("saveConfiguration")
+    def handleSaveConfiguration(config):
+        logger.info("[SocketIO] Réception de 'saveConfiguration'");
+
+        if createNewEventConfiguration(config, matchInformation):
+            socketio.emit("getSaveConfiguration");
+        else:
+            socketio.emit("getSaveConfigurationError");
+
+        return
+
 
 
     return

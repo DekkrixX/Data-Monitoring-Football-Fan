@@ -69,3 +69,32 @@ def getConfigurationList():
 	logger.info(f"[Event] Liste des configuration: {configurationList}")
 
 	return configurationList
+
+
+
+##
+# @brief Créer une nouvelle configuration d'évènement.
+#
+# @param confg            Nouvelle configuration à créé.
+# @param matchInformation Enregistre des informations d'avant match.
+#
+# @return True si la nouvelle configuration à été créé.
+# @retrun False sinon.
+##
+def createNewEventConfiguration(config, matchInfomation):
+    configurationList = getConfigurationList()
+
+    name = json.loads(config)["name"]
+    for configuration in configurationList:
+        if configuration == name:
+            return False
+
+    logger.info(f"[Event] Configuration à sauvegarder: {config}")
+
+    filePath = Config.PATH["data"] + "Event-Configuration/" + name + ".json"
+    with open(filePath, 'w') as f:
+        f.write(config)
+
+    matchInfomation["config"] = name;
+
+    return True

@@ -37,6 +37,15 @@ h1
     Main
    ========================================================================= */
 
+#error
+{
+	color: red;
+	font-size: 20px;
+	font-weight: bold;
+	text-align: center;
+	margin-bottom: 1vh;
+}
+
 /* ---------- Formulaire ---------- */
 form
 {
@@ -119,11 +128,57 @@ form > button:active
 	font-size: 20px;
 	cursor: pointer;
 }
-.event input
+.event .checkbox-custom
 {
-	flex-shrink: 0;
-	width: 30px;
-	height: 30px;
-	accent-color: #2ECC71;
-	cursor: pointer;
+    flex-shrink: 0;
+    width: 30px;
+    height: 30px;
+    border-radius: 5px;
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+    background-color: #E74C3C;
+    border: 2px solid #C0392B;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+.event .checkbox-custom::before, .event .checkbox-custom::after
+{
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 16px;
+    height: 3px;
+    border-radius: 2px;
+    background-color: white;
+}
+.event .checkbox-custom::before
+{
+	transform: translate(-50%, -50%) rotate(45deg);
+}
+.event .checkbox-custom::after
+{
+	transform: translate(-50%, -50%) rotate(-45deg);
+}
+.event .checkbox-custom.checked
+{
+    background-color: #2ECC71;
+    border-color: #27AE60;
+}
+.event .checkbox-custom.checked::before
+{
+    width: 8px;
+    transform: translate(-70%, 20%) rotate(45deg);
+}
+.event .checkbox-custom.checked::after
+{
+    width: 14px;
+    transform: translate(-30%, -30%) rotate(-45deg);
+}
+
+
+
+.hidden
+{
+	display: none;
 }

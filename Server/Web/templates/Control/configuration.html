@@ -11,9 +11,12 @@
             <h1>Configuration du contrôle des évènements</h1>
         </header>
         <main>
-        	<form method="POST" action="/event/preparation">
+            <p id="error" class="hidden">
+                Le nom de la configuration existe déjà
+            </p>
+        	<form>
         		<input name="name" type="text" placeholder="Nom de la configuration">
-        		<button type="submit">Sauvegarde</button>
+        		<button id="save">Sauvegarde</button>
         		<div id="pannel">
         			{% for category in events.config %}
                     <div class="category">
@@ -21,9 +24,8 @@
                         {% for event in category.event %}
                         <div class="event">
                             <label for="{{ event.name }}">{{ event.name }}</label>
-                            {% if event.enable %}
-                            <input id="{{ event.name }}" name="{{ event.name }}" type="checkbox" {% if event.enable %} checked {% endif %}>
-                            {% endif %}
+                            <input id="{{ event.name }}" class="hidden" name="{{ event.name }}" type="checkbox" {% if event.enable %} checked {% endif %} code="{{ event.code }}">
+                            <span class="checkbox-custom {% if event.enable %}checked{% endif %}" onclick="toggleCheck(this)"></span>
                         </div>
                         {% endfor %}
                     </div>
@@ -31,9 +33,11 @@
         		</div>
         	</form>
         </main>
+        <script src="{{ url_for('static', filename='lib/socket.io.min.js') }}"></script>
         <script>
             // Définition des variables dynamiques
             window.DEBUG = {{ debug }};
         </script>
+        <script src="{{ url_for('static', filename='js/Control/configuration.js') }}"></script>
     </body>
 </html>
