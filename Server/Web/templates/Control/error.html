@@ -34,6 +34,12 @@
                     La page demandée n'existe pas ou a été déplacée.<br>
                     Vérifiez l'URL ou retournez à l'accueil.
                 </p>
+                {% elif code == 405 %}
+                <p class="error-title">MÉTHODE NON AUTORISÉE</p>
+                <p class="error-description">
+                    La méthode HTTP utilisée n'est pas autorisée pour cette ressource.<br>
+                    Vérifiez la requête envoyée (GET, POST, etc.) et réessayez.
+                </p>
                 {% elif code == 408 %}
                 <p class="error-title">DÉLAI D'ATTENTE DÉPASSÉ</p>
                 <p class="error-description">
@@ -56,7 +62,7 @@
                 <div class="divider"></div>
                 <a class="btn-home" href="/">Retour à l'accueil</a>
             </div>
-            <p class="footer">DASHBOARD — HTTP/{{ code }}</p>
+            <p class="footer">Dashboard de monitoring - HTTP/{{ code }}</p>
         </div>
     </body>
 </html>

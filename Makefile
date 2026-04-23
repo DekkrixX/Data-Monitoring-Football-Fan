@@ -65,6 +65,7 @@ test:
 	@if docker ps -a --format "{{.Names}}" | grep -w test > /dev/null; \
 	then \
 		docker rm -f test; \
+		docker rmi data-monitoring-football-fan-test:latest; \
 	fi
 	@echo "${_YELLOW}Lancement des conteneurs Docker de test${_RESET}"
 	@docker compose --profile test up -d

@@ -32,11 +32,6 @@ class AccelerometerGyroscopeSimulator:
         self._ay = 0.0
         self._az = 9.81  # gravité
 
-        # Gyroscope (°/s)
-        self._gx = 0.0
-        self._gy = 0.0
-        self._gz = 0.0
-
         self._lastUpdate = time.time()
         self._stateDuration = random.randint(30, 120)
         self._t = 0
@@ -68,7 +63,7 @@ class AccelerometerGyroscopeSimulator:
             self._az = 9.81 + self._applyNoise(0.1)
 
         elif self._state == "walking":
-            step = math.sin(self.t * 6)
+            step = math.sin(self._t * 6)
             self._ax = step * 1.5 + self._applyNoise(0.3)
             self._ay = self._applyNoise(0.5)
             self._az = 9.81 + abs(step) * 2 + self._applyNoise(0.3)
@@ -77,21 +72,6 @@ class AccelerometerGyroscopeSimulator:
             self._ax = random.uniform(-8, 8)
             self._ay = random.uniform(-8, 8)
             self._az = random.uniform(0, 15)
-
-        if self._state == "idle":
-            self._gx = self._applyNoise(0.5)
-            self._gy = self._applyNoise(0.5)
-            self._gz = self._applyNoise(0.5)
-
-        elif self._state == "walking":
-            self._gx = math.sin(self.t * 3) * 30 + self._applyNoise(2)
-            self._gy = self._applyNoise(5)
-            self._gz = math.cos(self.t * 2) * 20 + self._applyNoise(2)
-
-        elif self._state == "active_motion":
-            self._gx = random.uniform(-180, 180)
-            self._gy = random.uniform(-180, 180)
-            self._gz = random.uniform(-250, 250)
 
 # =============================================================================
 #  Gestion du bruit sur les données
@@ -118,4 +98,8 @@ class AccelerometerGyroscopeSimulator:
 
         self._updateTarget()
 
-        return ([round(self._ax, 3), round(self._ay, 3), round(self._az, 3)], [round(self._gx, 2), round(self._gy, 2), round(self._gz, 2)])
+        ax2 = self._ax * self._ax
+        ay2 = self._ay * self._ay
+        az2 = self._az * self._az
+
+        return round(math.sqrt(ax2 + ay2 + az2), 3)

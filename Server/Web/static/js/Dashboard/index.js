@@ -10,7 +10,7 @@
 //  Import des bibliothèques
 // ============================================================================
 
-import { supporterCard, stadiumBleacherCard, comparisonCard } from "../Utils/board.js";
+import { supporterCard, stadiumBleacherCard, comparisonCard } from "../Utils/element.js";
 
 // ============================================================================
 //  Initialisation
@@ -18,7 +18,7 @@ import { supporterCard, stadiumBleacherCard, comparisonCard } from "../Utils/boa
 
 const socket = io();
 
-if (DEBUG)
+if (window.DEBUG)
     console.log("[Index] Initialisation - Demande de la liste des supporters connectés");
 
 // Demande de la liste des supporters actuellement connectés
@@ -36,31 +36,33 @@ socket.emit("getStadiumBleacher")
  * @param {Array<{id: number, name: string}>} dataList Liste des supporters actuellement connectés.
  */
 socket.on("getSupporterResponse", (dataList) =>
+{
+    if (window.DEBUG)
+        console.log(`[Index] getSupporterResponse - Réception de ${dataList.length} supporter(s)`);
+
+    const grid = document.getElementById("gridSupporter");
+
+    for (const data of dataList)
     {
-        if (DEBUG)
-            console.log(`[Index] getSupporterResponse - Réception de ${dataList.length} supporter(s)`);
-
-        const grid = document.getElementById("gridSupporter");
-
-        for (const data of dataList)
-        {
-            if (DEBUG)
+            if (window.DEBUG)
                 console.log(`[Index] getSupporterResponse - Ajout du supporter id=${data.id} (${data.name})`);
 
             const element = supporterCard(data.id, data.name, data.color);
             grid.appendChild(element);
         }
 
-        // La carte de comparaison n'est pertinente qu'à partir de 2 supporters
-        if (dataList.length >= 2)
-        {
-            if (DEBUG)
-                console.log("[Index] getSupporterResponse - Ajout de la carte de comparaison");
+    // La carte de comparaison n'est pertinente qu'à partir de 2 supporters
+    if (dataList.length >= 2)
+    {
+        if (window.DEBUG)
+            console.log("[Index] getSupporterResponse - Ajout de la carte de comparaison");
 
-            const comparison = comparisonCard("Supporter", "heart_rate", "Fréquence cardiaque");
-            grid.appendChild(comparison);
-        }
-    });
+        const comparison = comparisonCard("Supporter", "heart_rate", "Fréquence cardiaque");
+        grid.appendChild(comparison);
+    }
+});
+
+
 
 /**
  * @brief Connexion d'un nouveau supporter en temps réel.
@@ -68,38 +70,40 @@ socket.on("getSupporterResponse", (dataList) =>
  * @param {{id: number, name: string, color: string}} data Données du supporter qui vient de se connecter.
  */
 socket.on("supporterConnection", (data) =>
+{
+    if (window.DEBUG)
+        console.log(`[Index] supporterConnection - Nouveau supporter id=${data.id} (${data.name})`);
+
+    const grid    = document.getElementById("gridSupporter");
+    const element = supporterCard(data.id, data.name, data.color);
+
+    const comparisonEl = grid.querySelector("#comparisonSupporter");
+
+    if (comparisonEl !== null)
     {
-        if (DEBUG)
-            console.log(`[Index] supporterConnection - Nouveau supporter id=${data.id} (${data.name})`);
+        // Insère la nouvelle carte avant la carte de comparaison existante
+        grid.insertBefore(element, comparisonEl);
+    }
+    else
+    {
+        grid.appendChild(element);
 
-        const grid    = document.getElementById("gridSupporter");
-        const element = supporterCard(data.id, data.name, data.color);
+        // Compte les cartes de supporter présentes (exclut #comparisonSupporter)
+        const supporterCount = grid.querySelectorAll(".card:not(#comparisonSupporter)").length;
 
-        const comparisonEl = grid.querySelector("#comparisonSupporter");
-
-        if (comparisonEl !== null)
+        // Crée la carte de comparaison dès que deux supporters sont affichés
+        if (supporterCount >= 2)
         {
-            // Insère la nouvelle carte avant la carte de comparaison existante
-            grid.insertBefore(element, comparisonEl);
+            if (window.DEBUG)
+                console.log("[Index] supporterConnection - Ajout de la carte de comparaison");
+
+            const comparison = comparisonCard("Supporter", "heart_rate", "Fréquence cardiaque");
+            grid.appendChild(comparison);
         }
-        else
-        {
-            grid.appendChild(element);
+    }
+});
 
-            // Compte les cartes de supporter présentes (exclut #comparisonSupporter)
-            const supporterCount = grid.querySelectorAll(".card:not(#comparisonSupporter)").length;
 
-            // Crée la carte de comparaison dès que deux supporters sont affichés
-            if (supporterCount >= 2)
-            {
-                if (DEBUG)
-                    console.log("[Index] supporterConnection - Ajout de la carte de comparaison");
-
-                const comparison = comparisonCard("Supporter", "heart_rate", "Fréquence cardiaque");
-                grid.appendChild(comparison);
-            }
-        }
-    });
 
 /**
  * @brief Déconnexion d'un supporter en temps réel.
@@ -107,31 +111,33 @@ socket.on("supporterConnection", (data) =>
  * @param {number} id Identifiant du supporter déconnecté.
  */
 socket.on("supporterDisconnection", (id) =>
+{
+    if (window.DEBUG)
+        console.log(`[Index] supporterDisconnection - Déconnexion du supporter id=${id}`);
+
+    const grid        = document.getElementById("gridSupporter");
+    const cardToRemove = grid.querySelector("#s" + id);
+
+    if (cardToRemove)
+        cardToRemove.remove();
+
+    // Retire la carte de comparaison si moins de 2 supporters restent
+    const supporterCount = grid.querySelectorAll(".card:not(#comparisonSupporter)").length;
+
+    if (supporterCount < 2)
     {
-        if (DEBUG)
-            console.log(`[Index] supporterDisconnection - Déconnexion du supporter id=${id}`);
-
-        const grid        = document.getElementById("gridSupporter");
-        const cardToRemove = grid.querySelector("#s" + id);
-
-        if (cardToRemove)
-            cardToRemove.remove();
-
-        // Retire la carte de comparaison si moins de 2 supporters restent
-        const supporterCount = grid.querySelectorAll(".card:not(#comparisonSupporter)").length;
-
-        if (supporterCount < 2)
+        const comparisonEl = grid.querySelector("#comparisonSupporter");
+        if (comparisonEl)
         {
-            const comparisonEl = grid.querySelector("#comparisonSupporter");
-            if (comparisonEl)
-            {
-                if (DEBUG)
-                    console.log("[Index] supporterDisconnection - Suppression de la carte de comparaison (moins de 2 supporters)");
+            if (window.DEBUG)
+                console.log("[Index] supporterDisconnection - Suppression de la carte de comparaison (moins de 2 supporters)");
 
-                comparisonEl.remove();
-            }
+            comparisonEl.remove();
         }
-    });
+    }
+});
+
+
 
 /**
  * @brief Réception de la liste initiale des tribunes connectés.
@@ -139,33 +145,35 @@ socket.on("supporterDisconnection", (id) =>
  * @param {Array<{id: number, name: string}>} dataList Liste des tribunes actuellement connectés.
  */
 socket.on("getStadiumBleacherResponse", (dataList) =>
+{
+    if (window.DEBUG)
+        console.log(`[Index] getStadiumBleacherResponse - Réception de ${dataList.length} tribune(s)`);
+
+    const grid = document.getElementById("gridStadiumBleacher");
+
+    for (const data of dataList)
     {
-        if (DEBUG)
-            console.log(`[Index] getStadiumBleacherResponse - Réception de ${dataList.length} tribune(s)`);
+        if (window.DEBUG)
+            console.log(`[Index] getStadiumBleacherResponse - Ajout de la tribune id=${data.id} (${data.name})`);
 
-        const grid = document.getElementById("gridStadiumBleacher");
+        const element = stadiumBleacherCard(data.id, data.name, data.color);
+        grid.appendChild(element);
+    }
 
-        for (const data of dataList)
-        {
-            if (DEBUG)
-                console.log(`[Index] getStadiumBleacherResponse - Ajout de la tribune id=${data.id} (${data.name})`);
+    // La carte de comparaison n'est pertinente qu'à partir de 2 tribunes
+    if (dataList.length >= 2)
+    {
+        if (window.DEBUG)
+            console.log("[Index] getStadiumBleacherResponse - Ajout de la carte de comparaison");
 
-            const element = stadiumBleacherCard(data.id, data.name, data.color);
-            grid.appendChild(element);
-        }
+        const comparison1 = comparisonCard("StadiumBleacher", "accelerometer", "Mouvement");
+        const comparison2 = comparisonCard("StadiumBleacher", "acoustic", "Acoustique");
+        grid.appendChild(comparison1);
+        grid.appendChild(comparison2);
+    }
+});
 
-        // La carte de comparaison n'est pertinente qu'à partir de 2 tribunes
-        if (dataList.length >= 2)
-        {
-            if (DEBUG)
-                console.log("[Index] getStadiumBleacherResponse - Ajout de la carte de comparaison");
 
-            const comparison1 = comparisonCard("StadiumBleacher", "accelerometer", "Mouvement");
-            const comparison2 = comparisonCard("StadiumBleacher", "acoustic", "Acoustique");
-            grid.appendChild(comparison1);
-            grid.appendChild(comparison2);
-        }
-    });
 
 /**
  * @brief Connexion d'une nouvelle tribune en temps réel.
@@ -173,40 +181,42 @@ socket.on("getStadiumBleacherResponse", (dataList) =>
  * @param {{id: number, name: string, color: string}} data Données de la tribune qui vient de se connecter.
  */
 socket.on("stadiumBleacherConnection", (data) =>
+{
+    if (window.DEBUG)
+        console.log(`[Index] stadiumBleacherConnection - Nouvelle tribune id=${data.id} (${data.name})`);
+
+    const grid    = document.getElementById("gridStadiumBleacher");
+    const element = stadiumBleacherCard(data.id, data.name, data.color);
+
+    const comparisonEl = grid.querySelector("#comparisonStadiumBleacher");
+
+    if (comparisonEl !== null)
     {
-        if (DEBUG)
-            console.log(`[Index] stadiumBleacherConnection - Nouvelle tribune id=${data.id} (${data.name})`);
+        // Insère la nouvelle carte avant la carte de comparaison existante
+        grid.insertBefore(element, comparisonEl);
+    }
+    else
+    {
+        grid.appendChild(element);
 
-        const grid    = document.getElementById("gridStadiumBleacher");
-        const element = stadiumBleacherCard(data.id, data.name, data.color);
+        // Compte les cartes de tribunes présentes (exclut #comparisonStadiumBleacher)
+        const stadiumBleacherCount = grid.querySelectorAll(".card:not(#comparisonSupporter)").length;
 
-        const comparisonEl = grid.querySelector("#comparisonStadiumBleacher");
-
-        if (comparisonEl !== null)
+        // Crée la carte de comparaison dès que deux tribunes sont affichés
+        if (stadiumBleacherCount >= 2)
         {
-            // Insère la nouvelle carte avant la carte de comparaison existante
-            grid.insertBefore(element, comparisonEl);
+            if (window.DEBUG)
+                console.log("[Index] stadiumBleacherConnection - Ajout de la carte de comparaison");
+
+            const comparison1 = comparisonCard("StadiumBleacher", "accelerometer", "Mouvement");
+            const comparison2 = comparisonCard("StadiumBleacher", "acoustic", "Acoustique");
+            grid.appendChild(comparison1);
+            grid.appendChild(comparison2);
         }
-        else
-        {
-            grid.appendChild(element);
+    }
+});
 
-            // Compte les cartes de tribunes présentes (exclut #comparisonStadiumBleacher)
-            const stadiumBleacherCount = grid.querySelectorAll(".card:not(#comparisonSupporter)").length;
 
-            // Crée la carte de comparaison dès que deux tribunes sont affichés
-            if (stadiumBleacherCount >= 2)
-            {
-                if (DEBUG)
-                    console.log("[Index] stadiumBleacherConnection - Ajout de la carte de comparaison");
-
-                const comparison1 = comparisonCard("StadiumBleacher", "accelerometer", "Mouvement");
-                const comparison2 = comparisonCard("StadiumBleacher", "acoustic", "Acoustique");
-                grid.appendChild(comparison1);
-                grid.appendChild(comparison2);
-            }
-        }
-    });
 
 /**
  * @brief Déconnexion d'une tribune en temps réel.
@@ -214,39 +224,41 @@ socket.on("stadiumBleacherConnection", (data) =>
  * @param {number} id Identifiant de la tribune déconnecté.
  */
 socket.on("stadiumBleacherDisconnection", (id) =>
+{
+    if (window.DEBUG)
+        console.log(`[Index] stadiumBleacherDisconnection - Déconnexion de la tribune id=${id}`);
+
+    const grid        = document.getElementById("gridStadiumBleacher");
+    const cardToRemove = grid.querySelector("#b" + id);
+
+    if (cardToRemove)
+        cardToRemove.remove();
+
+    // Retire la carte de comparaison si moins de 2 tribunes restent
+    const stadiumBleacherCount = grid.querySelectorAll(".card:not(#comparisonStadiumBleacher)").length;
+
+    if (stadiumBleacherCount < 2)
     {
-        if (DEBUG)
-            console.log(`[Index] stadiumBleacherDisconnection - Déconnexion de la tribune id=${id}`);
-
-        const grid        = document.getElementById("gridStadiumBleacher");
-        const cardToRemove = grid.querySelector("#b" + id);
-
-        if (cardToRemove)
-            cardToRemove.remove();
-
-        // Retire la carte de comparaison si moins de 2 tribunes restent
-        const stadiumBleacherCount = grid.querySelectorAll(".card:not(#comparisonStadiumBleacher)").length;
-
-        if (stadiumBleacherCount < 2)
+        const comparisonEl = grid.querySelector("#comparisonStadiumBleacher");
+        if (comparisonEl)
         {
-            const comparisonEl = grid.querySelector("#comparisonStadiumBleacher");
-            if (comparisonEl)
-            {
-                if (DEBUG)
-                    console.log("[Index] stadiumBleacherDisconnection - Suppression de la carte de comparaison (moins de 2 tribunes)");
+            if (window.DEBUG)
+                console.log("[Index] stadiumBleacherDisconnection - Suppression de la carte de comparaison (moins de 2 tribunes)");
 
-                comparisonEl.remove();
-            }
+            comparisonEl.remove();
         }
-    });
+    }
+});
+
+
 
 /**
  * @brief Fermeture du serveur.
  */
 socket.on("serverClose", () =>
-    {
-        if (DEBUG)
-            console.log("[Index] serverClose - Fermeture du serveur, rechargement de la page");
+{
+    if (window.DEBUG)
+        console.log("[Index] serverClose - Fermeture du serveur, rechargement de la page");
 
-        window.location.href = "/";
-    });
+    window.location.href = "/";
+});

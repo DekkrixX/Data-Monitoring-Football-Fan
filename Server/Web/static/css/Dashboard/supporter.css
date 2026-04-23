@@ -1,116 +1,108 @@
-/* ==============================================================
-   SUPPORTER – STYLE GÉNÉRAL
-   ============================================================== */
+/* =========================================================================
+    Body
+   ========================================================================= */
 
-/* ---------- Fond de page ----------
-   Gris clair provenant des variables globales. */
 body
 {
-  background-color: var(--c-gray);
+    background-color: var(--body-background);
 }
 
+/* =========================================================================
+    Header
+   ========================================================================= */
 
-/* ==============================================================
-   HEADER
-   --------------------------------------------------------------
-   Trois colonnes égales, même mise en forme que le fichier
-   `comparaison.css`. */
 header
 {
-  background-color: var(--c-white);
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  justify-content: space-between;
-  align-items: center;
-  justify-items: center;
-  margin: var(--sp-header-y) var(--sp-header-x);
-  padding: var(--sp-btn-y) var(--sp-btn-x);
-  border-radius: var(--s-radius-sm);
+    background-color: var(--header-background);
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    justify-content: space-between;
+    align-items: center;
+    justify-items: center;
+    margin: 5vh 10vw;
+    padding: 2vh 2vw;
+    border-radius: 15px;
+    border: 5px solid var(--header-border);
 }
 
-/* ---------- Titres du header ----------
-   Couleur injectée dynamiquement depuis le code Python. */
-header > h1, header > h2
+
+
+h1
 {
-  font-size: 50px;
-  color: var(--color); /* injecté par le code Python */
+    font-size: 50px;
 }
 
 
-/* ==============================================================
-   GRID DE DONNÉES
-   --------------------------------------------------------------
-   Même disposition que le fichier `index.css`. */
+
+h2
+{
+    color: var(--color);
+	font-size: 50px;
+}
+
+
+
+.button
+{
+    font-size: 30px;
+    font-weight: bold;
+    border-radius: 15px;
+    padding: 1vh 1vw;
+    background-color: var(--back-button-background);
+}
+.button:active
+{
+    transform: translateY(2px);
+}
+
+/* =========================================================================
+    Main
+   ========================================================================= */
+
+/* ---------- grille ---------- */
 .grid
 {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  justify-content: space-between;
-  align-items: center;
-  justify-items: center;
-  margin: 50px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    justify-content: space-between;
+    align-items: center;
+    justify-items: center;
+    margin: 0 10vw;
 }
 
-/* ==============================================================
-   CARTES DE SUPPORT
-   --------------------------------------------------------------
-   Dimensions fixes, fond blanc, coins arrondis. */
+
+
+/* ---------- carte ---------- */
 .card
 {
-  background-color: var(--c-white);
-  height: 150px;
-  width: 250px;
-  border-radius: var(--s-radius-sm);
+    background-color: var(--card-background);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 12vw;
+    height: 10vh;
+    border-radius: 15px;
+    border: 5px solid var(--card-border);
 }
-
-/* ---------- Texte centré et gras à l’intérieur de la carte ---------- */
 .card > p
 {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-}
-
-
-/* ==============================================================
-   LABEL / VALEUR (affichage des métriques)
-   ============================================================== */
-.label
-{
-  font-size: 25px;
+    font-weight: bold;
+    font-size: 30px;
 }
 .value
 {
-  height: 100px;
-  font-size: 75px;
-  color: var(--color); /* injecté par le code Python */
+    color: var(--color);
 }
 
-/* ==============================================================
-   CONTENEUR DE GRAPHIQUE (similaire à comparaison.css)
-   ============================================================== */
+
+
+/* ---------- graphique ---------- */
 .chart-container
 {
-  margin: var(--sp-header-y) var(--sp-header-x);
-  padding: var(--sp-btn-y) var(--sp-btn-x);
-  background-color: var(--c-white);
-  border-radius: var(--s-radius-sm);
-  height: 500px;
-}
-
-/* ==============================================================
-   BOUTON ACTIONNEL
-   --------------------------------------------------------------
-   Bouton stylisé avec les couleurs du thème sombre / clair.
-   ============================================================== */
-.button
-{
-  font-size: 25px;
-  font-weight: bold;
-  background-color: var(--color); /* injecté par le code Python */
-  color: var(--c-white);
-  border-radius: var(--s-radius-sm);
-  padding: var(--sp-btn-y) var(--sp-btn-x);
-  grid-column: 3; /* placé dans la troisième colonne du header */
+    display: flex;
+    align-items: center;
+    width: 90%;
+    height: 60vh;
+    margin: 5vh auto 5vh auto;
 }

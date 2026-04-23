@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Configuration des évènements</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/Control/configuration.css') }}">
+    </head>
+    <body>
+        <header>
+            <h1>Configuration du contrôle des évènements</h1>
+        </header>
+        <main>
+        	<form method="POST" action="/event/preparation">
+        		<input name="name" type="text" placeholder="Nom de la configuration">
+        		<button type="submit">Sauvegarde</button>
+        		<div id="pannel">
+        			{% for category in events.config %}
+                    <div class="category">
+                        <h2>{{ category.category }}</h2>
+                        {% for event in category.event %}
+                        <div class="event">
+                            <label for="{{ event.name }}">{{ event.name }}</label>
+                            {% if event.enable %}
+                            <input id="{{ event.name }}" name="{{ event.name }}" type="checkbox" {% if event.enable %} checked {% endif %}>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endfor %}
+        		</div>
+        	</form>
+        </main>
+        <script>
+            // Définition des variables dynamiques
+            window.DEBUG = {{ debug }};
+        </script>
+    </body>
+</html>

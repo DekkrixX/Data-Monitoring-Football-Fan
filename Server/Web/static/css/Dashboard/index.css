@@ -1,86 +1,93 @@
-/* ==============================================================
-   INDEX – STYLE GÉNÉRAL
-   ============================================================== */
+/* =========================================================================
+    Body
+   ========================================================================= */
 
-/* ---------- Fond de page ----------
-   Dégradé bleu‑gris. */
 body
 {
-  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-  min-height: 920px;
+	background-color: var(--body-background);
 }
 
-/* ---------- Titres ----------
-   Couleurs et alignement centraux. */
-.title
-{
-  color: var(--c-white);
-  font-size: 50px;
-  text-align: center;
-}
-.subtitle
-{
-  color: var(--c-gray);
-  font-size: 30px;
-  text-align: center;
-}
+/* =========================================================================
+    Header
+   ========================================================================= */
 
-
-/* ---------- Header ----------
-   Simple marge autour du header (pas de styles supplémentaires). */
 header
 {
-  margin: 10px;
+	background-color: var(--header-background);
+	display: grid;
+	grid-template-columns: 0.5fr 1fr 0.5fr;
+	justify-content: space-between;
+	align-items: center;
+	justify-items: center;
+	margin: 5vh 10vw;
+	padding: 2vh 2vw;
+	border-radius: 15px;
+	border: 5px solid var(--header-border);
 }
 
-/* ==============================================================
-   GRID PRINCIPALE
-   --------------------------------------------------------------
-   4 colonnes égales, espacement généreux. */
+
+
+h1
+{
+	font-size: 50px;
+	text-align: center;
+	grid-column: 2;
+}
+
+/* =========================================================================
+    Main
+   ========================================================================= */
+
+h2
+{
+	font-size: 30px;
+	text-align: center;
+	text-decoration: underline;
+}
+
+
+
+/* ---------- Grille ---------- */
 #gridSupporter, #gridStadiumBleacher
 {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  margin: 50px;
-  justify-content: space-between;
-  align-items: center;
-  justify-items: center;
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 5vw;
+	align-items: center;
+	padding: 5vh 5vw;
+	margin-bottom: 5vh;
 }
 
-/* ==============================================================
-   CARTES (éléments individuels de la grille)
-   --------------------------------------------------------------
-   Fond blanc, bordure grise, ombre, rayon, transition
-   au survol. */
+
+
+/* ---------- Carte ---------- */
 .card
 {
-  display: grid;
-  align-items: center;
-  background-color: var(--c-white);
-  border: 5px solid var(--c-gray);
-  padding: 20px;
-  width: 350px;
-  border-radius: var(--s-radius-lg);
-  margin-top: var(--sp-card-y);
-  cursor: pointer;
-  box-shadow: var(--s-shadow-sm);
-  transition: transform .3s ease, box-shadow .3s ease;
+	background-color: var(--card-background);
+	display: grid;
+	align-items: center;
+	border-radius: 15px;
+	border: 5px solid var(--card-border);
+	cursor: pointer;
+	padding: 2vh 2vw;
 }
 .card:hover
 {
-  transform: translateY(-5px);
-  box-shadow: var(--s-shadow-md);
+	background-color: var(--card-hover-background);
+	border-color: var(--card-hover-border);
 }
-
-/* ---------- Contenu de la carte ----------
-   Nom (gros) et identifiant (plus petit). */
-.name
+.card:active
 {
-  font-size: 50px;
+	transform: translateY(2px);
 }
 .id
 {
-  color: var(--c-black);
-  font-size: 25px;
-  font-weight: bold;
+	font-size: 25px;
+	font-weight: bold;
+}
+.name
+{
+	font-size: 25px;
+	font-weight: bold;
 }

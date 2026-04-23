@@ -10,9 +10,8 @@
 //  Import des bibliothèques
 // ============================================================================
 
-import { createChart } from "../Utils/board.js";
+import { createChart } from "../Utils/element.js";
 import { subtractSeconds } from "../Utils/time.js";
-import { adjustColor } from "../Utils/color.js";
 
 // ============================================================================
 //  Initialisation
@@ -26,43 +25,7 @@ if (window.DEBUG)
 // Création du graphique d'accélération
 const canvaAccelerometer = document.getElementById("chart_accelerometer");
 const ctxAccelerometer   = canvaAccelerometer.getContext("2d");
-const chartAccelerometer = createChart(ctxAccelerometer, [], "", -156.96, 156.96, 10);
-
-// Couleurs dérivées
-const colorX = color;                   // couleur originale
-const colorY = adjustColor(color, -30); // plus foncée
-const colorZ = adjustColor(color, +30); // plus claire
-
-// Création des courbes des points (x, y, z)
-chartAccelerometer.data.datasets.push({
-    label: "x",
-    data: [],
-    borderColor: colorX,
-    fill: false,
-    tension: 0.4,
-    pointRadius: 4,
-    borderWidth: 3
-});
-
-chartAccelerometer.data.datasets.push({
-    label: "y",
-    data: [],
-    borderColor: colorY,
-    fill: false,
-    tension: 0.4,
-    pointRadius: 4,
-    borderWidth: 3
-});
-
-chartAccelerometer.data.datasets.push({
-    label: "z",
-    data: [],
-    borderColor: colorZ,
-    fill: false,
-    tension: 0.4,
-    pointRadius: 4,
-    borderWidth: 3
-});
+const chartAccelerometer = createChart(ctxAccelerometer, [{title: window.name, color: window.color}], "m/s2", 0, 19.62, 1.5);
 
 // Création du graphique acoustic
 const canvaAcoustic = document.getElementById("chart_acoustic");
@@ -85,21 +48,23 @@ socket.emit("getStadiumBleacherAcoustic", window.id);
  * @param {{id: number, accelerometer: [number, number, number], average: number, minimum: number, maximum: number}} data Données de la tribune.
  */
 socket.on("getStadiumBleacherAccelerometerResponse", (data) =>
+{
+    if (data.id !== window.id)
+        return;
+
+    if (window.DEBUG)
+        console.log(`[StadiumBleacher] getStadiumBleacherAccelerometerResponse - Réception des données initiales (ACCELEROMETER=${data.accelerometer})`);
+
+    if (data.accelerometer != "")
     {
-        if (data.id !== window.id)
-            return;
+        _displayData(data.accelerometer, data.average, data.minimum, data.maximum, "accelerometer");
+        _fillGraphicData(chartAccelerometer, data.accelerometer, "accelerometer");
+    }
+    else
+        _displayData(["-"], "-", "-", "-", "accelerometer");
+});
 
-        if (window.DEBUG)
-            console.log(`[StadiumBleacher] getStadiumBleacherAccelerometerResponse - Réception des données initiales (ACCELEROMETER=${data.accelerometer})`);
 
-        if (data.accelerometer != "")
-        {
-            _displayData(data.accelerometer, data.average, data.minimum, data.maximum, "accelerometer");
-            _fillGraphicData(chartAccelerometer, data.accelerometer, "accelerometer");
-        }
-        else
-            _displayData(["-"], "-", "-", "-", "accelerometer");
-    });
 
 /**
  * @brief Réception des données initiales de la tribune.
@@ -107,21 +72,23 @@ socket.on("getStadiumBleacherAccelerometerResponse", (data) =>
  * @param {{id: number, acoustic: number, average: number, minimum: number, maximum: number}} data Données de la tribune.
  */
 socket.on("getStadiumBleacherAcousticResponse", (data) =>
+{
+    if (data.id !== window.id)
+        return;
+
+    if (window.DEBUG)
+        console.log(`[StadiumBleacher] getStadiumBleacherAcousticResponse - Réception des données initiales (ACOUSTIC=${data.acoustic})`);
+
+    if (data.acoustic != "")
     {
-        if (data.id !== window.id)
-            return;
+        _displayData(data.acoustic, data.average, data.minimum, data.maximum, "acoustic");
+        _fillGraphicData(chartAcoustic, data.acoustic, "acoustic");
+    }
+    else
+        _displayData(["-"], "-", "-", "-", "acoustic");
+});
 
-        if (window.DEBUG)
-            console.log(`[StadiumBleacher] getStadiumBleacherAcousticResponse - Réception des données initiales (ACOUSTIC=${data.acoustic})`);
 
-        if (data.acoustic != "")
-        {
-            _displayData(data.acoustic, data.average, data.minimum, data.maximum, "acoustic");
-            _fillGraphicData(chartAcoustic, data.acoustic, "acoustic");
-        }
-        else
-            _displayData(["-"], "-", "-", "-", "acoustic");
-    });
 
 /**
  * @brief Réception d'une nouvelle mesure en temps réel.
@@ -129,16 +96,18 @@ socket.on("getStadiumBleacherAcousticResponse", (data) =>
  * @param {{id: number, accelerometer: [number, number, number], average: number, minimum: number, maximum: number}} data Nouvelles données de la tribune.
  */
 socket.on("newStadiumBleacherAccelerometer", (data) =>
-    {
-        if (data.id !== window.id)
-            return;
+{
+    if (data.id !== window.id)
+        return;
 
-        if (window.DEBUG)
-            console.log(`[StadiumBleacher] newStadiumBleacherAccelerometer - Nouvelle mesure reçue (ACCELEROMETER=${data.accelerometer})`);
+    if (window.DEBUG)
+        console.log(`[StadiumBleacher] newStadiumBleacherAccelerometer - Nouvelle mesure reçue (ACCELEROMETER=${data.accelerometer})`);
 
-        _displayData(data.accelerometer, data.average, data.minimum, data.maximum, "accelerometer");
-        _fillGraphicData(chartAccelerometer, data.accelerometer, "accelerometer");
-    });
+    _displayData(data.accelerometer, data.average, data.minimum, data.maximum, "accelerometer");
+    _fillGraphicData(chartAccelerometer, data.accelerometer, "accelerometer");
+});
+
+
 
 /**
  * @brief Réception d'une nouvelle mesure en temps réel.
@@ -146,16 +115,18 @@ socket.on("newStadiumBleacherAccelerometer", (data) =>
  * @param {{id: number, acoustic: number, average: number, minimum: number, maximum: number}} data Nouvelles données de la tribune.
  */
 socket.on("newStadiumBleacherAcoustic", (data) =>
-    {
-        if (data.id !== window.id)
-            return;
+{
+    if (data.id !== window.id)
+        return;
 
-        if (window.DEBUG)
-            console.log(`[StadiumBleacher] newStadiumBleacherAcoustic - Nouvelle mesure reçue (ACOUSTIC=${data.acoustic})`);
+    if (window.DEBUG)
+        console.log(`[StadiumBleacher] newStadiumBleacherAcoustic - Nouvelle mesure reçue (ACOUSTIC=${data.acoustic})`);
 
-        _displayData(data.acoustic, data.average, data.minimum, data.maximum, "acoustic");
-        _fillGraphicData(chartAcoustic, data.acoustic, "acoustic");
-    });
+    _displayData(data.acoustic, data.average, data.minimum, data.maximum, "acoustic");
+    _fillGraphicData(chartAcoustic, data.acoustic, "acoustic");
+});
+
+
 
 /**
  * @brief Déconnexion de la tribune actuellement affiché.
@@ -163,26 +134,28 @@ socket.on("newStadiumBleacherAcoustic", (data) =>
  * @param {number} stadiumBleacherId Identifiant de la tribune déconnecté.
  */
 socket.on("stadiumBleacherDisconnection", (stadiumBleacherId) =>
-    {
-        if (stadiumBleacherId !== window.id)
-            return;
+{
+    if (stadiumBleacherId !== window.id)
+        return;
 
-        if (window.DEBUG)
-            console.log(`[StadiumBleacher] stadiumBleacherDisconnection - Tribune id=${window.id} déconnecté`);
+    if (window.DEBUG)
+        console.log(`[StadiumBleacher] stadiumBleacherDisconnection - Tribune id=${window.id} déconnecté`);
 
-        _showDisconnectMessage();
-    });
+    _showDisconnectMessage();
+});
+
+
 
 /**
  * @brief Fermeture du serveur.
  */
 socket.on("serverClose", () =>
-    {
-        if (window.DEBUG)
-            console.log("[StadiumBleacher] serverClose - Fermeture du serveur, redirection vers l'accueil");
+{
+    if (window.DEBUG)
+        console.log("[StadiumBleacher] serverClose - Fermeture du serveur, redirection vers l'accueil");
 
-        window.location.href = "/";
-    });
+    window.location.href = "/";
+});
 
 // ============================================================================
 //  Fonctions internes
@@ -225,12 +198,14 @@ function _showDisconnectMessage()
 
     // Suppression automatique après 5 secondes
     setTimeout(() =>
-        {
-            if (window.DEBUG)
-                console.log("[StadiumBleacher] _showDisconnectMessage - Suppression de l'overlay");
+    {
+        if (window.DEBUG)
+            console.log("[StadiumBleacher] _showDisconnectMessage - Suppression de l'overlay");
 
-            overlay.remove();
-        }, 5000);
+        overlay.remove();
+    }, 5000);
+
+    return ;
 }
 
 /**
@@ -251,6 +226,8 @@ function _displayData(data, average, minimum, maximum, type)
     grid.querySelector(".average").textContent = average;
     grid.querySelector(".minimum").textContent = minimum;
     grid.querySelector(".maximum").textContent = maximum;
+
+    return ;
 }
 
 /**
@@ -275,13 +252,7 @@ function _fillGraphicData(chart, data, type)
             if (window.DEBUG)
                     console.log(`[StadiumBleacher] _fillGraphicData - Ajout du point DATA=${data[i]} à t=${timestamp}`);
 
-            if (type == "accelerometer")
-            {
-                chart.data.labels.push(timestamp);
-                for (let j=0; j < 3; j++)
-                    chart.data.datasets[j].data.push(data[i][j]);
-            }
-            else if (type == "acoustic")
+            if (type == "acoustic" || type == "accelerometer")
             {
                 chart.data.labels.push(timestamp);
                 chart.data.datasets[0].data.push(data[i]);
@@ -295,13 +266,7 @@ function _fillGraphicData(chart, data, type)
             // Limite l'historique affiché à 100 points
             if (chart.data.labels.length > 100)
             {
-                if (type == "accelerometer")
-                {
-                    chart.data.labels.shift();
-                    for (let j=0; j < 3; j++)
-                        chart.data.datasets[j].data.shift();
-                }
-                else if (type == "acoustic")
+                if (type == "acoustic" || type == "accelerometer")
                 {
                     chart.data.labels.shift();
                     chart.data.datasets[0].data.shift();
@@ -312,4 +277,6 @@ function _fillGraphicData(chart, data, type)
 
     // Mise à jour sans animation pour un rendu temps réel fluide
     chart.update("none");
+
+    return ;
 }

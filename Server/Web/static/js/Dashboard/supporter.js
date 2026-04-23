@@ -10,7 +10,7 @@
 //  Import des bibliothèques
 // ============================================================================
 
-import { createChart } from "../Utils/board.js";
+import { createChart } from "../Utils/element.js";
 import { subtractSeconds } from "../Utils/time.js";
 
 // ============================================================================
@@ -42,21 +42,23 @@ socket.emit("getSupporterHeartRate", window.id);
  * @param {{id: number, heartRate: number, average: number, minimum: number, maximum: number}} data Données du supporter.
  */
 socket.on("getSupporterHeartRateResponse", (data) =>
+{
+    if (data.id !== window.id)
+        return;
+
+    if (window.DEBUG)
+        console.log(`[Supporter] getSupporterHeartRateResponse - Réception des données initiales (HR=${data.heartRate} bpm)`);
+
+    if (data.heartRate != "")
     {
-        if (data.id !== window.id)
-            return;
+        _displayData(data.heartRate, data.average, data.minimum, data.maximum, "heart-rate");
+        _fillGraphicData(chartHeartRate, data.heartRate, "heart-rate");
+    }
+    else
+        _displayData(["-"], "-", "-", "-", "heart-rate");
+});
 
-        if (window.DEBUG)
-            console.log(`[Supporter] getSupporterHeartRateResponse - Réception des données initiales (HR=${data.heartRate} bpm)`);
 
-        if (data.heartRate != "")
-        {
-            _displayData(data.heartRate, data.average, data.minimum, data.maximum, "heart-rate");
-            _fillGraphicData(chartHeartRate, data.heartRate, "heart-rate");
-        }
-        else
-            _displayData(["-"], "-", "-", "-", "heart-rate");
-    });
 
 /**
  * @brief Réception d'une nouvelle mesure en temps réel.
@@ -64,16 +66,18 @@ socket.on("getSupporterHeartRateResponse", (data) =>
  * @param {{id: number, heartRate: number, average: number, minimum: number, maximum: number}} data Nouvelles données du supporter.
  */
 socket.on("newSupporterHeartRate", (data) =>
-    {
-        if (data.id !== window.id)
-            return;
+{
+    if (data.id !== window.id)
+        return;
 
-        if (window.DEBUG)
-            console.log(`[Supporter] newSupporterHeartRate - Nouvelle mesure reçue (HR=${data.heartRate} bpm)`);
+    if (window.DEBUG)
+        console.log(`[Supporter] newSupporterHeartRate - Nouvelle mesure reçue (HR=${data.heartRate} bpm)`);
 
-        _displayData(data.heartRate, data.average, data.minimum, data.maximum, "heart-rate");
-        _fillGraphicData(chartHeartRate, data.heartRate, "heart-rate");
-    });
+    _displayData(data.heartRate, data.average, data.minimum, data.maximum, "heart-rate");
+    _fillGraphicData(chartHeartRate, data.heartRate, "heart-rate");
+});
+
+
 
 /**
  * @brief Déconnexion du supporter actuellement affiché.
@@ -81,26 +85,28 @@ socket.on("newSupporterHeartRate", (data) =>
  * @param {number} supporterId Identifiant du supporter déconnecté.
  */
 socket.on("supporterDisconnection", (supporterId) =>
-    {
-        if (supporterId !== window.id)
-            return;
+{
+    if (supporterId !== window.id)
+        return;
 
-        if (window.DEBUG)
-            console.log(`[Supporter] supporterDisconnection - Supporter id=${window.id} déconnecté`);
+    if (window.DEBUG)
+        console.log(`[Supporter] supporterDisconnection - Supporter id=${window.id} déconnecté`);
 
-        _showDisconnectMessage();
-    });
+    _showDisconnectMessage();
+});
+
+
 
 /**
  * @brief Fermeture du serveur.
  */
 socket.on("serverClose", () =>
-    {
-        if (window.DEBUG)
-            console.log("[Supporter] serverClose - Fermeture du serveur, redirection vers l'accueil");
+{
+    if (window.DEBUG)
+        console.log("[Supporter] serverClose - Fermeture du serveur, redirection vers l'accueil");
 
-        window.location.href = "/";
-    });
+    window.location.href = "/";
+});
 
 // ============================================================================
 //  Fonctions internes
@@ -143,13 +149,17 @@ function _showDisconnectMessage()
 
     // Suppression automatique après 5 secondes
     setTimeout(() =>
-        {
-            if (window.DEBUG)
-                console.log("[Supporter] _showDisconnectMessage - Suppression de l'overlay");
+    {
+        if (window.DEBUG)
+            console.log("[Supporter] _showDisconnectMessage - Suppression de l'overlay");
 
-            overlay.remove();
-        }, 5000);
+        overlay.remove();
+    }, 5000);
+
+    return ;
 }
+
+
 
 /**
  * @brief Met à jour les éléments DOM affichant les statistiques du supporter.
@@ -170,7 +180,11 @@ function _displayData(data, average, minimum, maximum, type)
     grid.querySelector(".average").textContent = average;
     grid.querySelector(".minimum").textContent = minimum;
     grid.querySelector(".maximum").textContent = maximum;
+
+    return ;
 }
+
+
 
 /**
  * @brief Ajoute un nouveau point de données sur le graphique.
@@ -219,4 +233,6 @@ function _fillGraphicData(chart, data, type)
 
     // Mise à jour sans animation pour un rendu temps réel fluide
     chart.update("none");
+
+    return ;
 }

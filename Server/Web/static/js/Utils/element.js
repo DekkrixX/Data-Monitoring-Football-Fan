@@ -1,13 +1,13 @@
 /**
- * @file board.js
+ * @file element.js
  *
  * @brief Composants UI et utilitaires graphiques partagés entre les pages.
  *
- * Fournit les fonctions de création des cartes supporter et comparaison affichées sur la page d'accueil, ainsi que la factory createChart() utilisée par les pages supporter et comparaison.
+ * Fournit les fonctions de création d'éléments HTML.
  */
 
 // ============================================================================
-//  Carte supporter (page d'accueil)
+//  Fonction de création de composant HTML
 // ============================================================================
 
 /**
@@ -54,6 +54,8 @@ export function supporterCard(id, name, color)
     return card;
 }
 
+
+
 /**
  * @brief Crée et retourne une carte HTML cliquable représentant une tribune.
  *
@@ -98,9 +100,7 @@ export function stadiumBleacherCard(id, name, color)
     return card;
 }
 
-// ============================================================================
-//  Carte comparaison (page d'accueil)
-// ============================================================================
+
 
 /**
  * @brief Crée et retourne la carte HTML de comparaison entre supporters ou tribunes.
@@ -145,9 +145,7 @@ export function comparisonCard(type, data, titre)
     return card;
 }
 
-// ============================================================================
-//  Création du graphique Chart.js
-// ============================================================================
+
 
 /**
  * @brief Crée et retourne un graphique Chart.js de type "line" configuré

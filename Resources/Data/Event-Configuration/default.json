@@ -1,0 +1,215 @@
+{
+    "name": "Default",
+    "config": [
+        {
+            "category": "Phase de jeu",
+            "event": [
+                {
+                    "name": "Coup d'envoi du début du match",
+                    "code": 1,
+                    "enable": true
+                },
+                {
+                    "name": "Fin de la première mi-temps",
+                    "code": 2,
+                    "enable": true
+                },
+                {
+                    "name": "Coup d'envoi de la seconde mi-temps",
+                    "code": 3,
+                    "enable": true
+                },
+                {
+                    "name": "Fin de la seconde mi-temps",
+                    "code": 4,
+                    "enable": true
+                },
+                {
+                    "name": "Coup d'envoi de la première mi-temps des prolongations",
+                    "code": 5,
+                    "enable": true
+                },
+                {
+                    "name": "Fin de la première mi-temps des prolongations",
+                    "code": 6,
+                    "enable": true
+                },
+                {
+                    "name": "Coup d'envoi de la seconde mi-temps des prolongations",
+                    "code": 7,
+                    "enable": true
+                },
+                {
+                    "name": "Fin de la seconde mi-temps des prolongations",
+                    "code": 8,
+                    "enable": true
+                },
+                {
+                    "name": "Début de la séance de tir au but",
+                    "code": 9,
+                    "enable": true
+                },
+                {
+                    "name": "Fin de la séance de tir au but",
+                    "code": 10,
+                    "enable": true
+                },
+                {
+                    "name": "Temps additionnel",
+                    "code": 11,
+                    "enable": true
+                },
+                {
+                    "name": "Fin du match",
+                    "code": 12,
+                    "enable": true
+                }
+            ]
+        },
+        {
+            "category": "Fait de jeu",
+            "event": [
+                {
+                    "name": "Tir cadré",
+                    "code": 13,
+                    "enable": true
+                },
+                {
+                    "name": "Tir non cadré",
+                    "code": 14,
+                    "enable": true
+                },
+                {
+                    "name": "Tir sur la barre",
+                    "code": 15,
+                    "enable": true
+                },
+                {
+                    "name": "Tir sur le poteau",
+                    "code": 16,
+                    "enable": true
+                },
+                {
+                    "name": "But",
+                    "code": 17,
+                    "enable": true
+                },
+                {
+                    "name": "Arrêt du gardien",
+                    "code": 18,
+                    "enable": true
+                },
+                {
+                    "name": "Hors jeu",
+                    "code": 19,
+                    "enable": true
+                },
+                {
+                    "name": "Faute légère",
+                    "code": 20,
+                    "enable": true
+                },
+                {
+                    "name": "Faute grave",
+                    "code": 21,
+                    "enable": true
+                },
+                {
+                    "name": "Carton jaune",
+                    "code": 22,
+                    "enable": true
+                },
+                {
+                    "name": "Carton rouge",
+                    "code": 23,
+                    "enable": true
+                },
+                {
+                    "name": "Blessure",
+                    "code": 24,
+                    "enable": true
+                }
+            ]
+        },
+        {
+            "category": "Reprise de jeu",
+            "event": [
+                {
+                    "name": "Touche",
+                    "code": 25,
+                    "enable": true
+                },
+                {
+                    "name": "Corner",
+                    "code": 26,
+                    "enable": true
+                },
+                {
+                    "name": "Sortie de but",
+                    "code": 27,
+                    "enable": true
+                },
+                {
+                    "name": "Coup franc",
+                    "code": 28,
+                    "enable": true
+                },
+                {
+                    "name": "Pénalty",
+                    "code": 29,
+                    "enable": true
+                },
+                {
+                    "name": "Engagement",
+                    "code": 30,
+                    "enable": true
+                }
+            ]
+        },
+        {
+            "category": "Intervention exterieur",
+            "event": [
+                {
+                    "name": "Changement",
+                    "code": 31,
+                    "enable": true
+                },
+                {
+                    "name": "Intervention de la VAR",
+                    "code": 32,
+                    "enable": true
+                },
+                {
+                    "name": "Fin d'intervention de la VAR",
+                    "code": 33,
+                    "enable": true
+                },
+                {
+                    "name": "Arrêt du jeu",
+                    "code": 34,
+                    "enable": true
+                },
+                {
+                    "name": "Reprise du jeu",
+                    "code": 35,
+                    "enable": true
+                },
+                {
+                    "name": "Début de l'échauffement des joueurs",
+                    "code": 36,
+                    "enable": true
+                },
+                {
+                    "name": "Fin de l'échauffement des joueurs",
+                    "code": 37,
+                    "enable": true
+                },
+                {
+                    "name": "Entrée des joueurs sur le terrain",
+                    "code": 38,
+                    "enable": true
+                }
+            ]
+        }
+    ]
+}

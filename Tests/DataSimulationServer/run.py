@@ -42,7 +42,7 @@ mqttClient = None
 
 def heartRateMessage(heartRateSimulator, idf):
     heartRate = heartRateSimulator.getHeartRate()
-    topic     = getMQTTTopic("heart_rate", idf)
+    topic     = f"monitoring/heart_rate/{idf}"
     message   = json.dumps({"n": "Simulatior", "hr": [heartRate]})
             
     if not mqttClient.publish(topic, message):
@@ -55,7 +55,7 @@ def heartRateMessage(heartRateSimulator, idf):
 
 def acousticMessage(acousticSimulator, idf):
     acoustic = acousticSimulator.getAcoustic()
-    topic    = getMQTTTopic("acoustic", idf)
+    topic    = f"monitoring/acoustic/{idf}"
     message  = json.dumps({"n": "Simulator", "a": [acoustic]})
 
     if not mqttClient.publish(topic, message):
@@ -66,9 +66,9 @@ def acousticMessage(acousticSimulator, idf):
     return
 
 def accelerometerGyroscopeMessage(accelerometerGyroscopeSimulator, idf):
-    accelerometer, gyroscope = accelerometerGyroscopeSimulator.getAccelerometerGyroscope()
-    topic                    = getMQTTTopic("accelerometer_gyroscope", idf)
-    message                  = json.dumps({"n": "Simulator", "a": [accelerometer], "g": [gyroscope]})
+    accelerometer = accelerometerGyroscopeSimulator.getAccelerometerGyroscope()
+    topic         = f"monitoring/accelerometer_gyroscope/{idf}"
+    message       = json.dumps({"n": "Simulator", "a": [accelerometer]})
 
     if not mqttClient.publish(topic, message):
         logger.warning(f"[DataSimulationServer] Échec de la publication sur le topic '{topic}'")

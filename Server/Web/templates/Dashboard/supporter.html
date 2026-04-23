@@ -18,27 +18,29 @@
             <h1>Supporter n°{{ id }}</h1>
             <a href="/" class="button">← Retour</a>
         </header>
-        <div id="heart-rate" class="grid">
-            <div class="card">
-                <p class="heart-rate value">-</p>
-                <p class="label">BPM</p>
+        <main>
+            <div id="heart-rate" class="grid">
+                <div class="card">
+                    <p class="heart-rate value">-</p>
+                    <p class="label">BPM</p>
+                </div>
+                <div class="card">
+                    <p class="average value">-</p>
+                    <p class="label">Moyenne</p>
+                </div>
+                <div class="card">
+                    <p class="minimum value">-</p>
+                    <p class="label">Minimum</p>
+                </div>
+                <div class="card">
+                    <p class="maximum value">-</p>
+                    <p class="label">Maximum</p>
+                </div>
             </div>
-            <div class="card">
-                <p class="average value">-</p>
-                <p class="label">Moyenne</p>
+            <div class="chart-container">
+                <canvas id="chart_heart-rate"></canvas>
             </div>
-            <div class="card">
-                <p class="minimum value">-</p>
-                <p class="label">Minimum</p>
-            </div>
-            <div class="card">
-                <p class="maximum value">-</p>
-                <p class="label">Maximum</p>
-            </div>
-        </div>
-        <div class="chart-container">
-            <canvas id="chart_heart-rate"></canvas>
-        </div>
+        </main>
         <script src="{{ url_for('static', filename='lib/socket.io.min.js') }}"></script>
         <script src="{{ url_for('static', filename='lib/chart.umd.min.js') }}"></script>
         <script>

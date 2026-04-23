@@ -222,6 +222,17 @@ def registerSocketioHandlers(socketio, supporterList, stadiumBleacherList):
 
         return
 
+# =============================================================================
+#  Données d'avant match
+# =============================================================================
+    
+    ##
+    # @brief Réception des infomations d'avant match
+    ##
+    @socketio.on("matchInfomation")
+    def handleMathInformation():
+        logger.info("[SocketIO] Réception de 'matchInfomation'")
+        return
 
 
     return

@@ -10,22 +10,42 @@
         <header>
             <h1>Contrôle des évènements du match</h1>
         </header>
-        <button>Préparation d'avant match</button>
-        <button>Récapitulatif des évènements du match</button>
-        <div id="panel">
-            {% for category in events %}
-            <div class="category">
-                <h2>{{ category.category }}</h2>
-                {% for event in category.event %}
-                <button>{{ event.name }}</button>
-                {% endfor %}
+        <main>
+            <div>
+                <button onclick="window.location.href+='/preparation'">Préparation d'avant match</button>
+                <div id="pannel">
+                    {% for category in events.config %}
+                    <div class="category">
+                        <h2>{{ category.category }}</h2>
+                        {% for event in category.event %}
+                        {% if event.enable %}
+                        <div class="event">
+                            <button onclick='newEvent("{{ event.name }}", {{ event.code }})'>{{ event.name }}</button>
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                    {% endfor %}
+                </div>
             </div>
-            {% endfor %}
-        </div>
+            <div>
+                <div id="event">
+                    <h2>Récapitulatif des évènements en direct</h2>
+                    <div id="event-list">   
+                    </div>
+                    <div id="event-selected" class="hidden">
+                    </div>
+                </div>
+            </div>
+        </main>
         <script src="{{ url_for('static', filename='lib/socket.io.min.js') }}"></script>
         <script>
             // Définition des variables dynamiques
             window.DEBUG = {{ debug }};
+            window.deleteLightIcon = "{{ url_for('static', filename='icon/delete-light.png') }}";
+            window.modifyLightIcon = "{{ url_for('static', filename='icon/modify-light.png') }}";
+            window.deleteDarkIcon = "{{ url_for('static', filename='icon/delete-dark.png') }}";
+            window.modifyDarkIcon = "{{ url_for('static', filename='icon/modify-dark.png') }}";
         </script>
         <script type="module" src="{{ url_for('static', filename='js/Control/event.js') }}"></script>
     </body>

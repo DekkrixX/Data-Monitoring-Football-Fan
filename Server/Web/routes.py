@@ -16,6 +16,7 @@ from flask import render_template
 
 from Server.Config.setting import Config
 from Server.Utils.data import getColorOfSupporter, getColorOfStadiumBleacher
+from Server.Utils.event import loadConfiguration, getConfigurationList
 from Server.Utils.logger import Logger
 
 # =============================================================================
@@ -100,11 +101,8 @@ def registerRoutes(app, supporterList, stadiumBleacherList):
     ##
     @app.route("/event")
     def eventPage():
-        json_path = os.path.join(app.root_path, "..", "..", "Resources", "Data", "event.json")
-        with open(json_path, "r", encoding="utf-8") as f:
-            events = json.load(f)
-
-        return render_template("Control/event.html", debug=int(Config.DEBUG), events=events)
+        config = loadConfiguration("default");
+        return render_template("Control/event.html", debug=int(Config.DEBUG), events=config)
 
 
 
@@ -113,7 +111,17 @@ def registerRoutes(app, supporterList, stadiumBleacherList):
     ##
     @app.route("/event/preparation")
     def preparationPage():
-        return render_template("Control/preparation.html", debug=int(Config.DEBUG))
+        return render_template("Control/preparation.html", debug=int(Config.DEBUG), configurationList=getConfigurationList(), matchInformation={"config": "Default"}, lastInfomation=False)
+
+
+
+    ##
+    # @brief Page de configuration du contrôle d'évènements.
+    ##
+    @app.route("/event/configuration")
+    def configurationPage():
+        config = loadConfiguration("default");
+        return render_template("Control/configuration.html", debug=int(Config.DEBUG), events=config)
 
 # =============================================================================
 #  Gestionnaires d'erreurs HTTP
@@ -152,6 +160,15 @@ def registerRoutes(app, supporterList, stadiumBleacherList):
     @app.errorhandler(404)
     def pageNotFound(error):
         return render_template("Control/error.html", code=404), 404
+
+
+
+    ##
+    # @brief Page d'erreur 405
+    ##
+    @app.errorhandler(405)
+    def methodNotAllowed(error):
+        return render_template("Control/error.html", code=405), 405
 
 
 

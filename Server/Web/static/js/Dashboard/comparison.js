@@ -10,7 +10,7 @@
 //  Import des bibliothèques
 // ============================================================================
 
-import { createChart } from "../Utils/board.js";
+import { createChart } from "../Utils/element.js";
 import { subtractSeconds } from "../Utils/time.js";
 import { dataToString, typeToString } from "../Utils/stringConversion.js";
 
@@ -29,12 +29,6 @@ if (window.DEBUG)
 // Création du graphique multi-courbes (vide au départ, alimenté par les événements)
 const canva = document.getElementById("chart");
 const ctx   = canva.getContext("2d");
-const canvaX = document.getElementById("chartX");
-const ctxX   = canvaX.getContext("2d");
-const canvaY = document.getElementById("chartY");
-const ctxY   = canvaY.getContext("2d");
-const canvaZ = document.getElementById("chartZ");
-const ctxZ   = canvaZ.getContext("2d");
 let chart = null;
 
 // Demande des données initiales
@@ -45,13 +39,7 @@ if (window.type == "Supporter" && window.data == "heart_rate")
 }
 else if (window.type == "StadiumBleacher" && window.data == "accelerometer")
 {
-    chartX = createChart(ctxX, [], "m/s²", -156.96, 156.96, 10);
-    chartY = createChart(ctxY, [], "m/s²", -156.96, 156.96, 10);
-    chartZ = createChart(ctxZ, [], "m/s²", -156.96, 156.96, 10);
-    canvaX.parentElement.classList.remove("display-none");
-    canvaY.parentElement.classList.remove("display-none");
-    canvaZ.parentElement.classList.remove("display-none");
-    canva.parentElement.classList.add("display-none");
+    chart = createChart(ctx, [], "m/s²", 0, 19.62, 1.5);
     socket.emit("getStadiumBleacherAccelerometerAll");
 }
 else if (window.type == "StadiumBleacher" && window.data == "acoustic")
@@ -69,12 +57,14 @@ else
 //  Événements SocketIO
 // ============================================================================
 
-/**
- * @brief Réception des fréquence cardiaque initiales de tous les supporters connectés.
- *
- * @param {Array<{id: number, name: string, color: string, heartRate: number}>} dataList Liste des données de chaque supporter connecté.
- */
-socket.on("getSupporterHeartRateAllResponse", (dataList) =>
+if (window.data == "heart_rate")
+{
+    /**
+     * @brief Réception des fréquence cardiaque initiales de tous les supporters connectés.
+     *
+     * @param {Array<{id: number, name: string, color: string, heartRate: number}>} dataList Liste des données de chaque supporter connecté.
+     */
+    socket.on("getSupporterHeartRateAllResponse", (dataList) =>
     {
         if (window.DEBUG)
             console.log(`[Comparison] getSupporterHeartRateAllResponse - Réception des données de ${dataList.length} supporter(s)`);
@@ -89,12 +79,33 @@ socket.on("getSupporterHeartRateAllResponse", (dataList) =>
         }
     });
 
-/**
- * @brief Réception des données acoustiques initiales de toutes les tribunes connectées.
- *
- * @param {Array<{id: number, name: string, color: string, acoustic: number}>} dataList Liste des données de chaque tribune connecté.
- */
-socket.on("getStadiumBleacherAcousticAllResponse", (dataList) =>
+
+
+    /**
+     * @brief Réception d'une nouvelle mesure en temps réel.
+     *
+     * @param {{name: string, heartRate: number}} data
+     *        Nouvelles données du supporter.
+     */
+    socket.on("newSupporterHeartRate", (data) =>
+    {
+        if (window.DEBUG)
+            console.log(`[Comparison] newSupporterHeartRate - Nouvelle mesure pour '${data.name}' (HR=${data.heartRate} bpm)`);
+
+        _fillGraphicData(chart, data.name, data.heartRate);
+    });
+}
+
+
+
+if (window.data == "acoustic")
+{
+    /**
+     * @brief Réception des données acoustiques initiales de toutes les tribunes connectées.
+     *
+     * @param {Array<{id: number, name: string, color: string, acoustic: number}>} dataList Liste des données de chaque tribune connecté.
+     */
+    socket.on("getStadiumBleacherAcousticAllResponse", (dataList) =>
     {
         if (window.DEBUG)
             console.log(`[Comparison] getStadiumBleacherAcousticAllResponse - Réception des données de ${dataList.length} tribune(s)`);
@@ -109,12 +120,33 @@ socket.on("getStadiumBleacherAcousticAllResponse", (dataList) =>
         }
     });
 
-/**
- * @brief Réception des données de l'accéléromètre initiales de toutes les tribunes connectées.
- *
- * @param {Array<{id: number, name: string, color: string, accelerometer: [number, number, number]}>} dataList Liste des données de chaque tribune connecté.
- */
-socket.on("getStadiumBleacherAccelerometerAllResponse", (dataList) =>
+
+
+    /**
+     * @brief Réception d'une nouvelle mesure en temps réel.
+     *
+     * @param {{name: string, acoustic: number}} data
+     *        Nouvelles données d'une tribune.
+     */
+    socket.on("newStadiumBleacherAcoustic", (data) =>
+    {
+        if (window.DEBUG)
+            console.log(`[Comparison] newStadiumBleacherAcoustic - Nouvelle mesure pour '${data.name}' (ACOUSTIC=${data.acoustic} db)`);
+
+        _fillGraphicData(chart, data.name, data.acoustic);
+    });
+}
+
+
+
+if (window.data == "accelerometer")
+{
+    /**
+     * @brief Réception des données de l'accéléromètre initiales de toutes les tribunes connectées.
+     *
+     * @param {Array<{id: number, name: string, color: string, accelerometer: [number, number, number]}>} dataList Liste des données de chaque tribune connecté.
+     */
+    socket.on("getStadiumBleacherAccelerometerAllResponse", (dataList) =>
     {
         if (window.DEBUG)
             console.log(`[Comparison] getStadiumBleacherAccelerometerAllResponse - Réception des données de ${dataList.length} tribune(s)`);
@@ -124,64 +156,29 @@ socket.on("getStadiumBleacherAccelerometerAllResponse", (dataList) =>
             if (window.DEBUG)
                 console.log(`[Comparison] getStadiumBleacherAccelerometerAllResponse - Ajout de la tribune '${data.name}' (ACCELEROMETER=${data.accelerometer})`);
 
-            // Séparation des coordonnées
-            const [x, y, z] = splitCoord(data.accelerometer)
-
-            _addToGraphic(chartX, data.name, data.color);
-            _fillGraphicData(chartX, data.name, x);
-            _addToGraphic(chartY, data.name, data.color);
-            _fillGraphicData(chartY, data.name, y);
-            _addToGraphic(chartZ, data.name, data.color);
-            _fillGraphicData(chartZ, data.name, z);
+            _addToGraphic(chart, data.name, data.color);
+            _fillGraphicData(chart, data.name, data.accelerometer);
         }
     });
 
-/**
- * @brief Réception d'une nouvelle mesure en temps réel.
- *
- * @param {{name: string, heartRate: number}} data
- *        Nouvelles données du supporter.
- */
-socket.on("newSupporterHeartRate", (data) =>
+
+
+    /**
+     * @brief Réception d'une nouvelle mesure en temps réel.
+     *
+     * @param {{name: string, accelerometer: [number, number, number]}} data
+     *        Nouvelles données d'une tribune.
+     */
+    socket.on("newStadiumBleacherAccelerometer", (data) =>
     {
         if (window.DEBUG)
-            console.log(`[Comparison] newSupporterHeartRate - Nouvelle mesure pour '${data.name}' (HR=${data.heartRate} bpm)`);
+            console.log(`[Comparison] newStadiumBleacherAccelerometer - Nouvelle mesure pour '${data.name}' (ACCELEROMETER=${data.accelerometer} m/s2)`);
 
-        _fillGraphicData(chart, data.name, data.heartRate);
+        _fillGraphicData(chart, data.name, data.accelerometer);
     });
+}
 
-/**
- * @brief Réception d'une nouvelle mesure en temps réel.
- *
- * @param {{name: string, acoustic: number}} data
- *        Nouvelles données d'une tribune.
- */
-socket.on("newStadiumBleacherAcoustic", (data) =>
-    {
-        if (window.DEBUG)
-            console.log(`[Comparison] newStadiumBleacherAcoustic - Nouvelle mesure pour '${data.name}' (ACOUSTIC=${data.acoustic} db)`);
 
-        _fillGraphicData(chart, data.name, data.acoustic);
-    });
-
-/**
- * @brief Réception d'une nouvelle mesure en temps réel.
- *
- * @param {{name: string, accelerometer: [number, number, number]}} data
- *        Nouvelles données d'une tribune.
- */
-socket.on("newStadiumBleacherAcoustic", (data) =>
-    {
-        if (window.DEBUG)
-            console.log(`[Comparison] newStadiumBleacherAcoustic - Nouvelle mesure pour '${data.name}' (ACOUSTIC=${data.acoustic} db)`);
-
-        // Séparation des coordonnées
-        const [x, y, z] = splitCoord(data.accelerometer)
-
-        _fillGraphicData(chartX, data.name, x);
-        _fillGraphicData(chartY, data.name, y);
-        _fillGraphicData(chartZ, data.name, z)
-    });
 
 /**
  * @brief Connexion d'un nouveau supporter en temps réel.
@@ -190,12 +187,14 @@ socket.on("newStadiumBleacherAcoustic", (data) =>
  *        Données du supporter qui vient de se connecter.
  */
 socket.on("supporterConnection", (data) =>
-    {
-        if (window.DEBUG)
-            console.log(`[ComparisonSupporter] supporterConnection - Nouveau supporter '${data.name}', ajout de la courbe`);
+{
+    if (window.DEBUG)
+        console.log(`[ComparisonSupporter] supporterConnection - Nouveau supporter '${data.name}', ajout de la courbe`);
 
-        _addToGraphic(chart, data.name, data.color);
-    });
+    _addToGraphic(chart, data.name, data.color);
+});
+
+
 
 /**
  * @brief Connexion d'une nouvelle tribune en temps réel.
@@ -204,15 +203,14 @@ socket.on("supporterConnection", (data) =>
  *        Données de la tribune qui vient de se connecter.
  */
 socket.on("stadiumBleacherConnection", (data) =>
-    {
-        if (window.DEBUG)
-            console.log(`[Comparison] stadiumBleacherConnection - Nouvelle tribune '${data.name}', ajout de la courbe`);
+{
+    if (window.DEBUG)
+        console.log(`[Comparison] stadiumBleacherConnection - Nouvelle tribune '${data.name}', ajout de la courbe`);
 
-        _addToGraphic(chart, data.name, data.color);
-        _addToGraphic(chartX, data.name, data.color);
-        _addToGraphic(chartY, data.name, data.color);
-        _addToGraphic(chartZ, data.name, data.color);
-    });
+    _addToGraphic(chart, data.name, data.color);
+});
+
+
 
 /**
  * @brief Déconnexion d'un supporter en temps réel.
@@ -220,12 +218,14 @@ socket.on("stadiumBleacherConnection", (data) =>
  * @param {string} supporterName Nom du supporter déconnecté.
  */
 socket.on("supporterDisconnection", (supporterName) =>
-    {
-        if (window.DEBUG)
-            console.log(`[ComparisonSupporter] supporterDisconnection - Suppression de la courbe du supporter '${supporterName}'`);
+{
+    if (window.DEBUG)
+        console.log(`[ComparisonSupporter] supporterDisconnection - Suppression de la courbe du supporter '${supporterName}'`);
 
-        _removeFromGraphic(chart, supporterName);
-    });
+    _removeFromGraphic(chart, supporterName);
+});
+
+
 
 /**
  * @brief Déconnexion d'une tribune en temps réel.
@@ -233,26 +233,25 @@ socket.on("supporterDisconnection", (supporterName) =>
  * @param {string} stadiumBleacherName Nom de la tribune déconnecté.
  */
 socket.on("stadiumBleacherDisconnection", (stadiumBleacherName) =>
-    {
-        if (window.DEBUG)
-            console.log(`[Comparison] stadiumBleacherDisconnection - Suppression de la courbe de la tribune '${stadiumBleacherName}'`);
+{
+    if (window.DEBUG)
+        console.log(`[Comparison] stadiumBleacherDisconnection - Suppression de la courbe de la tribune '${stadiumBleacherName}'`);
 
-        _removeFromGraphic(chart, stadiumBleacherName);
-        _removeFromGraphic(chartX, stadiumBleacherName);
-        _removeFromGraphic(chartY, stadiumBleacherName);
-        _removeFromGraphic(chartZ, stadiumBleacherName);
-    });
+    _removeFromGraphic(chart, stadiumBleacherName);
+});
+
+
 
 /**
  * @brief Fermeture du serveur.
  */
 socket.on("serverClose", () =>
-    {
-        if (window.DEBUG)
-            console.log("[ComparisonSupporter] serverClose - Fermeture du serveur, redirection vers l'accueil");
+{
+    if (window.DEBUG)
+        console.log("[ComparisonSupporter] serverClose - Fermeture du serveur, redirection vers l'accueil");
 
-        window.location.href = "/";
-    });
+    window.location.href = "/";
+});
 
 // ============================================================================
 //  Fonctions internes
@@ -299,7 +298,11 @@ function _fillGraphicData(chart, name, data)
 
     // Mise à jour sans animation pour un rendu temps réel fluide
     chart.update("none");
+
+    return ;
 }
+
+
 
 /**
  * @brief Ajoute une nouvelle courbe vide pour un supporter sur le graphique.
@@ -335,7 +338,11 @@ function _addToGraphic(chart, name, color)
     });
 
     chart.update("none");
+
+    return ;
 }
+
+
 
 /**
  * @brief Retire la courbe d'un supporter du graphique.
@@ -359,33 +366,6 @@ function _removeFromGraphic(chart, name)
 
     chart.data.datasets.splice(index, 1);
     chart.update("none");
-}
 
-// ============================================================================
-//  Fonction utilitaire
-// ============================================================================
-
-/**
- * @brief Sépare les coordonnées dans trois tableau.
- * 
- * @param array Tableau à séparer.
- * 
- * @return {{array} {array} {array}} Les tableaux de chaque coordonnées.
- */
-function splitCoord(array) 
-{
-  // Initialiser les tableaux pour x, y et z
-  let xArray = [];
-  let yArray = [];
-  let zArray = [];
-
-  // Parcourir le tableau d'entrées et extraire chaque valeur de x, y et z
-  array.forEach(([x, y, z]) => {
-    xArray.push(x);
-    yArray.push(y);
-    zArray.push(z);
-  });
-
-  // Retourner les trois tableaux
-  return [xArray, yArray, zArray];
+    return ;
 }

@@ -110,15 +110,15 @@ def _onMqttMessage(message):
     dataType = topic[1]
     idf = int(topic[2])
 
-    if dataType == 2:
+    if dataType == "heart_rate":
         if not _supporterExists(idf):
             _createSupporter(idf, dataType)
         _addSupporterHeartRate(idf, data)
-    elif dataType == 3:
+    elif dataType == "accelerometer_gyroscope":
         if not _stadiumBleacherExists(idf):
             _createStadiumBleacher(idf, dataType)
         _addStadiumBleacherAccelerometer(idf, data)
-    elif dataType == 4:
+    elif dataType == "acoustic":
         if not _stadiumBleacherExists(idf):
             _createStadiumBleacher(idf, dataType)
         _addStadiumBleacherAcoustic(idf, data)

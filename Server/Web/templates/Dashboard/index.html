@@ -8,18 +8,20 @@
     </head>
     <body>
         <header>
-            <h1 class="title">Dashboard</h1>
-            <h2 class="subtitle">Visualisation des données des supporters en temps réel</h2>
+            <h1>Dashboard de monitoring</h1>
         </header>
-        <div id="gridSupporter">
-        </div>
-        <h2 class="subtitle">Visualisation des données des tribunes en temps réel</h2>
-        <div id="gridStadiumBleacher">
-        </div>
+        <main>
+            <h2>Données des supporters en temps réel</h2>
+            <div id="gridSupporter">
+            </div>
+            <h2>Données des tribunes en temps réel</h2>
+            <div id="gridStadiumBleacher">
+            </div>
+        </main>
         <script src="{{ url_for('static', filename='lib/socket.io.min.js') }}"></script>
         <script>
             // Définition des variables dynamiques
-            const DEBUG = {{ debug }};
+            window.DEBUG = {{ debug }};
         </script>
         <script type="module" src="{{ url_for('static', filename='js/Dashboard/index.js') }}"></script>
     </body>

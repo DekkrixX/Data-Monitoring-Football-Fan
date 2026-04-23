@@ -18,48 +18,50 @@
             <h1>Tribune n°{{ id }}</h1>
             <a href="/" class="button">← Retour</a>
         </header>
-        <div id="accelerometer" class="grid">
-            <div class="card">
-                <p class="accelerometer value">-</p>
-                <p class="label">Accéléromètre</p>
+        <main>
+            <div id="accelerometer" class="grid">
+                <div class="card">
+                    <p class="accelerometer value">-</p>
+                    <p class="label">Accéléromètre</p>
+                </div>
+                <div class="card">
+                    <p class="average value">-</p>
+                    <p class="label">Moyenne</p>
+                </div>
+                <div class="card">
+                    <p class="minimum value">-</p>
+                    <p class="label">Minimum</p>
+                </div>
+                <div class="card">
+                    <p class="maximum value">-</p>
+                    <p class="label">Maximum</p>
+                </div>
             </div>
-            <div class="card">
-                <p class="average value">-</p>
-                <p class="label">Moyenne</p>
+            <div class="chart-container">
+                <canvas id="chart_accelerometer"></canvas>
             </div>
-            <div class="card">
-                <p class="minimum value">-</p>
-                <p class="label">Minimum</p>
+            <div id="acoustic" class="grid">
+                <div class="card">
+                    <p class="acoustic value">-</p>
+                    <p class="label">Acoustique</p>
+                </div>
+                <div class="card">
+                    <p class="average value">-</p>
+                    <p class="label">Moyenne</p>
+                </div>
+                <div class="card">
+                    <p class="minimum value">-</p>
+                    <p class="label">Minimum</p>
+                </div>
+                <div class="card">
+                    <p class="maximum value">-</p>
+                    <p class="label">Maximum</p>
+                </div>
             </div>
-            <div class="card">
-                <p class="maximum value">-</p>
-                <p class="label">Maximum</p>
+            <div class="chart-container">
+                <canvas id="chart_acoustic"></canvas>
             </div>
-        </div>
-        <div class="chart-container">
-            <canvas id="chart_accelerometer"></canvas>
-        </div>
-        <div id="acoustic" class="grid">
-            <div class="card">
-                <p class="acoustic value">-</p>
-                <p class="label">Acoustique</p>
-            </div>
-            <div class="card">
-                <p class="average value">-</p>
-                <p class="label">Moyenne</p>
-            </div>
-            <div class="card">
-                <p class="minimum value">-</p>
-                <p class="label">Minimum</p>
-            </div>
-            <div class="card">
-                <p class="maximum value">-</p>
-                <p class="label">Maximum</p>
-            </div>
-        </div>
-        <div class="chart-container">
-            <canvas id="chart_acoustic"></canvas>
-        </div>
+        </main>
         <script src="{{ url_for('static', filename='lib/socket.io.min.js') }}"></script>
         <script src="{{ url_for('static', filename='lib/chart.umd.min.js') }}"></script>
         <script>

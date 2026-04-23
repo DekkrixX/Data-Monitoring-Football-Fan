@@ -1,291 +1,155 @@
-/* ==============================================================
-   ERROR PAGE – STYLE GLOBAL
-   ============================================================== */
+/* =========================================================================
+   THEME VARIABLES
+   ========================================================================= */
 
-/* ---------- Corps de page ----------
-   Fond sombre, texte clair, police principale, centrage
-   vertical/horizontal, et gestion du débordement. */
+:root
+{
+    --bg: #f5f6fa;
+    --panel: #ffffff;
+    --text: #1f1f1f;
+    --muted: #6b6b6b;
+    --accent: #2ecc71;
+    --border: #dcdde1;
+    --error-code: #e74c3c;
+}
+@media (prefers-color-scheme: dark)
+{
+    :root
+    {
+        --bg: #0f1115;
+        --panel: #1a1d24;
+        --text: #f1f1f1;
+        --muted: #a0a0a0;
+        --accent: #2ecc71;
+        --border: #2b2f3a;
+        --error-code: #ff6b6b;
+    }
+}
+
+/* =========================================================================
+   GLOBAL
+   ========================================================================= */
+
 body
 {
-  background-color: var(--c-bg-dark);
-  color: var(--c-text);
-  font-family: var(--font-sans);
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  position: relative;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
 }
 
+/* =========================================================================
+   CONTAINER
+   ========================================================================= */
 
-/* ---------- Grille de fond (texture) ----------
-   Deux dégradés linéaires créent un motif quadrillé discret. */
-body::before
-{
-  content: "";
-  position: fixed;
-  inset: 0;
-  background-image:
-    linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
-  background-size: 48px 48px;
-  pointer-events: none;
-  z-index: 0;
-}
-
-/* ---------- Halo rouge (effet glow) ----------
-   Cercle radial centré, utilisé comme décor d’arrière‑plan. */
-body::after
-{
-  content: "";
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 600px;
-  height: 600px;
-  background: radial-gradient(circle, var(--c-red-glow) 0%, transparent 70%);
-  pointer-events: none;
-  z-index: 0;
-}
-
-
-/* ==============================================================
-   CONTAINER PRINCIPAL
-   --------------------------------------------------------------
-   Contenu réel de la page (texte, bouton…) affiché au-dessus
-   des calques précédents grâce au z‑index = 1. */
 .container
 {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0;
-  text-align: center;
-  animation: fadeIn .6s ease both;
+    text-align: center;
+    width: 90%;
+    max-width: 600px;
 }
 
-/* ---------- Animation d’apparition ----------
-   Fade‑in + légère translation verticale. */
-@keyframes fadeIn
-{
-  from
-  {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to
-  {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
+/* =========================================================================
+   ERROR CODE
+   ========================================================================= */
 
-
-/* ==============================================================
-   CODE ERREUR (GRAND NUMÉRO)
-   --------------------------------------------------------------
-   Texte très grand, couleur dynamique via gradient, effet glitch.
-   ============================================================== */
 .error-code
 {
-  font-family: var(--font-mono);
-  font-size: clamp(100px, 18vw, 180px);
-  font-weight: 900;
-  line-height: 1;
-  letter-spacing: -4px;
-  color: transparent;
-  background: linear-gradient(160deg, #ff6b6b 0%, var(--c-red) 40%, var(--c-red-dark) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  filter: drop-shadow(0 0 40px rgba(224, 52, 52, 0.5));
-  animation: glitch 4s infinite;
-  position: relative;
+    font-size: 120px;
+    font-weight: bold;
+    color: var(--error-code);
+    margin-bottom: 2vh;
 }
 
+/* =========================================================================
+   PANEL
+   ========================================================================= */
 
-/* ---------- Animation glitch ----------
-   Simule un léger “glitch” visuel. */
-@keyframes glitch
-{
-  0%, 90%, 100%
-  {
-    transform: translate(0, 0) skew(0deg);
-  }
-  91%
-  {
-    transform: translate(-3px, 0) skew(-1deg);
-  }
-  92%
-  {
-    transform: translate(3px, 0) skew(1deg);
-  }
-  93%
-  {
-    transform: translate(0, 0) skew(0deg);
-  }
-  94%
-  {
-    transform: translate(-2px, 1px) skew(-0.5deg);
-  }
-  95%
-  {
-    transform: translate(0, 0) skew(0deg);
-  }
-}
-
-/* ==============================================================
-   PANNEAU D’INFORMATION
-   --------------------------------------------------------------
-   Cadre contenant le texte d’erreur et le bouton retour.
-   ============================================================== */
 .panel
 {
-  margin-top: 8px;
-  background: var(--c-bg-panel);
-  border: 1px solid var(--c-border);
-  border-top: 2px solid var(--c-red);
-  padding: 32px 48px 36px;
-  width: min(480px, 90vw);
-  position: relative;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 15px;
+    padding: 3vh 2vw;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
 }
 
-/* ---------- Petit angle décoratif (coin inférieur droit) ---------- */
-.panel::after
-{
-  content: "";
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  width: 18px;
-  height: 18px;
-  border-bottom: 2px solid var(--c-red);
-  border-right: 2px solid var(--c-red);
-}
+/* =========================================================================
+   BADGE
+   ========================================================================= */
 
-/* ==============================================================
-   BADGE D’ÉTAT
-   --------------------------------------------------------------
-   Petite étiquette indiquant le statut (ex. “404”). */
 .status-badge
 {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--c-red);
-  background: rgba(224, 52, 52, 0.1);
-  border: 1px solid rgba(224, 52, 52, 0.3);
-  padding: 5px 12px;
-  margin-bottom: 20px;
+    display: inline-block;
+    padding: 0.5vh 1vw;
+    font-size: 14px;
+    border-radius: 20px;
+    background: var(--accent);
+    color: white;
+    margin-bottom: 2vh;
 }
 
+/* =========================================================================
+   TEXTS
+   ========================================================================= */
 
-/* ---------- Point lumineux animé (clignotement) ---------- */
-.status-badge::before
-{
-  content: "";
-  width: 6px;
-  height: 6px;
-  background: var(--c-red);
-  border-radius: 50%;
-  animation: blink 1.2s ease-in-out infinite;
-}
-@keyframes blink
-{
-  0%, 100%
-  {
-    opacity: 1; 
-  }
-  50%
-  {
-    opacity: 0.2;
-  }
-}
-
-/* ==============================================================
-   TITRES ET DESCRIPTIONS
-   ============================================================== */
 .error-title
 {
-  font-family: var(--font-mono);
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--c-text);
-  letter-spacing: 1px;
-  margin-bottom: 12px;
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 1vh;
 }
+
 .error-description
 {
-  font-size: 14px;
-  color: var(--c-text-muted);
-  line-height: 1.7;
-  margin-bottom: 28px;
+    font-size: 16px;
+    color: var(--muted);
+    line-height: 1.5;
 }
 
+/* =========================================================================
+   DIVIDER
+   ========================================================================= */
 
-/* ---------- Séparateur horizontal ---------- */
 .divider
 {
-  width: 100%;
-  height: 1px;
-  background: var(--c-border);
-  margin: 0 0 24px;
+    height: 1px;
+    background: var(--border);
+    margin: 3vh 0;
 }
 
+/* =========================================================================
+   BUTTON
+   ========================================================================= */
 
-/* ==============================================================
-   BOUTON RETOUR À LA PAGE D’ACCUEIL
-   ============================================================== */
 .btn-home
 {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  background: transparent;
-  border: 1px solid var(--c-red);
-  color: var(--c-red);
-  font-family: var(--font-mono);
-  font-size: 12px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  text-decoration: none;
-  padding: 12px 28px;
-  cursor: pointer;
-  transition: background .2s, color .2s;
-  position: relative;
+    display: inline-block;
+    padding: 1vh 2vw;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: bold;
+    background: var(--text);
+    color: var(--bg);
+    transition: 0.2s;
 }
 
-/* Arrow prefix */
-.btn-home::before {
-  content: "›";
-  font-size: 16px;
-  line-height: 1;
-}
-
-
-/* Hover effect */
 .btn-home:hover
 {
-  background: var(--c-red);
-  color: #fff;
+    opacity: 0.8;
 }
 
-/* ==============================================================
-   FOOTER (texte secondaire)
-   ============================================================== */
+/* =========================================================================
+   FOOTER
+   ========================================================================= */
+
 .footer
 {
-  margin-top: 32px;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--c-text-muted);
-  letter-spacing: 1px;
-  opacity: 0.5;
+    margin-top: 3vh;
+    font-size: 12px;
+    color: var(--muted);
 }
