@@ -6,6 +6,8 @@
  * Fournit les fonctions de création d'éléments HTML.
  */
 
+let idEvent = 0; ///< @brief Identifiant unique des évènements.
+
 // ============================================================================
 //  Fonction de création de composant HTML
 // ============================================================================
@@ -246,6 +248,9 @@ export function createChart(ctx, list, value, min, max, step)
  */
 export function createEvent(name, code)
 {
+    const id = idEvent;
+    idEvent++;
+
     if (window.DEBUG)
         console.log(`[Element] createEvent - Création de l'évènement : ${name}`);
 
@@ -280,7 +285,8 @@ export function createEvent(name, code)
             console.log(`[Element] createElement - Suppression de l'évènement : ${p.textContent}`);
 
         const eventSelected = document.getElementById("event-selected");
-        eventSelected.classList.add("hidden");
+        if (eventSelected.querySelector("p").textContent == id)
+            eventSelected.classList.add("hidden");
         div.remove();
     });
     modifyImg.addEventListener("click", () =>
@@ -290,6 +296,10 @@ export function createEvent(name, code)
 
         const eventSelected = document.getElementById("event-selected");
         eventSelected.classList.remove("hidden");
+        const h3 = eventSelected.querySelector("h3");
+        const idEventSelected = eventSelected.querySelector("p");
+        h3.textContent = p.textContent;
+        idEventSelected.textContent = id;
     });
 
     return div;

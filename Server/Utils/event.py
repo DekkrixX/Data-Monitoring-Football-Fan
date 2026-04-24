@@ -110,7 +110,7 @@ def createNewEventConfiguration(config, matchInfomation):
 ##
 def loadMatchInformation():
     lastInformation = True
-    matchInformation = {"config": "Default"}
+    matchInformation = {"config": "Default", "domicile": {"team": ""}, "exterieur": {"team": ""}}
     filePath = Config.PATH["data"] + Config.PREPARATION_FILE
 
     try:

@@ -34,7 +34,21 @@
                     <div id="event-list">   
                     </div>
                     <div id="event-selected" class="hidden">
-                        <div>Test</div>
+                        <div>
+                            <h3></h3>
+                            <p class="hidden"></p>
+                            <form>
+                                <label>
+                                    Minutes de jeu:
+                                    <input name="time" type="number" min="1" max="135">
+                                </label>
+                                <select>
+                                    <option selected>Équipe</option>
+                                    <option>{% if lastInformation %}{{ domicile }}{% else %}Domicile{% endif %}</option>
+                                    <option>{% if lastInformation %}{{ exterieur }}{% else %}Exterieur{% endif %}</option>
+                                </select>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -101,9 +101,9 @@ def registerRoutes(app, supporterList, stadiumBleacherList):
     ##
     @app.route("/event")
     def eventPage():
-        matchInformation, _ = loadMatchInformation()
+        matchInformation, lastInformation = loadMatchInformation()
         config = loadConfiguration(matchInformation["config"])
-        return render_template("Control/event.html", debug=int(Config.DEBUG), events=config)
+        return render_template("Control/event.html", debug=int(Config.DEBUG), events=config, lastInformation=lastInformation, domicile=matchInformation["domicile"]["team"], exterieur=matchInformation["exterieur"]["team"])
 
 
 
