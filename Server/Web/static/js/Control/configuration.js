@@ -48,8 +48,9 @@ button.addEventListener("click", (event) =>
         configuration.config.push(categoryObj); // Ajouter la catégorie à la configuration
     });
 
-    console.log(`[Configuration] Configuration à sauvegarder: ${JSON.stringify(configuration, null, 4)}`);
-    socket.emit("saveConfiguration", JSON.stringify(configuration, null, 4))
+    if (window.DEBUG)
+        console.log(`[Configuration] Configuration à sauvegarder: ${JSON.stringify(configuration, null, 4)}`);
+    socket.emit("saveConfiguration", JSON.stringify(configuration, null, 4));
 });
 
 
@@ -86,3 +87,5 @@ function toggleCheck(span)
 
     return ;
 }
+
+window.toggleCheck = toggleCheck;

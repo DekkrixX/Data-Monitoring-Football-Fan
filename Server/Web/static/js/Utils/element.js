@@ -22,7 +22,7 @@
 export function supporterCard(id, name, color)
 {
     if (DEBUG)
-        console.log(`[Board] supporterCard - Création de la carte pour le supporter id=${id} (${name})`);
+        console.log(`[Element] supporterCard - Création de la carte pour le supporter id=${id} (${name})`);
 
     // Création de la carte
     const card = document.createElement("div");
@@ -33,7 +33,7 @@ export function supporterCard(id, name, color)
     card.addEventListener("click", () =>
         {
             if (DEBUG)
-                console.log(`[Board] supporterCard - Clic sur la carte du supporter id=${id}, redirection vers /supporter/${id}`);
+                console.log(`[Element] supporterCard - Clic sur la carte du supporter id=${id}, redirection vers /supporter/${id}`);
 
             window.location.href = "/supporter/" + id;
         });
@@ -68,7 +68,7 @@ export function supporterCard(id, name, color)
 export function stadiumBleacherCard(id, name, color)
 {
     if (DEBUG)
-        console.log(`[Board] stadiumBleacherCard - Création de la carte pour la tribune id=${id} (${name})`);
+        console.log(`[Element] stadiumBleacherCard - Création de la carte pour la tribune id=${id} (${name})`);
 
     // Création de la carte
     const card = document.createElement("div");
@@ -79,7 +79,7 @@ export function stadiumBleacherCard(id, name, color)
     card.addEventListener("click", () =>
         {
             if (DEBUG)
-                console.log(`[Board] stadiumBleacherCard - Clic sur la carte du supporter id=${id}, redirection vers /stadiumBleacher/${id}`);
+                console.log(`[Element] stadiumBleacherCard - Clic sur la carte du supporter id=${id}, redirection vers /stadiumBleacher/${id}`);
 
             window.location.href = "/stadiumBleacher/" + id;
         });
@@ -114,7 +114,7 @@ export function stadiumBleacherCard(id, name, color)
 export function comparisonCard(type, data, titre)
 {
     if (DEBUG)
-        console.log("[Board] comparisonCard - Création de la carte de comparaison");
+        console.log("[Element] comparisonCard - Création de la carte de comparaison");
 
     // Création de la carte
     const card = document.createElement("div");
@@ -125,7 +125,7 @@ export function comparisonCard(type, data, titre)
     card.addEventListener("click", () =>
         {
             if (DEBUG)
-                console.log("[Board] comparisonCard - Clic sur la carte de comparaison, redirection vers /comparison");
+                console.log("[Element] comparisonCard - Clic sur la carte de comparaison, redirection vers /comparison");
 
             window.location.href = "/comparison/" + type + "/" + data;
         });
@@ -163,13 +163,13 @@ export function comparisonCard(type, data, titre)
 export function createChart(ctx, list, value, min, max, step)
 {
     if (window.DEBUG)
-        console.log(`[Board] createChart - Création du graphique avec ${list.length} dataset(s)`);
+        console.log(`[Element] createChart - Création du graphique avec ${list.length} dataset(s)`);
 
     // Construction des datasets à partir de la liste fournie
     const datasetList = list.map((element) =>
         {
             if (window.DEBUG)
-                console.log(`[Board] createChart - Dataset: label='${element.title}', color='${element.color}'`);
+                console.log(`[Element] createChart - Dataset: label='${element.title}', color='${element.color}'`);
 
             return {
                 label:           element.title,
@@ -231,7 +231,66 @@ export function createChart(ctx, list, value, min, max, step)
     });
 
     if (window.DEBUG)
-        console.log("[Board] createChart - Graphique créé");
+        console.log("[Element] createChart - Graphique créé");
 
     return chart;
+}
+
+/**
+ * @brief Crée et retourne un évènement.
+ *
+ * @param {string} name Nom de l'évènement.
+ * @param {number} code Code de l'évènement.
+ *
+ * @returns {HTMLDivElement} Élément div prêt à être inséré dans le DOM.
+ */
+export function createEvent(name, code)
+{
+    if (window.DEBUG)
+        console.log(`[Element] createEvent - Création de l'évènement : ${name}`);
+
+    // Création de l'élément
+    const div = document.createElement("div");
+    const p = document.createElement("p");
+    const buttons = document.createElement("div");
+    const removeImg = document.createElement("img");
+    const modifyImg = document.createElement("img");
+
+    if (window.matchMedia("(prefers-color-scheme: dark)").matches)
+        removeImg.src = window.deleteDarkIcon;
+    else
+        removeImg.src = window.deleteLightIcon
+    if (window.matchMedia("(prefers-color-scheme: dark)").matches)
+        modifyImg.src = window.modifyDarkIcon;
+    else
+        modifyImg.src = window.modifyLightIcon;
+
+    p.textContent = name;
+    removeImg.alt = "Icone de suppression";
+    modifyImg.alt = "Icone de modification";
+    div.appendChild(p);
+    buttons.appendChild(modifyImg);
+    buttons.appendChild(removeImg);
+    div.appendChild(buttons);
+
+    // Ajout des évènements de modification et suppression de l'évènement
+    removeImg.addEventListener("click", () =>
+    {
+        if (window.DEBUG)
+            console.log(`[Element] createElement - Suppression de l'évènement : ${p.textContent}`);
+
+        const eventSelected = document.getElementById("event-selected");
+        eventSelected.classList.add("hidden");
+        div.remove();
+    });
+    modifyImg.addEventListener("click", () =>
+    {
+        if (window.DEBUG)
+        console.log(`[Element] createElement - Modfication de l'évènement : ${p.textContent}`);
+
+        const eventSelected = document.getElementById("event-selected");
+        eventSelected.classList.remove("hidden");
+    });
+
+    return div;
 }

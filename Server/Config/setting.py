@@ -122,6 +122,12 @@ class Config:
     GRAFANA_PORT = int(os.getenv("GRAFANA_PORT", 0)) ##< @brief Port du serveur Grafana.
 
 # =============================================================================
+#  Fichier cache
+# =============================================================================
+
+    PREPARATION_FILE = os.getenv("PREPARATION_FILE", None) ##< @brief Fichier cache de la préparation d'avant match.
+
+# =============================================================================
 #  Délais d'échantillonage des capteurs
 # =============================================================================
 
@@ -175,6 +181,9 @@ class Config:
             # Grafana
             "GRAFANA_HOST": cls.GRAFANA_HOST,
             "GRAFANA_PORT": cls.GRAFANA_PORT,
+
+            # Fichier cache
+            "PREPARATION_FILE": cls.PREPARATION_FILE,
 
             # Délais d'échantillonage des capteurs
             "SENSOR_DELAY": cls.SENSOR_DELAY

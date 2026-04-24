@@ -80,16 +80,15 @@ function getMatchInformation()
         {
             team: form.querySelector("input[name='team']").value,
             coach: form.querySelector("input[name='coach']").value,
-            players: []
+            player: []
         };
 
-        for (let i = 1; i <= 20; i++)
+        for (let i = 0; i <= 19; i++)
         {
             const name = form.querySelector(`input[name='player${i}']`).value;
             const number = form.querySelector(`input[name='numero${i}']`).value;
 
-            if (name || number)
-                data.players.push({name: name, number: number});
+            data.player.push({name: name, number: number});
         }
 
         return data;
@@ -111,16 +110,18 @@ function getMatchInformation()
 /**
  * @brief Envoi automatique des données
  */
-function autoSend() {
+function autoSend()
+{
     clearTimeout(timeout);
 
     timeout = setTimeout(() => 
     {
-        const data = getMatchInformation();
+        const data = JSON.stringify(getMatchInformation(), null, 4);
 
         socket.emit("matchInformation", data);
 
-        console.log("Infomation du match envoyé :", data);
+        if (window.DEBUG)
+            console.log("Infomation du match envoyé :", data);
     }, 500);
 
     return ;

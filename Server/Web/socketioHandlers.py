@@ -33,9 +33,8 @@ logger = Logger("Serveur/SocketIO")
 # @param socketio            Instance SocketIO de l'application.
 # @param supporterList       Liste partagée des objets Supporter actifs.
 # @param stadiumBleacherList Liste partagée des objets StadiumBleacher actifs.
-# @param matchInformation    Enregistrement des informations d'avant match.
 ##
-def registerSocketioHandlers(socketio, supporterList, stadiumBleacherList, matchInformation):
+def registerSocketioHandlers(socketio, supporterList, stadiumBleacherList):
 
 # =============================================================================
 #  Liste des supporters
@@ -230,10 +229,18 @@ def registerSocketioHandlers(socketio, supporterList, stadiumBleacherList, match
     
     ##
     # @brief Réception des infomations d'avant match
+    #
+    # @param data Informations d'avant match.
     ##
-    @socketio.on("matchInfomation")
-    def handleMathInformation():
-        logger.info("[SocketIO] Réception de 'matchInfomation'")
+    @socketio.on("matchInformation")
+    def handleMatchInformation(data):
+        logger.info("[SocketIO] Réception de 'matchInformation'")
+        logger.info(f"[SocketIO] Mise à jour des données d'avant match : {data}")
+
+        filePath = Config.PATH["data"] + Config.PREPARATION_FILE
+        with open(filePath, 'w') as f:
+            f.write(data)
+
         return
 
 

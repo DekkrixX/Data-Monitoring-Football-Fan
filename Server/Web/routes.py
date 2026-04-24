@@ -16,7 +16,7 @@ from flask import render_template, request, redirect, url_for, session
 
 from Server.Config.setting import Config
 from Server.Utils.data import getColorOfSupporter, getColorOfStadiumBleacher
-from Server.Utils.event import loadConfiguration, getConfigurationList
+from Server.Utils.event import loadConfiguration, getConfigurationList, loadMatchInformation
 from Server.Utils.logger import Logger
 
 # =============================================================================
@@ -35,9 +35,8 @@ logger = Logger("Serveur/Routes")
 # @param app                 Instance Flask de l'application.
 # @param supporterList       Liste partagée des objets Supporter actifs.
 # @param stadiumBleacherList Liste partagée des objets StadiumBleacher actifs.
-# @param matchInformation    Enregistrement des informations d'avant match.
 ##
-def registerRoutes(app, supporterList, stadiumBleacherList, matchInformation):
+def registerRoutes(app, supporterList, stadiumBleacherList):
     logger.info("[Routes] Enregistrement des routes et gestionnaires d'erreurs")
 
 # =============================================================================
@@ -102,7 +101,8 @@ def registerRoutes(app, supporterList, stadiumBleacherList, matchInformation):
     ##
     @app.route("/event")
     def eventPage():
-        config = loadConfiguration(matchInformation["config"]);
+        matchInformation, _ = loadMatchInformation()
+        config = loadConfiguration(matchInformation["config"])
         return render_template("Control/event.html", debug=int(Config.DEBUG), events=config)
 
 
@@ -112,7 +112,8 @@ def registerRoutes(app, supporterList, stadiumBleacherList, matchInformation):
     ##
     @app.route("/event/preparation")
     def preparationPage():
-        return render_template("Control/preparation.html", debug=int(Config.DEBUG), configurationList=getConfigurationList(), matchInformation=matchInformation, lastInfomation=False)
+        matchInformation, lastInformation = loadMatchInformation()
+        return render_template("Control/preparation.html", debug=int(Config.DEBUG), configurationList=getConfigurationList(), matchInformation=matchInformation, lastInformation=lastInformation)
 
 
 
@@ -121,6 +122,7 @@ def registerRoutes(app, supporterList, stadiumBleacherList, matchInformation):
     ##
     @app.route("/event/configuration")
     def configurationPage():
+        matchInformation, _ = loadMatchInformation()
         config = loadConfiguration(matchInformation["config"])
         return render_template("Control/configuration.html", debug=int(Config.DEBUG), events=config)
 

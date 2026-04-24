@@ -22,7 +22,7 @@
                         <input name="coach" type=text placeholder="Entraineur" {% if lastInformation %} value="{{ matchInformation.domicile.coach }}" {% endif %} >
                     </div>
                     <div class="player">
-                        {% for i in range(1, 21) %}
+                        {% for i in range(20) %}
                         <div>
                             <input name="player{{ i }}" type=text placeholder="Joueur" {% if lastInformation %} value="{{ matchInformation.domicile.player[i].name }}" {% endif %}>
                             <input name="numero{{ i }}" type=number placeholder="Numéro" min="1" max="99" {% if lastInformation %} value="{{ matchInformation.domicile.player[i].number }}" {% endif %}>
@@ -40,7 +40,7 @@
                     <label>Configuration de contôle d'évènements</label>
                     <select id="config" name="config">
                         {% for config in configurationList %}
-                        <option {% if matchInformation.config == config %}selected{% endif %} >{{ config }}</option>
+                        <option {% if lastInformation %}{% if matchInformation.config == config %}selected{% endif %}{% else %}{% if config == "Default" %}selected{% endif %}{% endif %} >{{ config }}</option>
                         {% endfor %}
                         <option>Nouvelle configuration</option>
                     </select>
@@ -56,7 +56,7 @@
                         <input name="coach" type=text placeholder="Entraineur" {% if lastInformation %} value="{{ matchInformation.exterieur.coach }}" {% endif %}>
                     </div>
                     <div class="player">
-                        {% for i in range(1, 21) %}
+                        {% for i in range(20) %}
                         <div>
                             <input name="player{{ i }}" type=text placeholder="Joueur" {% if lastInformation %} value="{{ matchInformation.exterieur.player[i].name }}" {% endif %}>
                             <input name="numero{{ i }}" type=number placeholder="Numéro" min="1" max="99" {% if lastInformation %} value="{{ matchInformation.exterieur.player[i].number }}" {% endif %}>

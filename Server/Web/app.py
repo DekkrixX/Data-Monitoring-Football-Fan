@@ -38,8 +38,6 @@ supporterList = []       ##< @brief Liste des supporters actifs, alimentée par 
 stadiumBleacherList = [] ##< @brief Liste des tribunes du stade actives, alimentée par les messages MQTT.
 socketio = None          ##< @brief Instance SocketIO partagée entre main() et les callbacks MQTT.
 
-matchInformation = {"config": "Default"} ##< @brief Enregistrement des infomations d'avant match.
-
 # =============================================================================
 #  Programme principal
 # =============================================================================
@@ -63,8 +61,8 @@ def main():
     app      = _createFlaskApp()
     socketio = SocketIO(app, cors_allowed_origins="*", async_mode="threading")
 
-    registerRoutes(app, supporterList, stadiumBleacherList, matchInformation)
-    registerSocketioHandlers(socketio, supporterList, stadiumBleacherList, matchInformation)
+    registerRoutes(app, supporterList, stadiumBleacherList)
+    registerSocketioHandlers(socketio, supporterList, stadiumBleacherList)
 
     # Connexion au broker MQTT pour recevoir les données des supporters en temps réel
     mqttClient = MQTTClientWrapper("interface web", Config.MQTT_BROKER_HOST, Config.MQTT_BROKER_PORT, Config.MQTT_BROKER_KEEPALIVE, qos=Config.MQTT_BROKER_QOS, onMessageCallback=_onMqttMessage)

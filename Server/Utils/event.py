@@ -21,11 +21,11 @@ from Server.Utils.logger import Logger
 logger = Logger("Serveur/Event")
 
 # =============================================================================
-#  Charge une configuration
+#  Configuration
 # =============================================================================
 
 ##
-# @brief Charge un configuration de contôle d'évènement.
+# @brief Charge une configuration de contôle d'évènement.
 #
 # @param config Le nom de la configuration à charger.
 #
@@ -98,3 +98,33 @@ def createNewEventConfiguration(config, matchInfomation):
     matchInfomation["config"] = name;
 
     return True
+
+# =============================================================================
+#  Données d'avant match
+# =============================================================================
+
+##
+# @brief Charge les informations d'avant match.
+#
+# @return Les informations d'avant match et si les dernières informatons sont valide.
+##
+def loadMatchInformation():
+    lastInformation = True
+    matchInformation = {"config": "Default"}
+    filePath = Config.PATH["data"] + Config.PREPARATION_FILE
+
+    try:
+        logger.info(f"[Event] Lecture du fichier de configuration : '{filePath}'")
+
+        with open(filePath, "r") as file:
+            matchInformation = json.load(file)
+
+    except FileNotFoundError:
+        lastInformation = False
+
+    except json.JSONDecodeError as e:
+        message = f"[Event] Fichier de configuration invalide (JSON malformé) : '{filePath}'"
+        logger.error(message)
+        raise RuntimeError(message) from e
+
+    return matchInformation, lastInformation
