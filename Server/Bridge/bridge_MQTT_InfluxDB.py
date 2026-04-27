@@ -12,12 +12,14 @@
 # =============================================================================
 
 import json
+from datetime import datetime
 
 from Server.Config.setting import Config
 from Server.Core.mqtt import MQTTClientWrapper
 from Server.Core.influxdb import InfluxDBClientWrapper
 from Server.Utils.display import printBanner
-from Server.Utils.topic import buildPointInfluxDB
+from Server.Utils.topic import jsonToFieldsPoints
+from Server.Utils.time import subtract_seconds
 from Server.Utils.logger import Logger
 
 # =============================================================================
@@ -120,10 +122,22 @@ def _onMessage(message):
 
     logger.info(f"[Bridge MQTT-InfluxDB] Données décodées : {data}")
 
-    # buildPointInfluxDB() retire "type" du dict et sépare tags et fields
-    tags, fields = buildPointInfluxDB(data.copy())
+    # Récupération du timestamp
+    timestamp = datetime.now()
 
-    influxdbClient.send(data["t"], fields, tags)
+    topic = message.topic.split("/")
+    measurment = topic[0]
+    dataType = topic[1]
+    idf = int(topic[2])
+
+    # Ajout de l'identifiant et le type de données aux tags
+    tags = {"id": idf, "data": dataType}
+
+    # Construction de la liste des champs
+    fieldsList = jsonToFieldsPoints(data)
+
+    for i in range(len(fieldsList)):
+        influxdbClient.send(measurment, fieldsList[i], tags, subtract_seconds(timestamp, i))
 
     return
 

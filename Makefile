@@ -45,6 +45,11 @@ run:
 stop:
 	@echo "$(_YELLOW)Arrêt des conteneurs Docker$(_RESET)"
 	@docker compose down
+	@docker volume prune -f
+	@if docker ps -a --format "{{.Names}}" | grep -w test > /dev/null; \
+	then \
+		docker rm -f test; \
+	fi
 
 # =============================================================================
 #  Affichage des logs des conteneurs Docker
@@ -62,11 +67,6 @@ log:
 #  Lancement des conteneurs Docker de test
 # =============================================================================
 test:
-	@if docker ps -a --format "{{.Names}}" | grep -w test > /dev/null; \
-	then \
-		docker rm -f test; \
-		docker rmi data-monitoring-football-fan-test:latest; \
-	fi
 	@echo "${_YELLOW}Lancement des conteneurs Docker de test${_RESET}"
 	@docker compose --profile test up -d
 
@@ -76,6 +76,10 @@ test:
 clear:
 	@echo "$(_YELLOW)Suppression des volumes Docker$(_RESET)"
 	@docker compose down -v
+	@if docker ps -a --format "{{.Names}}" | grep -w test > /dev/null; \
+	then \
+		docker rm -f test; \
+	fi
 
 # =============================================================================
 #  Création de la documentation

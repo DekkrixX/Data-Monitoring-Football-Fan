@@ -170,7 +170,7 @@ class InfluxDBClientWrapper:
         for key, value in fields.items():
             logger.info(f"   field | {key} = {value}")
 
-        self.writeApi.write(bucket=self.bucket, record=point)
+        self.writeApi.write(bucket=self.bucket, org=self.org, record=point)
 
         return
 

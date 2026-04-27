@@ -43,7 +43,7 @@ mqttClient = None
 def heartRateMessage(heartRateSimulator, idf):
     heartRate = heartRateSimulator.getHeartRate()
     topic     = f"monitoring/heart_rate/{idf}"
-    message   = json.dumps({"n": "Simulatior", "hr": [heartRate]})
+    message   = json.dumps({"n": "Simulator", "hr": [heartRate]})
             
     if not mqttClient.publish(topic, message):
         logger.warning(f"[DataSimulationServer] Échec de la publication sur le topic '{topic}'")

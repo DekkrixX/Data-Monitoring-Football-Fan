@@ -73,26 +73,43 @@ def getMQTTTopic(channelIndex, supporterId):
 # =============================================================================
 
 ##
-# @brief Sépare les champs d'un message en tags et fields pour InfluxDB.
+# @brief Transforme un JSON en liste de dicts (Les champs simple sont dupliqués et les champs liste génèrent plusieurs points).
 #
-# @param data Dictionnaire de données (modifié en place : "type" retiré).
+# @param data Dictionnaire de données.
 #
-# @return tuple (tags, fields) où tags et fields sont des dictionnaires.
+# @return list de dict correspondant aux champs d'un point.
 ##
-def buildPointInfluxDB(data):
-    tags   = {}
-    fields = {}
-
-    # "type" est utilisé comme nom de mesure, pas comme tag ni field
-    data.pop("t", None)
-
-    ## @brief Clés identifiant le supporter ou la tribune, utilisées comme tags InfluxDB.
-    TAG_KEYS = {"id", "n"}
+def jsonToFieldsPoints(data):
+    # Séparer champs simples et champs listes
+    scalarFields = {}
+    listFields = {}
 
     for key, value in data.items():
-        if key in TAG_KEYS:
-            tags[key] = value
-        else:
-            fields[key] = value
+        # On ignore le champ "n"
+        if key == "n":
+            continue
 
-    return tags, fields
+        if isinstance(value, list):
+            listFields[key] = value
+        else:
+            scalarFields[key] = value
+
+    # S'il n'y a pas de liste retourne un seul point
+    if not listFields:
+        return [scalarFields]
+
+    # On suppose que toutes les listes ont la même longueur
+    lengths = [len(v) for v in listFields.values()]
+    if len(set(lengths)) != 1:
+        raise ValueError("Toutes les listes doivent avoir la même taille")
+
+    result = []
+    n = lengths[0]
+
+    for i in range(n):
+        point = scalarFields.copy()
+        for key, values in listFields.items():
+            point[key] = values[i]
+        result.append(point)
+
+    return result
