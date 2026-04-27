@@ -68,7 +68,7 @@ def main():
         mqttClient.connect()
         influxdbClient.connect()
 
-        mqttClient.subscribe(Config.MQTT_BROKER_TOPICS)
+        mqttClient.subscribe(Config.MQTT_BROKER_TOPICS_DATA)
 
         # Mode bloquant: le thread reste ici jusqu'à déconnexion ou Ctrl+C
         mqttClient.start(blocking=True)

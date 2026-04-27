@@ -256,6 +256,7 @@ export function createEvent(name, code)
 
     // Création de l'élément
     const div = document.createElement("div");
+    const info = document.createElement("span");
     const p = document.createElement("p");
     const buttons = document.createElement("div");
     const removeImg = document.createElement("img");
@@ -270,9 +271,12 @@ export function createEvent(name, code)
     else
         modifyImg.src = window.modifyLightIcon;
 
+    info.classList.add("hidden");
+    info.setAttribute("code", code);
     p.textContent = name;
     removeImg.alt = "Icone de suppression";
     modifyImg.alt = "Icone de modification";
+    div.appendChild(info);
     div.appendChild(p);
     buttons.appendChild(modifyImg);
     buttons.appendChild(removeImg);

@@ -57,6 +57,7 @@
         <script>
             // Définition des variables dynamiques
             window.DEBUG = {{ debug }};
+            window.config = "{{ config }}".replace(/&#39;/g, "'").replace(/&#34;/g, '"');
             window.deleteLightIcon = "{{ url_for('static', filename='icon/delete-light.png') }}";
             window.modifyLightIcon = "{{ url_for('static', filename='icon/modify-light.png') }}";
             window.deleteDarkIcon = "{{ url_for('static', filename='icon/delete-dark.png') }}";

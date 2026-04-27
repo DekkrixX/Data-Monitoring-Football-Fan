@@ -88,11 +88,12 @@ class Config:
 #  MQTT
 # =============================================================================
 
-    MQTT_BROKER_HOST      = os.getenv("MQTT_BROKER_HOST", None)            ##< @brief Hôte du broker MQTT.
-    MQTT_BROKER_PORT      = int(os.getenv("MQTT_BROKER_PORT", 0))          ##< @brief Port du broker MQTT.
-    MQTT_BROKER_TOPICS    = os.getenv("MQTT_BROKER_TOPICS", "").split(",") ##< @brief Liste des topics MQTT souscrits.
-    MQTT_BROKER_KEEPALIVE = int(os.getenv("MQTT_BROKER_KEEPALIVE", 0))     ##< @brief Intervalle de keep-alive MQTT en secondes.
-    MQTT_BROKER_QOS       = int(os.getenv("MQTT_BROKER_QOS", 0))           ##< @brief Niveau de qualité de service MQTT (0, 1 ou 2).
+    MQTT_BROKER_HOST         = os.getenv("MQTT_BROKER_HOST", None)            ##< @brief Hôte du broker MQTT.
+    MQTT_BROKER_PORT         = int(os.getenv("MQTT_BROKER_PORT", 0))          ##< @brief Port du broker MQTT.
+    MQTT_BROKER_TOPICS_DATA  = os.getenv("MQTT_BROKER_TOPICS_DATA", "").split(",") ##< @brief Liste des topics MQTT de données souscrits.
+    MQTT_BROKER_TOPICS_EVENT = os.getenv("MQTT_BROKER_TOPICS_DATA", "").split(",") ##< @brief Liste des topics MQTT d'évènements souscrits.
+    MQTT_BROKER_KEEPALIVE    = int(os.getenv("MQTT_BROKER_KEEPALIVE", 0))     ##< @brief Intervalle de keep-alive MQTT en secondes.
+    MQTT_BROKER_QOS          = int(os.getenv("MQTT_BROKER_QOS", 0))           ##< @brief Niveau de qualité de service MQTT (0, 1 ou 2).
 
 # =============================================================================
 #  InfluxDB
@@ -120,6 +121,17 @@ class Config:
 
     GRAFANA_HOST = os.getenv("GRAFANA_HOST", None)   ##< @brief Hôte du serveur Grafana.
     GRAFANA_PORT = int(os.getenv("GRAFANA_PORT", 0)) ##< @brief Port du serveur Grafana.
+
+# =============================================================================
+#  PostgreSQL
+# =============================================================================
+
+    POSTGRESQL_HOST          = os.getenv("POSTGRESQL_HOST", None)     ##< @brief Hôte du serveur PostgreSQL.
+    POSTGRESQL_PORT          = int(os.getenv("POSTGRESQL_PORT", 0))   ##< @brief Port du seveur PostgreSQL.
+    POSTGRESQL_USER          = os.getenv("POSTGRESQL_USER", None)     ##< @brief Nom d'utilisateur de la base de données PostgreSQL.
+    POSTGRESQL_PASSWORD      = os.getenv("POSTGRESQL_PASSWORD", None) ##< @brief Mot de passe de la base de données PostgreSQL.
+    POSTGRESQL_DATABASE      = os.getenv("POSTGRESQL_DATABASE", None) ##< @brief Base de données PostgreSQL.
+    POSTGRESQL_DATABASE_FILE = os.getenv("POSTGRESQL_DATABASE_FILE", None) ##< @brief Fichier de construction de la base de données.
 
 # =============================================================================
 #  Fichier cache
@@ -158,11 +170,12 @@ class Config:
             "WEB_PORT":   cls.WEB_PORT,
 
             # MQTT
-            "MQTT_BROKER_HOST":      cls.MQTT_BROKER_HOST,
-            "MQTT_BROKER_PORT":      cls.MQTT_BROKER_PORT,
-            "MQTT_BROKER_TOPICS":    cls.MQTT_BROKER_TOPICS,
-            "MQTT_BROKER_KEEPALIVE": cls.MQTT_BROKER_KEEPALIVE,
-            "MQTT_BROKER_QOS":       cls.MQTT_BROKER_QOS,
+            "MQTT_BROKER_HOST":         cls.MQTT_BROKER_HOST,
+            "MQTT_BROKER_PORT":         cls.MQTT_BROKER_PORT,
+            "MQTT_BROKER_TOPICS_DATA":  cls.MQTT_BROKER_TOPICS_DATA,
+            "MQTT_BROKER_TOPICS_EVENT": cls.MQTT_BROKER_TOPICS_EVENT,
+            "MQTT_BROKER_KEEPALIVE":    cls.MQTT_BROKER_KEEPALIVE,
+            "MQTT_BROKER_QOS":          cls.MQTT_BROKER_QOS,
 
             # InfluxDB
             "INFLUXDB_HOST":   cls.INFLUXDB_HOST,
@@ -181,6 +194,14 @@ class Config:
             # Grafana
             "GRAFANA_HOST": cls.GRAFANA_HOST,
             "GRAFANA_PORT": cls.GRAFANA_PORT,
+
+            # PostgreSQL
+            "POSTGRESQL_HOST":          cls.POSTGRESQL_HOST,
+            "POSTGRESQL_PORT":          cls.POSTGRESQL_PORT,
+            "POSTGRESQL_USER":          cls.POSTGRESQL_USER,
+            "POSTGRESQL_PASSWORD":      cls.POSTGRESQL_PASSWORD,
+            "POSTGRESQL_DATABASE":      cls.POSTGRESQL_DATABASE,
+            "POSTGRESQL_DATABASE_FILE": cls.POSTGRESQL_DATABASE_FILE,
 
             # Fichier cache
             "PREPARATION_FILE": cls.PREPARATION_FILE,

@@ -11,6 +11,7 @@
 # =============================================================================
 
 from flask_socketio import emit
+from datetime import datetime
 
 from Server.Config.setting import Config
 from Server.Utils.data import createSupporterHeartRateForClient, getNameOfSupporter, getColorOfSupporter, createStadiumBleacherAccelerometerForClient, createStadiumBleacherAcousticForClient, getNameOfStadiumBleacher, getColorOfStadiumBleacher
@@ -33,8 +34,10 @@ logger = Logger("Serveur/SocketIO")
 # @param socketio            Instance SocketIO de l'application.
 # @param supporterList       Liste partagée des objets Supporter actifs.
 # @param stadiumBleacherList Liste partagée des objets StadiumBleacher actifs.
+# @param mqttClient          Client MQTT.
+# @param postgresqlClient    Client PosgreSQL.
 ##
-def registerSocketioHandlers(socketio, supporterList, stadiumBleacherList):
+def registerSocketioHandlers(socketio, supporterList, stadiumBleacherList, mqttClient, postgresqlClient):
 
 # =============================================================================
 #  Liste des supporters
@@ -258,6 +261,41 @@ def registerSocketioHandlers(socketio, supporterList, stadiumBleacherList):
             socketio.emit("getSaveConfiguration");
         else:
             socketio.emit("getSaveConfigurationError");
+
+        return
+
+# =============================================================================
+#  Données d'évènements
+# =============================================================================
+
+    ##
+    # @brief Envoi les données complètes des évènements du match.
+    ##
+    @socketio.on("getEventAll")
+    def handleGetEventAll():
+        logger.info("[SocketIO] Réception de 'getEventAll'")
+
+        events = postgresqlClient.fetch("SELECT * FROM event")
+
+        for event in events:
+            if event["event_time"]:
+                event["event_time"] = event["event_time"].isoformat()
+
+        socketio.emit("getEventAllResponse", events);
+        return
+
+    ##
+    # @brief Réception d'un nouvel évènement.
+    ##
+    @socketio.on("newEvent")
+    def handleNewEvent(code):
+        logger.info(f"[SocketIO] Réception de 'newEvent': code:{code}")
+
+        mqttClient.publish(f"event/{code}", '{}')
+        
+        idf = postgresqlClient.execute("INSERT INTO event (code, team, event_time, minute) VALUES (%s, NULL, %s, NULL) RETURNING id", (code, datetime.now()), returning=True)
+
+        socketio.emit("newEventResponse", idf["id"])
 
         return
 

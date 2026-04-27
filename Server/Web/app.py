@@ -20,6 +20,7 @@ from Server.Core.StadiumBleacher.stadiumBleacher import StadiumBleacher
 from Server.Utils.display import printBanner
 from Server.Utils.data import createSupporterHeartRateForClient, getNameOfSupporter, getColorOfSupporter, createStadiumBleacherAccelerometerForClient, createStadiumBleacherAcousticForClient, getNameOfStadiumBleacher, getColorOfStadiumBleacher
 from Server.Core.mqtt import MQTTClientWrapper
+from Server.Core.postgresql import PostgreSQLClientWrapper
 from Server.Web.routes import registerRoutes
 from Server.Web.socketioHandlers import registerSocketioHandlers
 from Server.Utils.logger import Logger
@@ -61,14 +62,19 @@ def main():
     app      = _createFlaskApp()
     socketio = SocketIO(app, cors_allowed_origins="*", async_mode="threading")
 
-    registerRoutes(app, supporterList, stadiumBleacherList)
-    registerSocketioHandlers(socketio, supporterList, stadiumBleacherList)
-
-    # Connexion au broker MQTT pour recevoir les données des supporters en temps réel
+    # Connexion au broker MQTT
     mqttClient = MQTTClientWrapper("interface web", Config.MQTT_BROKER_HOST, Config.MQTT_BROKER_PORT, Config.MQTT_BROKER_KEEPALIVE, qos=Config.MQTT_BROKER_QOS, onMessageCallback=_onMqttMessage)
+    # Connexion à la base de données PostgreSQL
+    postgresqlClient = PostgreSQLClientWrapper(Config.POSTGRESQL_HOST, Config.POSTGRESQL_PORT, Config.POSTGRESQL_DATABASE, Config.POSTGRESQL_USER, Config.POSTGRESQL_PASSWORD)
+
+    registerRoutes(app, supporterList, stadiumBleacherList)
+    registerSocketioHandlers(socketio, supporterList, stadiumBleacherList, mqttClient, postgresqlClient)
 
     mqttClient.connect()
-    mqttClient.subscribe(Config.MQTT_BROKER_TOPICS)
+    mqttClient.subscribe(Config.MQTT_BROKER_TOPICS_DATA)
+
+    postgresqlClient.connect()
+    postgresqlClient.initDatabaseFromFile(Config.POSTGRESQL_DATABASE_FILE)
 
     # Mode non bloquant: socketio.run() prend ensuite la main
     mqttClient.start(blocking=False)
@@ -87,6 +93,8 @@ def main():
 
         if mqttClient.isConnected():
             mqttClient.stop()
+        if postgresql.isConnected():
+            postgresqlClient.close()
 
     return
 

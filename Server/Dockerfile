@@ -12,6 +12,5 @@ RUN pip install --no-cache-dir \
     pypubsub \
     flask \
     flask-socketio \
-    matplotlib \
-    numpy \
-    python-dotenv
+    python-dotenv \
+    psycopg

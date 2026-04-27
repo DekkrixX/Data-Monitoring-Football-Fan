@@ -103,7 +103,7 @@ def registerRoutes(app, supporterList, stadiumBleacherList):
     def eventPage():
         matchInformation, lastInformation = loadMatchInformation()
         config = loadConfiguration(matchInformation["config"])
-        return render_template("Control/event.html", debug=int(Config.DEBUG), events=config, lastInformation=lastInformation, domicile=matchInformation["domicile"]["team"], exterieur=matchInformation["exterieur"]["team"])
+        return render_template("Control/event.html", debug=int(Config.DEBUG), events=config, config=json.dumps(config, ensure_ascii=False), lastInformation=lastInformation, domicile=matchInformation["domicile"]["team"], exterieur=matchInformation["exterieur"]["team"])
 
 
 
