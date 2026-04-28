@@ -301,4 +301,20 @@ def registerSocketioHandlers(socketio, supporterList, stadiumBleacherList, mqttC
 
 
 
+
+    ##
+    # @brief Suppression d'un évènement.
+    #
+    # @param idf Identifiant de l'évènement.
+    ##
+    @socketio.on("deleteEvent")
+    def handleDeleteEvent(idf):
+        logger.info(f"[SocketIO] Réception du 'deleteEvent': id:{idf}")
+
+        postgresqlClient.execute("DELETE FROM event WHERE id = %s", (idf,))
+
+        return
+
+
+
     return

@@ -6,8 +6,6 @@
  * Fournit les fonctions de création d'éléments HTML.
  */
 
-let idEvent = 0; ///< @brief Identifiant unique des évènements.
-
 // ============================================================================
 //  Fonction de création de composant HTML
 // ============================================================================
@@ -243,16 +241,14 @@ export function createChart(ctx, list, value, min, max, step)
 /**
  * @brief Crée et retourne un évènement.
  *
- * @param {string} name Nom de l'évènement.
- * @param {number} code Code de l'évènement.
+ * @param {string}   name   Nom de l'évènement.
+ * @param {number}   code   Code de l'évènement.
+ * @param {socketio} socket Socket de connexion au serveur.
  *
  * @returns {HTMLDivElement} Élément div prêt à être inséré dans le DOM.
  */
-export function createEvent(name, code)
+export function createEvent(name, code, socket)
 {
-    const id = idEvent;
-    idEvent++;
-
     if (window.DEBUG)
         console.log(`[Element] createEvent - Création de l'évènement : ${name}`);
 
@@ -291,9 +287,10 @@ export function createEvent(name, code)
             console.log(`[Element] createElement - Suppression de l'évènement : ${p.textContent}`);
 
         const eventSelected = document.getElementById("event-selected");
-        if (eventSelected.querySelector("p").textContent == id)
+        if (eventSelected.querySelector("p").textContent == info.getAttribute("id"))
             eventSelected.classList.add("hidden");
         div.remove();
+        socket.emit("deleteEvent", info.getAttribute("id"));
     });
     modifyImg.addEventListener("click", () =>
     {

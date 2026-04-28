@@ -82,7 +82,7 @@ socket.on("getEventAllResponse", (data) =>
 		if (window.DEBUG)
 			console.log(`[Event] getEventAllResponse - Création de l'évènement '${name}' pour l'identifiant '${event.id}'`);
 
-		const eventElement = createEvent(name, event.code);
+		const eventElement = createEvent(name, event.code, socket);
 		const info = eventElement.querySelector("span");
 
 		info.setAttribute("id", event.id);
@@ -130,7 +130,7 @@ function newEvent(name, code)
 		console.log(`[Event] Nouvelle évènement : ${name}`);
 
 	const eventList = document.getElementById("event-list");
-	const newEventElement = createEvent(name, code);
+	const newEventElement = createEvent(name, code, socket);
 	eventList.appendChild(newEventElement);
 
 	socket.emit("newEvent", code)
