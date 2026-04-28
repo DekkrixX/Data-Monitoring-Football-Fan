@@ -1,0 +1,212 @@
+[
+    {
+        "category": "Phase de jeu",
+        "event": [
+            {
+                "name": "Coup d'envoi du début du match",
+                "code": 1,
+                "data": ["Timestamp"]
+            },
+            {
+                "name": "Fin de la première mi-temps",
+                "code": 2,
+                "data": ["Timestamp"]
+            },
+            {
+                "name": "Coup d'envoi de la seconde mi-temps",
+                "code": 3,
+                "data": ["Timestamp"]
+            },
+            {
+                "name": "Fin de la seconde mi-temps",
+                "code": 4,
+                "data": ["Timestamp"]
+            },
+            {
+                "name": "Coup d'envoi de la première mi-temps des prolongations",
+                "code": 5,
+                "data": ["Timestamp"]
+            },
+            {
+                "name": "Fin de la première mi-temps des prolongations",
+                "code": 6,
+                "data": ["Timestamp"]
+            },
+            {
+                "name": "Coup d'envoi de la seconde mi-temps des prolongations",
+                "code": 7,
+                "data": ["Timestamp"]
+            },
+            {
+                "name": "Fin de la seconde mi-temps des prolongations",
+                "code": 8,
+                "data": ["Timestamp"]
+            },
+            {
+                "name": "Début de la séance de tir au but",
+                "code": 9,
+                "data": ["Timestamp"]
+            },
+            {
+                "name": "Fin de la séance de tir au but",
+                "code": 10,
+                "data": ["Timestamp"]
+            },
+            {
+                "name": "Temps additionnel",
+                "code": 11,
+                "data": ["Timestamp", "Nombre de minutes"]
+            },
+            {
+                "name": "Fin du match",
+                "code": 12,
+                "data": ["Timestamp"]
+            }
+        ]
+    },
+    {
+        "category": "Fait de jeu",
+        "event": [
+            {
+                "name": "Tir cadré",
+                "code": 13,
+                "data": ["Timestamp", "Minute de jeu", "Équipe", "Joueur"]
+            },
+            {
+                "name": "Tir non cadré",
+                "code": 14,
+                "data": ["Timestamp", "Minute de jeu", "Équipe", "Joueur"]
+            },
+            {
+                "name": "Tir sur la barre",
+                "code": 15,
+                "data": ["Timestamp", "Minute de jeu", "Équipe", "Joueur"]
+            },
+            {
+                "name": "Tir sur le poteau",
+                "code": 16,
+                "data": ["Timestamp", "Minute de jeu", "Équipe", "Joueur"]
+            },
+            {
+                "name": "But",
+                "code": 17,
+                "data": ["Timestamp", "Minute de jeu", "Équipe", "Joueur"]
+            },
+            {
+                "name": "Arrêt du gardien",
+                "code": 18,
+                "data": ["Timestamp", "Minute de jeu", "Équipe", "Joueur"]
+            },
+            {
+                "name": "Hors jeu",
+                "code": 19,
+                "data": ["Timestamp", "Minute de jeu", "Équipe", "Joueur"]
+            },
+            {
+                "name": "Faute légère",
+                "code": 20,
+                "data": ["Timestamp", "Minute de jeu", "Équipe", "Joueur fautif", "Joueur victime"]
+            },
+            {
+                "name": "Faute grave",
+                "code": 21,
+                "data": ["Timestamp", "Minute de jeu", "Équipe", "Joueur fautif", "Joueur victime"]
+            },
+            {
+                "name": "Carton jaune",
+                "code": 22,
+                "data": ["Timestamp", "Minute de jeu", "Équipe", "Joueur"]
+            },
+            {
+                "name": "Carton rouge",
+                "code": 23,
+                "data": ["Timestamp", "Minute de jeu", "Équipe", "Joueur"]
+            },
+            {
+                "name": "Blessure",
+                "code": 24,
+                "data": ["Timestamp", "Minute de jeu", "Équipe", "Joueur"]
+            }
+        ]
+    },
+    {
+        "category": "Reprise de jeu",
+        "event": [
+            {
+                "name": "Touche",
+                "code": 25,
+                "data": ["Timestamp", "Minute de jeu", "Équipe", "Joueur"]
+            },
+            {
+                "name": "Corner",
+                "code": 26,
+                "data": ["Timestamp", "Minute de jeu", "Équipe", "Joueur"]
+            },
+            {
+                "name": "Sortie de but",
+                "code": 27,
+                "data": ["Timestamp", "Minute de jeu", "Équipe", "Joueur"]
+            },
+            {
+                "name": "Coup franc",
+                "code": 28,
+                "data": ["Timestamp", "Minute de jeu", "Équipe", "Joueur"]
+            },
+            {
+                "name": "Pénalty",
+                "code": 29,
+                "data": ["Timestamp", "Minute de jeu", "Équipe", "Joueur"]
+            },
+            {
+                "name": "Engagement",
+                "code": 30,
+                "data": ["Timestamp", "Minute de jeu", "Équipe", "Joueur"]
+            }
+        ]
+    },
+    {
+        "category": "Intervention exterieur",
+        "event": [
+            {
+                "name": "Changement",
+                "code": 31,
+                "data": ["Timestamp", "Minute de jeu", "Équipe", "Joueur sortant", "Joueur entrant"]
+            },
+            {
+                "name": "Intervention de la VAR",
+                "code": 32,
+                "data": ["Timestamp", "Cause"]
+            },
+            {
+                "name": "Fin d'intervention de la VAR",
+                "code": 33,
+                "data": ["Timestamp"]
+            },
+            {
+                "name": "Arrêt du jeu",
+                "code": 34,
+                "data": ["Timestamp", "Cause"]
+            },
+            {
+                "name": "Reprise du jeu",
+                "code": 35,
+                "data": ["Timestamp"]
+            },
+            {
+                "name": "Début de l'échauffement des joueurs",
+                "code": 36,
+                "data": ["Timestamp", "Équipe"]
+            },
+            {
+                "name": "Fin de l'échauffement des joueurs",
+                "code": 37,
+                "data": ["Timestamp", "Équipe"]
+            },
+            {
+                "name": "Entrée des joueurs sur le terrain",
+                "code": 38,
+                "data": ["Timestamp", "Équipe"]
+            }
+        ]
+    }
+]

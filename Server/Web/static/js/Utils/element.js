@@ -238,6 +238,8 @@ export function createChart(ctx, list, value, min, max, step)
     return chart;
 }
 
+
+
 /**
  * @brief Crée et retourne un évènement.
  *
@@ -304,7 +306,93 @@ export function createEvent(name, code)
         const idEventSelected = eventSelected.querySelector("p");
         h3.textContent = p.textContent;
         idEventSelected.textContent = id;
+        undisplayEventInformation();
+        for (const category of JSON.parse(window.configInformation))
+        {
+            const foundEvent = category.event.find(e => e.name === p.textContent);
+            if (foundEvent)
+            {
+                for (const info of foundEvent.data)
+                    displayEventInformation(info);
+            }
+        }
     });
 
     return div;
+}
+
+
+
+/**
+ * @brief Affiche un champ d'information d'évènement.
+ *
+ * @param {string} info Le type d'information.
+ */
+function displayEventInformation(info)
+{
+    switch (info)
+    {
+        case "Timestamp":
+            document.querySelector("input[name='Timestamp']").parentElement.classList.remove("hidden");
+            break;
+
+        case "Minute de jeu":
+            document.querySelector("input[name='Minute de jeu']").parentElement.classList.remove("hidden");
+            break;
+
+        case "Équipe":
+            document.querySelector("select[name='Équipe']").classList.remove("hidden");
+            break;
+
+        case "Joueur":
+            document.querySelector("select[name='Joueur']").classList.remove("hidden");
+            break;
+
+        case "Joueur fautif":
+            document.querySelector("select[name='Joueur fautif']").classList.remove("hidden");
+            break;
+
+        case "Joueur sortant":
+            document.querySelector("select[name='Joueur sortant']").classList.remove("hidden");
+            break;
+
+        case "Joueur entrant":
+            document.querySelector("select[name='Joueur entrant']").classList.remove("hidden");
+            break;
+
+        case "Joueur victime":
+            document.querySelector("select[name='Joueur victime']").classList.remove("hidden");
+            break;
+
+        case "Cause":
+            document.querySelector("input[name='Cause']").parentElement.classList.remove("hidden");
+            break;
+
+        default:
+            if (window.DEBUG)
+                console.log(`[Element] createEventInformation - Information '${info}' inconnu`);
+            break;
+    }
+
+    return ;
+}
+
+
+
+/**
+ * @brief Supprime l'affichage des champs d'information d'évènement.
+ */
+function undisplayEventInformation()
+{
+    document.querySelector("input[name='Timestamp']").parentElement.classList.add("hidden");
+    document.querySelector("input[name='Minute de jeu']").parentElement.classList.add("hidden");
+    document.querySelector("select[name='Équipe']").classList.add("hidden");
+    document.querySelector("select[name='Joueur']").classList.add("hidden");
+    document.querySelector("select[name='Joueur fautif']").classList.add("hidden");
+    document.querySelector("select[name='Joueur sortant']").classList.add("hidden");
+    document.querySelector("select[name='Joueur entrant']").classList.add("hidden");
+    document.querySelector("select[name='Joueur victime']").classList.add("hidden");
+    document.querySelector("input[name='Cause']").parentElement.classList.add("hidden");
+
+    return ;
 }

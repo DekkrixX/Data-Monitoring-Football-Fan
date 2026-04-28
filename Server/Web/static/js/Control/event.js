@@ -21,6 +21,46 @@ if (window.DEBUG)
 
 socket.emit("getEventAll");
 
+const team          = document.querySelector("select[name='Équipe']");
+const joueur        = document.querySelector("select[name='Joueur']");
+const joueurFautif  = document.querySelector("select[name='Joueur fautif']");
+const joueurVictime = document.querySelector("select[name='Joueur victime']");
+const joueurSortant = document.querySelector("select[name='Joueur sortant']");
+const joueurEntrant = document.querySelector("select[name='Joueur entrant']");
+team.addEventListener("change", () =>
+{
+	for (const select of document.querySelectorAll("select[name='Joueur'], select[name='Joueur fautif'], select[name='Joueur victime'], select[name='Joueur sortant'], select[name='Joueur entrant']"))
+	{
+		for (const option of select.children)
+			option.classList.add("hidden");
+	}
+	for (const option of joueur.children)
+	{
+		if (option.getAttribute("team") == team.selectedOptions[0].getAttribute("team"))
+			option.classList.remove("hidden");
+	}
+	for (const option of joueurFautif.children)
+	{
+		if (option.getAttribute("team") == team.selectedOptions[0].getAttribute("team"))
+			option.classList.remove("hidden");
+	}
+	for (const option of joueurSortant.children)
+	{
+		if (option.getAttribute("team") == team.selectedOptions[0].getAttribute("team"))
+			option.classList.remove("hidden");
+	}
+	for (const option of joueurEntrant.children)
+	{
+		if (option.getAttribute("team") == team.selectedOptions[0].getAttribute("team"))
+			option.classList.remove("hidden");
+	}
+	for (const option of joueurVictime.children)
+	{
+		if (option.getAttribute("team") != team.selectedOptions[0].getAttribute("team"))
+			option.classList.remove("hidden");
+	}
+});
+
 // ============================================================================
 //  Événements SocketIO
 // ============================================================================

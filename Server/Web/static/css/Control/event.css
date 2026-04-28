@@ -220,6 +220,7 @@ main > div:last-child
 #event-selected input, #event-selected select
 {
 	font-size: 20px;
+	text-align: center;
 	padding: 0.5vh 0.5vw;
 	border: 1px solid var(--input-border);
 	border-radius: 5px;
@@ -229,19 +230,25 @@ main > div:last-child
 #event-selected select
 {
 	width: 100%;
-	text-align: center;
 }
 #event-selected input[type="number"]
 {
-	text-align: center;
 	width: 5vw;
+}
+#event-selected input[name="Timestamp"]
+{
+	width: 10vw;
+}
+#event-selected input[name="Cause"]
+{
+	width: 15vw;
 }
 
 
 
 .hidden
 {
-	display: none;
+	display: none !important;
 }
 
 

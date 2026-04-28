@@ -16,7 +16,7 @@ from flask import render_template, request, redirect, url_for, session
 
 from Server.Config.setting import Config
 from Server.Utils.data import getColorOfSupporter, getColorOfStadiumBleacher
-from Server.Utils.event import loadConfiguration, getConfigurationList, loadMatchInformation
+from Server.Utils.event import loadConfiguration, getConfigurationList, loadMatchInformation, loadConfigurationInformation
 from Server.Utils.logger import Logger
 
 # =============================================================================
@@ -102,8 +102,9 @@ def registerRoutes(app, supporterList, stadiumBleacherList):
     @app.route("/event")
     def eventPage():
         matchInformation, lastInformation = loadMatchInformation()
+        configInformation = loadConfigurationInformation()
         config = loadConfiguration(matchInformation["config"])
-        return render_template("Control/event.html", debug=int(Config.DEBUG), events=config, config=json.dumps(config, ensure_ascii=False), lastInformation=lastInformation, domicile=matchInformation["domicile"]["team"], exterieur=matchInformation["exterieur"]["team"])
+        return render_template("Control/event.html", debug=int(Config.DEBUG), events=config, config=json.dumps(config, ensure_ascii=False), lastInformation=lastInformation, domicile=matchInformation["domicile"], exterieur=matchInformation["exterieur"], configInformation=json.dumps(configInformation, ensure_ascii=False))
 
 
 

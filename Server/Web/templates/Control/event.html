@@ -38,15 +38,68 @@
                             <h3></h3>
                             <p class="hidden"></p>
                             <form>
-                                <label>
-                                    Minutes de jeu:
-                                    <input name="time" type="number" min="1" max="135">
+                                <label class="hidden">
+                                    Timestamp:
+                                    <input name="Timestamp" type="text">
                                 </label>
-                                <select>
+                                <label class="hidden">
+                                    Minute de jeu:
+                                    <input name="Minute de jeu" type="number" min="1" max="135">
+                                </label>
+                                <select name="Équipe" class="hidden">
                                     <option selected>Équipe</option>
-                                    <option>{% if lastInformation %}{{ domicile }}{% else %}Domicile{% endif %}</option>
-                                    <option>{% if lastInformation %}{{ exterieur }}{% else %}Exterieur{% endif %}</option>
+                                    <option team="domicile">{% if lastInformation %}{{ domicile.team }}{% else %}Domicile{% endif %}</option>
+                                    <option team="exterieur">{% if lastInformation %}{{ exterieur.team }}{% else %}Exterieur{% endif %}</option>
                                 </select>
+                                <select name="Joueur" class="hidden">
+                                    <option selected>Joueur</option>
+                                    {% for player in domicile.player %}
+                                    <option team="domicile">{{ player.name }} | {{ player.number }}</option>
+                                    {% endfor %}
+                                    {% for player in exterieur.player %}
+                                    <option team="exterieur">{{ player.name }} | {{ player.number }}</option>
+                                    {% endfor %}
+                                </select>
+                                <select name="Joueur fautif" class="hidden">
+                                    <option selected>Joueur fautif</option>
+                                    {% for player in domicile.player %}
+                                    <option team="domicile">{{ player.name }} | {{ player.number }}</option>
+                                    {% endfor %}
+                                    {% for player in exterieur.player %}
+                                    <option team="exterieur">{{ player.name }} | {{ player.number }}</option>
+                                    {% endfor %}
+                                </select>
+                                <select name="Joueur victime" class="hidden">
+                                    <option selected>Joueur victime</option>
+                                    {% for player in domicile.player %}
+                                    <option team="domicile">{{ player.name }} | {{ player.number }}</option>
+                                    {% endfor %}
+                                    {% for player in exterieur.player %}
+                                    <option team="exterieur">{{ player.name }} | {{ player.number }}</option>
+                                    {% endfor %}
+                                </select>
+                                <select name="Joueur sortant" class="hidden">
+                                    <option selected>Joueur sortant</option>
+                                    {% for player in domicile.player %}
+                                    <option team="domicile">{{ player.name }} | {{ player.number }}</option>
+                                    {% endfor %}
+                                    {% for player in exterieur.player %}
+                                    <option team="exterieur">{{ player.name }} | {{ player.number }}</option>
+                                    {% endfor %}
+                                </select>
+                                <select name="Joueur entrant" class="hidden">
+                                    <option selected>Joueur entrant</option>
+                                    {% for player in domicile.player %}
+                                    <option team="domicile">{{ player.name }} | {{ player.number }}</option>
+                                    {% endfor %}
+                                    {% for player in exterieur.player %}
+                                    <option team="exterieur">{{ player.name }} | {{ player.number }}</option>
+                                    {% endfor %}
+                                </select>
+                                <label class="hidden">
+                                    Cause:
+                                    <input name="Cause" type="text">
+                                </label>
                             </form>
                         </div>
                     </div>
@@ -58,6 +111,7 @@
             // Définition des variables dynamiques
             window.DEBUG = {{ debug }};
             window.config = "{{ config }}".replace(/&#39;/g, "'").replace(/&#34;/g, '"');
+            window.configInformation = "{{ configInformation }}".replace(/&#39;/g, "'").replace(/&#34;/g, '"');
             window.deleteLightIcon = "{{ url_for('static', filename='icon/delete-light.png') }}";
             window.modifyLightIcon = "{{ url_for('static', filename='icon/modify-light.png') }}";
             window.deleteDarkIcon = "{{ url_for('static', filename='icon/delete-dark.png') }}";

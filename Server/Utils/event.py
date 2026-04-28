@@ -55,6 +55,34 @@ def loadConfiguration(config):
 
 
 ##
+# @brief Charge les information des configurations de contôle d'évènement.
+#
+# @return Les information des configurations de contrôle d'évènement.
+##
+def loadConfigurationInformation():
+    filePath = Config.PATH["data"] + "event.json"
+
+    try:
+        logger.info(f"[Event] Lecture du fichier d'information des configuration : '{filePath}'")
+
+        with open(filePath, "r") as file:
+            return json.load(file)
+
+    except FileNotFoundError:
+        message = f"[Event] Fichier d'information des configuration introuvable : '{filePath}'"
+        logger.error(message)
+        raise RuntimeError(message)
+
+    except json.JSONDecodeError as e:
+        message = f"[Event] Fichier d'information des configuration invalide (JSON malformé) : '{filePath}'"
+        logger.error(message)
+        raise RuntimeError(message) from e
+
+    return ""
+
+
+
+##
 # @brief Renvoi la liste des configurations de contrôle d'évènement.
 #
 # @return La liste des configurations de contrôle d'évènement.
