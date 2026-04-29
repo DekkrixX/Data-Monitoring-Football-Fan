@@ -241,13 +241,14 @@ export function createChart(ctx, list, value, min, max, step)
 /**
  * @brief Crée et retourne un évènement.
  *
- * @param {string}   name   Nom de l'évènement.
- * @param {number}   code   Code de l'évènement.
- * @param {socketio} socket Socket de connexion au serveur.
+ * @param {string}   name    Nom de l'évènement.
+ * @param {number}   code    Code de l'évènement.
+ * @param {number}   matchId Identifiant du match.
+ * @param {socketio} socket  Socket de connexion au serveur.
  *
  * @returns {HTMLDivElement} Élément div prêt à être inséré dans le DOM.
  */
-export function createEvent(name, code, socket)
+export function createEvent(name, code, matchId, socket)
 {
     if (window.DEBUG)
         console.log(`[Element] createEvent - Création de l'évènement : ${name}`);
@@ -280,8 +281,10 @@ export function createEvent(name, code, socket)
     info.setAttribute("out_player", null);
     info.setAttribute("in_player", null);
     info.setAttribute("detail", null);
-    info.setAttribute("match", null);
+    info.setAttribute("match", matchId);
+    p.appendChild(document.createElement("span"));
     p.textContent = name;
+    p.name = name;
     removeImg.alt = "Icone de suppression";
     modifyImg.alt = "Icone de modification";
     div.appendChild(info);
@@ -321,7 +324,7 @@ export function createEvent(name, code, socket)
         // Afficher les champs dynamiques
         for (const category of JSON.parse(window.configInformation))
         {
-            const foundEvent = category.event.find(e => e.name === p.textContent);
+            const foundEvent = category.event.find(e => e.name === p.name);
             if (foundEvent)
             {
                 for (const field of foundEvent.data)
@@ -344,6 +347,11 @@ export function createEvent(name, code, socket)
             input.oninput = () =>
             {
                 info.setAttribute(attr, input.value);
+                if (info.getAttribute("match_minute") != "null")
+                {
+                    const event = document.querySelector(`#event-list span[id='${info.getAttribute("id")}']`).nextElementSibling;
+                    event.textContent = `${info.getAttribute("match_minute")}' ${event.name}`;
+                }
             };
         };
 

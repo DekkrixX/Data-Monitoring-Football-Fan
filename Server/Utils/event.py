@@ -141,11 +141,9 @@ def createNewEventConfiguration(config, matchInfomation):
 ##
 def loadMatchInformation(postgresqlClient):
     matchId = postgresqlClient.fetch("SELECT id FROM match ORDER BY ts DESC LIMIT 1")
-    logger.warning(f"MATCHID{matchId}")
     if matchId:
         matchId = matchId[0]["id"]
         event = postgresqlClient.fetch("SELECT code FROM event WHERE match = %s ORDER BY ts DESC LIMIT 1", (matchId,))
-        logger.warning(f"EVENT{event}")
         lastInformation = True if not event or event[0]["code"] != 12 else False
     if not matchId or not lastInformation:
         # Création d'un nouveaux match

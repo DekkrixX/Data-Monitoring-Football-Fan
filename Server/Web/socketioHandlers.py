@@ -306,10 +306,29 @@ def registerSocketioHandlers(socketio, supporterList, stadiumBleacherList, postg
         logger.info(f"[SocketIO] Réception de 'newEvent': code:{code}, matchId:{matchId}")
 
         ts = datetime.now()
-        
-        idf = postgresqlClient.execute("INSERT INTO event (code, ts, match) VALUES (%s, %s, %s) RETURNING id", (code, ts, matchId), returning=True)["id"]
 
-        socketio.emit("newEventResponse", {"id": idf, "ts": ts.isoformat()})
+        # Calcul de la minute de jeu
+        events = postgresqlClient.fetch("SELECT code, ts FROM event WHERE match = %s ORDER BY ts DESC", (matchId,))
+        reference = None
+        for event in events:
+            delta = ts - event["ts"]
+            minute =  delta.total_seconds() // 60
+            if event["code"] == 7:
+                reference = 106 + minute
+                break
+            elif event["code"] == 5:
+                reference = 91 + minute
+                break
+            elif event["code"] == 3:
+                reference = 46 + minute
+                break
+            elif event["code"] == 1:
+                reference = 1 + minute
+                break
+
+        idf = postgresqlClient.execute("INSERT INTO event (code, ts, match_minute, match) VALUES (%s, %s, %s, %s) RETURNING id", (code, ts, reference, matchId), returning=True)["id"]
+
+        socketio.emit("newEventResponse", {"id": idf, "ts": ts.isoformat(), "match_minute": reference})
 
         return
 

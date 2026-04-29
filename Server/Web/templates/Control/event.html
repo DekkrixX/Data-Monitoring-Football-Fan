@@ -58,46 +58,46 @@
                                 <select name="Joueur" class="hidden">
                                     <option selected>Joueur</option>
                                     {% for player in domicile.player %}
-                                    <option team="domicile" name="{{ player.name }}" number="{{ player.number }}" playerId="{{ player.id }}">{{ player.name }} | {{ player.number }}</option>
+                                    <option team="domicile" name="{{ player.name }}" number="{{ player.number }}" playerId="{{ player.id }}">[{{ player.number }}] {{ player.name }}</option>
                                     {% endfor %}
                                     {% for player in exterieur.player %}
-                                    <option team="exterieur" name="{{ player.name }}" number="{{ player.number }}" playerId="{{ player.id }}">{{ player.name }} | {{ player.number }}</option>
+                                    <option team="exterieur" name="{{ player.name }}" number="{{ player.number }}" playerId="{{ player.id }}">[{{ player.number }}] {{ player.name }}</option>
                                     {% endfor %}
                                 </select>
                                 <select name="Joueur fautif" class="hidden">
                                     <option selected>Joueur fautif</option>
                                     {% for player in domicile.player %}
-                                    <option team="domicile" name="{{ player.name }}" number="{{ player.number }}" playerId="{{ player.id }}">{{ player.name }} | {{ player.number }}</option>
+                                    <option team="domicile" name="{{ player.name }}" number="{{ player.number }}" playerId="{{ player.id }}">[{{ player.number }}] {{ player.name }}</option>
                                     {% endfor %}
                                     {% for player in exterieur.player %}
-                                    <option team="exterieur" name="{{ player.name }}" number="{{ player.number }}" playerId="{{ player.id }}">{{ player.name }} | {{ player.number }}</option>
+                                    <option team="exterieur" name="{{ player.name }}" number="{{ player.number }}" playerId="{{ player.id }}">[{{ player.number }}] {{ player.name }}</option>
                                     {% endfor %}
                                 </select>
                                 <select name="Joueur victime" class="hidden">
                                     <option selected>Joueur victime</option>
                                     {% for player in domicile.player %}
-                                    <option team="domicile" name="{{ player.name }}" number="{{ player.number }}" playerId="{{ player.id }}">{{ player.name }} | {{ player.number }}</option>
+                                    <option team="domicile" name="{{ player.name }}" number="{{ player.number }}" playerId="{{ player.id }}">[{{ player.number }}] {{ player.name }}</option>
                                     {% endfor %}
                                     {% for player in exterieur.player %}
-                                    <option team="exterieur" name="{{ player.name }}" number="{{ player.number }}" playerId="{{ player.id }}">{{ player.name }} | {{ player.number }}</option>
+                                    <option team="exterieur" name="{{ player.name }}" number="{{ player.number }}" playerId="{{ player.id }}">[{{ player.number }}] {{ player.name }}</option>
                                     {% endfor %}
                                 </select>
                                 <select name="Joueur sortant" class="hidden">
                                     <option selected>Joueur sortant</option>
                                     {% for player in domicile.player %}
-                                    <option team="domicile" name="{{ player.name }}" number="{{ player.number }}" playerId="{{ player.id }}">{{ player.name }} | {{ player.number }}</option>
+                                    <option team="domicile" name="{{ player.name }}" number="{{ player.number }}" playerId="{{ player.id }}">[{{ player.number }}] {{ player.name }}</option>
                                     {% endfor %}
                                     {% for player in exterieur.player %}
-                                    <option team="exterieur" name="{{ player.name }}" number="{{ player.number }}" playerId="{{ player.id }}">{{ player.name }} | {{ player.number }}</option>
+                                    <option team="exterieur" name="{{ player.name }}" number="{{ player.number }}" playerId="{{ player.id }}">[{{ player.number }}] {{ player.name }}</option>
                                     {% endfor %}
                                 </select>
                                 <select name="Joueur entrant" class="hidden">
                                     <option selected>Joueur entrant</option>
                                     {% for player in domicile.player %}
-                                    <option team="domicile" name="{{ player.name }}" number="{{ player.number }}" playerId="{{ player.id }}">{{ player.name }} | {{ player.number }}</option>
+                                    <option team="domicile" name="{{ player.name }}" number="{{ player.number }}" playerId="{{ player.id }}">[{{ player.number }}] {{ player.name }}</option>
                                     {% endfor %}
                                     {% for player in exterieur.player %}
-                                    <option team="exterieur" name="{{ player.name }}" number="{{ player.number }}" playerId="{{ player.id }}">{{ player.name }} | {{ player.number }}</option>
+                                    <option team="exterieur" name="{{ player.name }}" number="{{ player.number }}" playerId="{{ player.id }}">[{{ player.number }}] {{ player.name }}</option>
                                     {% endfor %}
                                 </select>
                                 <label class="hidden">

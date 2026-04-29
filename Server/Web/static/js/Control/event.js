@@ -69,7 +69,7 @@ selectValidOptions();
 // Envoi des données d'évènement
 document.addEventListener("DOMContentLoaded", () =>
 {
-    const inputs = document.querySelectorAll("#event-selected input, #even-selected select");
+    const inputs = document.querySelectorAll("#event-selected input, #event-selected select");
 
     inputs.forEach(input =>
     {
@@ -99,7 +99,7 @@ socket.on("getEventAllResponse", (data) =>
 		if (window.DEBUG)
 			console.log(`[Event] getEventAllResponse - Création de l'évènement '${name}' pour l'identifiant '${event.id}'`);
 
-		const eventElement = createEvent(name, event.code, socket);
+		const eventElement = createEvent(name, event.code, event.match, socket);
 		const info = eventElement.querySelector("span");
 
 		info.setAttribute("id", event.id);
@@ -117,6 +117,12 @@ socket.on("getEventAllResponse", (data) =>
 
 		const eventList = document.getElementById("event-list");
 		eventList.appendChild(eventElement);
+
+		if (info.getAttribute("match_minute") != "null")
+		{
+			const eventP = document.querySelector(`#event-list span[id='${event.id}']`).nextElementSibling;
+			eventP.textContent = `${info.getAttribute("match_minute")}' ${eventP.name}`;
+		}
 	}
 });
 
@@ -156,23 +162,30 @@ function newEvent(name, code)
 		console.log(`[Event] Nouvelle évènement : ${name}`);
 
 	const eventList = document.getElementById("event-list");
-	const newEventElement = createEvent(name, code, socket);
+	const newEventElement = createEvent(name, code, window.matchId, socket);
 	eventList.appendChild(newEventElement);
-
-	socket.on("newEventResponse", (data) =>
-	{
-		if (window.DEBUG)
-			console.log(`[Event] Récupération de l'identifiant de l'évènement : ${data.id}`);
-
-		const info = newEventElement.querySelector("span");
-		info.setAttribute("id", data.id);
-		info.setAttribute("ts", data.ts);
-	});
 
 	socket.emit("newEvent", code, window.matchId)
 
 	return ;
 }
+
+socket.on("newEventResponse", (data) =>
+{
+	if (window.DEBUG)
+		console.log(`[Event] Récupération de l'identifiant de l'évènement : ${data.id}`);
+
+	const newEventElement = document.getElementById("event-list").lastChild;
+	const info = newEventElement.querySelector("span");
+	info.setAttribute("id", data.id);
+	info.setAttribute("ts", data.ts);
+	info.setAttribute("match_minute", data.match_minute);
+	if (info.getAttribute("match_minute") != "null")
+	{
+		const event = document.querySelector(`#event-list span[id='${data.id}']`).nextElementSibling;
+		event.textContent = `${info.getAttribute("match_minute")}' ${event.name}`;
+	}
+});
 
 window.newEvent = newEvent;
 
@@ -187,7 +200,7 @@ function getEventInformation()
 
     if (!idEvent)
     {
-        console.log("Aucun événement sélectionné");
+        console.log("[Event] Aucun événement sélectionné");
         return null;
     }
 
@@ -195,7 +208,7 @@ function getEventInformation()
 
     if (!span)
     {
-        console.log(`Événement introuvable dans #event-list pour id=${idEvent}`);
+        console.log(`[Event] Événement introuvable dans #event-list pour id=${idEvent}`);
         return null;
     }
 
@@ -227,7 +240,7 @@ function autoSend()
     timeout = setTimeout(() => 
     {
     	const info = getEventInformation();
-    	if (!info)
+    	if (info)
     	{
         	const data = JSON.stringify(info, null, 4);
 
