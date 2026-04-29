@@ -78,6 +78,7 @@ function getMatchInformation()
     {
         const data =
         {
+            id: form.querySelector("input[name='team']").getAttribute("teamId"),
             team: form.querySelector("input[name='team']").value,
             coach: form.querySelector("input[name='coach']").value,
             player: []
@@ -87,8 +88,9 @@ function getMatchInformation()
         {
             const name = form.querySelector(`input[name='player${i}']`).value;
             const number = form.querySelector(`input[name='numero${i}']`).value;
+            const id = form.querySelector(`input[name='player${i}']`).getAttribute("playerId");
 
-            data.player.push({name: name, number: number});
+            data.player.push({name: name, number: number, id: id});
         }
 
         return data;
@@ -99,7 +101,8 @@ function getMatchInformation()
         domicile: getTeamData(domicileForm),
         exterieur: getTeamData(exterieurForm),
         stadium: matchForm.querySelector("input[name='stadium']").value,
-        config: matchForm.querySelector("#config").value
+        config: matchForm.querySelector("#config").value,
+        id: matchForm.querySelector("input[name='stadium']").getAttribute("matchId")
     };
 
     return matchInformation;

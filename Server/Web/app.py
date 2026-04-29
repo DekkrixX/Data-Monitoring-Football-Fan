@@ -67,8 +67,8 @@ def main():
     # Connexion à la base de données PostgreSQL
     postgresqlClient = PostgreSQLClientWrapper(Config.POSTGRESQL_HOST, Config.POSTGRESQL_PORT, Config.POSTGRESQL_DATABASE, Config.POSTGRESQL_USER, Config.POSTGRESQL_PASSWORD)
 
-    registerRoutes(app, supporterList, stadiumBleacherList)
-    registerSocketioHandlers(socketio, supporterList, stadiumBleacherList, mqttClient, postgresqlClient)
+    registerRoutes(app, supporterList, stadiumBleacherList, postgresqlClient)
+    registerSocketioHandlers(socketio, supporterList, stadiumBleacherList, postgresqlClient)
 
     mqttClient.connect()
     mqttClient.subscribe(Config.MQTT_BROKER_TOPICS_DATA)

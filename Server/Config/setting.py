@@ -134,12 +134,6 @@ class Config:
     POSTGRESQL_DATABASE_FILE = os.getenv("POSTGRESQL_DATABASE_FILE", None) ##< @brief Fichier de construction de la base de données.
 
 # =============================================================================
-#  Fichier cache
-# =============================================================================
-
-    PREPARATION_FILE = os.getenv("PREPARATION_FILE", None) ##< @brief Fichier cache de la préparation d'avant match.
-
-# =============================================================================
 #  Délais d'échantillonage des capteurs
 # =============================================================================
 
@@ -202,9 +196,6 @@ class Config:
             "POSTGRESQL_PASSWORD":      cls.POSTGRESQL_PASSWORD,
             "POSTGRESQL_DATABASE":      cls.POSTGRESQL_DATABASE,
             "POSTGRESQL_DATABASE_FILE": cls.POSTGRESQL_DATABASE_FILE,
-
-            # Fichier cache
-            "PREPARATION_FILE": cls.PREPARATION_FILE,
 
             # Délais d'échantillonage des capteurs
             "SENSOR_DELAY": cls.SENSOR_DELAY

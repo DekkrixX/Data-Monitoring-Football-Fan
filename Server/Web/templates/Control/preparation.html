@@ -16,16 +16,16 @@
                 <h2>Domicile</h2>
                 <form id="domicile" class="team-config">
                     <div class="team">
-                        <input name="team" type=text placeholder="Équipe" {% if lastInformation %} value="{{ matchInformation.domicile.team }}" {% endif %}>
+                        <input name="team" type=text placeholder="Équipe" {% if lastInformation and matchInformation.domicile.team != None %} value="{{ matchInformation.domicile.team }}" {% endif %} teamId="{{ matchInformation.domicile.id }}">
                     </div>
                     <div class="coach">
-                        <input name="coach" type=text placeholder="Entraineur" {% if lastInformation %} value="{{ matchInformation.domicile.coach }}" {% endif %} >
+                        <input name="coach" type=text placeholder="Entraineur" {% if lastInformation and matchInformation.domicile.coach != None %} value="{{ matchInformation.domicile.coach }}" {% endif %} >
                     </div>
                     <div class="player">
                         {% for i in range(20) %}
                         <div>
-                            <input name="player{{ i }}" type=text placeholder="Joueur" {% if lastInformation %} value="{{ matchInformation.domicile.player[i].name }}" {% endif %}>
-                            <input name="numero{{ i }}" type=number placeholder="Numéro" min="1" max="99" {% if lastInformation %} value="{{ matchInformation.domicile.player[i].number }}" {% endif %}>
+                            <input name="player{{ i }}" type=text placeholder="Joueur" {% if lastInformation and matchInformation.domicile.player[i].name != None %} value="{{ matchInformation.domicile.player[i].name }}" {% endif %} playerId="{{ matchInformation.domicile.player[i].id }}">
+                            <input name="numero{{ i }}" type=number placeholder="Numéro" min="1" max="99" {% if lastInformation and matchInformation.domicile.player[i].number != 0 %} value="{{ matchInformation.domicile.player[i].number }}" {% endif %}>
                         </div>
                         {% endfor %}
                     </div>
@@ -36,7 +36,7 @@
                     <label>Match</label> 
                     <input name="match" type="text" disabled>
                     <label>Stade</label>
-                    <input name="stadium" type="text" {% if lastInformation %} value="{{ matchInformation.stade }}" {% endif %} >
+                    <input name="stadium" type="text" {% if lastInformation and matchInformation.stadium != None %} value="{{ matchInformation.stadium }}" {% endif %} matchId="{{ matchInformation.id }}">
                     <label>Configuration de contôle d'évènements</label>
                     <select id="config" name="config">
                         {% for config in configurationList %}
@@ -50,16 +50,16 @@
                 <h2>Exterieur</h2>
                 <form id="exterieur" class="team-config">
                     <div class="team">
-                        <input name="team" type=text placeholder="Équipe" {% if lastInformation %} value="{{ matchInformation.exterieur.team }}" {% endif %}>
+                        <input name="team" type=text placeholder="Équipe" {% if lastInformation and matchInformation.exterieur.team != None %} value="{{ matchInformation.exterieur.team }}" {% endif %} teamId="{{ matchInformation.exterieur.id }}">
                     </div>
                     <div class="coach">
-                        <input name="coach" type=text placeholder="Entraineur" {% if lastInformation %} value="{{ matchInformation.exterieur.coach }}" {% endif %}>
+                        <input name="coach" type=text placeholder="Entraineur" {% if lastInformation and matchInformation.exterieur.coach != None %} value="{{ matchInformation.exterieur.coach }}" {% endif %}>
                     </div>
                     <div class="player">
                         {% for i in range(20) %}
                         <div>
-                            <input name="player{{ i }}" type=text placeholder="Joueur" {% if lastInformation %} value="{{ matchInformation.exterieur.player[i].name }}" {% endif %}>
-                            <input name="numero{{ i }}" type=number placeholder="Numéro" min="1" max="99" {% if lastInformation %} value="{{ matchInformation.exterieur.player[i].number }}" {% endif %}>
+                            <input name="player{{ i }}" type=text placeholder="Joueur" {% if lastInformation and matchInformation.exterieur.player[i].name != None %} value="{{ matchInformation.exterieur.player[i].name }}" {% endif %} playerId="{{ matchInformation.exterieur.player[i].id }}">
+                            <input name="numero{{ i }}" type=number placeholder="Numéro" min="1" max="99" {% if lastInformation and matchInformation.exterieur.player[i].number != 0 %} value="{{ matchInformation.exterieur.player[i].number }}" {% endif %}>
                         </div>
                         {% endfor %}
                     </div>

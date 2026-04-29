@@ -35,8 +35,9 @@ logger = Logger("Serveur/Routes")
 # @param app                 Instance Flask de l'application.
 # @param supporterList       Liste partagée des objets Supporter actifs.
 # @param stadiumBleacherList Liste partagée des objets StadiumBleacher actifs.
+# @param postgresqlClient    Client PostgreSQL.
 ##
-def registerRoutes(app, supporterList, stadiumBleacherList):
+def registerRoutes(app, supporterList, stadiumBleacherList, postgresqlClient):
     logger.info("[Routes] Enregistrement des routes et gestionnaires d'erreurs")
 
 # =============================================================================
@@ -101,10 +102,10 @@ def registerRoutes(app, supporterList, stadiumBleacherList):
     ##
     @app.route("/event")
     def eventPage():
-        matchInformation, lastInformation = loadMatchInformation()
+        matchInformation, lastInformation = loadMatchInformation(postgresqlClient)
         configInformation = loadConfigurationInformation()
         config = loadConfiguration(matchInformation["config"])
-        return render_template("Control/event.html", debug=int(Config.DEBUG), events=config, config=json.dumps(config, ensure_ascii=False), lastInformation=lastInformation, domicile=matchInformation["domicile"], exterieur=matchInformation["exterieur"], configInformation=json.dumps(configInformation, ensure_ascii=False))
+        return render_template("Control/event.html", debug=int(Config.DEBUG), events=config, config=json.dumps(config, ensure_ascii=False), lastInformation=lastInformation, domicile=matchInformation["domicile"], exterieur=matchInformation["exterieur"], configInformation=json.dumps(configInformation, ensure_ascii=False), matchId=matchInformation["id"])
 
 
 
@@ -113,7 +114,7 @@ def registerRoutes(app, supporterList, stadiumBleacherList):
     ##
     @app.route("/event/preparation")
     def preparationPage():
-        matchInformation, lastInformation = loadMatchInformation()
+        matchInformation, lastInformation = loadMatchInformation(postgresqlClient)
         return render_template("Control/preparation.html", debug=int(Config.DEBUG), configurationList=getConfigurationList(), matchInformation=matchInformation, lastInformation=lastInformation)
 
 
@@ -123,7 +124,7 @@ def registerRoutes(app, supporterList, stadiumBleacherList):
     ##
     @app.route("/event/configuration")
     def configurationPage():
-        matchInformation, _ = loadMatchInformation()
+        matchInformation, _ = loadMatchInformation(postgresqlClient)
         config = loadConfiguration(matchInformation["config"])
         return render_template("Control/configuration.html", debug=int(Config.DEBUG), events=config)
 

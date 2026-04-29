@@ -10,6 +10,7 @@
 #  Import des bibliothèques
 # =============================================================================
 
+import json
 from flask_socketio import emit
 from datetime import datetime
 
@@ -34,10 +35,9 @@ logger = Logger("Serveur/SocketIO")
 # @param socketio            Instance SocketIO de l'application.
 # @param supporterList       Liste partagée des objets Supporter actifs.
 # @param stadiumBleacherList Liste partagée des objets StadiumBleacher actifs.
-# @param mqttClient          Client MQTT.
 # @param postgresqlClient    Client PosgreSQL.
 ##
-def registerSocketioHandlers(socketio, supporterList, stadiumBleacherList, mqttClient, postgresqlClient):
+def registerSocketioHandlers(socketio, supporterList, stadiumBleacherList, postgresqlClient):
 
 # =============================================================================
 #  Liste des supporters
@@ -233,16 +233,29 @@ def registerSocketioHandlers(socketio, supporterList, stadiumBleacherList, mqttC
     ##
     # @brief Réception des infomations d'avant match
     #
-    # @param data Informations d'avant match.
+    # @param data  Informations d'avant match.
     ##
     @socketio.on("matchInformation")
     def handleMatchInformation(data):
         logger.info("[SocketIO] Réception de 'matchInformation'")
         logger.info(f"[SocketIO] Mise à jour des données d'avant match : {data}")
+        data = json.loads(data)
 
-        filePath = Config.PATH["data"] + Config.PREPARATION_FILE
-        with open(filePath, 'w') as f:
-            f.write(data)
+        for player in data["domicile"]["player"]:
+            try:
+                player["number"] = int(player["number"])
+            except:
+                player["number"] = 0
+            postgresqlClient.execute("UPDATE player SET team = %s, name = %s, player_number = %s WHERE id = %s", (int(data["domicile"]["id"]), player["name"], player["number"], int(player["id"])))
+        for player in data["exterieur"]["player"]:
+            try:
+                player["number"] = int(player["number"])
+            except:
+                player["number"] = 0
+            postgresqlClient.execute("UPDATE player SET team = %s, name = %s, player_number = %s WHERE id = %s", (int(data["exterieur"]["id"]), player["name"], player["number"], int(player["id"])))
+        postgresqlClient.execute("UPDATE team SET name = %s, coach = %s WHERE id = %s", (data["domicile"]["team"], data["domicile"]["coach"], int(data["domicile"]["id"])))
+        postgresqlClient.execute("UPDATE team SET name = %s, coach = %s WHERE id = %s", (data["exterieur"]["team"], data["exterieur"]["coach"], int(data["exterieur"]["id"])))
+        postgresqlClient.execute("UPDATE match SET domicile = %s, exterieur = %s, config = %s, stadium = %s WHERE id = %s", (int(data["domicile"]["id"]), int(data["exterieur"]["id"]), data["config"], data["stadium"], int(data["id"])));
 
         return
 
@@ -272,30 +285,31 @@ def registerSocketioHandlers(socketio, supporterList, stadiumBleacherList, mqttC
     # @brief Envoi les données complètes des évènements du match.
     ##
     @socketio.on("getEventAll")
-    def handleGetEventAll():
+    def handleGetEventAll(matchId):
         logger.info("[SocketIO] Réception de 'getEventAll'")
 
-        events = postgresqlClient.fetch("SELECT * FROM event")
+        events = postgresqlClient.fetch("SELECT * FROM event WHERE match = %s", (matchId,))
 
         for event in events:
-            if event["event_time"]:
-                event["event_time"] = event["event_time"].isoformat()
+            if event["ts"]:
+                event["ts"] = event["ts"].isoformat()
 
         socketio.emit("getEventAllResponse", events);
+        
         return
 
     ##
     # @brief Réception d'un nouvel évènement.
     ##
     @socketio.on("newEvent")
-    def handleNewEvent(code):
-        logger.info(f"[SocketIO] Réception de 'newEvent': code:{code}")
+    def handleNewEvent(code, matchId):
+        logger.info(f"[SocketIO] Réception de 'newEvent': code:{code}, matchId:{matchId}")
 
-        mqttClient.publish(f"event/{code}", '{}')
+        ts = datetime.now()
         
-        idf = postgresqlClient.execute("INSERT INTO event (code, team, event_time, minute) VALUES (%s, NULL, %s, NULL) RETURNING id", (code, datetime.now()), returning=True)
+        idf = postgresqlClient.execute("INSERT INTO event (code, ts, match) VALUES (%s, %s, %s) RETURNING id", (code, ts, matchId), returning=True)["id"]
 
-        socketio.emit("newEventResponse", idf["id"])
+        socketio.emit("newEventResponse", {"id": idf, "ts": ts.isoformat()})
 
         return
 
@@ -309,9 +323,32 @@ def registerSocketioHandlers(socketio, supporterList, stadiumBleacherList, mqttC
     ##
     @socketio.on("deleteEvent")
     def handleDeleteEvent(idf):
-        logger.info(f"[SocketIO] Réception du 'deleteEvent': id:{idf}")
+        logger.info(f"[SocketIO] Réception de 'deleteEvent': id:{idf}")
 
         postgresqlClient.execute("DELETE FROM event WHERE id = %s", (idf,))
+
+        return
+
+
+
+    ##
+    # @brief Modification d'un évènement.
+    #
+    # @param idf  Identifiant de l'évènement.
+    # @param data Données modifiées.
+    ##
+    @socketio.on("modifyEvent")
+    def handleModifyEvent(idf, data):
+        def toInt(value):
+            try:
+                return int(value)
+            except (TypeError, ValueError):
+                return None
+
+        logger.info(f"[SocketIO] Réception de 'modifyEvent': id:{idf} données:{data}")
+        data = json.loads(data)
+
+        postgresqlClient.execute("UPDATE event SET ts = %s, minute_number = %s, match_minute = %s, team = %s, player = %s, offending_player = %s, victim_player = %s, out_player = %s, in_player = %s, detail = %s, match = %s WHERE id = %s",(data["ts"], toInt(data["minute_number"]), toInt(data["match_minute"]), toInt(data["team"]), toInt(data["player"]), toInt(data["offending_player"]), toInt(data["victim_player"]), toInt(data["out_player"]), toInt(data["in_player"]), data["detail"], toInt(data["match"]), idf))
 
         return
 

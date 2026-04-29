@@ -271,6 +271,16 @@ export function createEvent(name, code, socket)
 
     info.classList.add("hidden");
     info.setAttribute("code", code);
+    info.setAttribute("minute_number", null);
+    info.setAttribute("match_minute", null);
+    info.setAttribute("team", null);
+    info.setAttribute("player", null);
+    info.setAttribute("offending_player", null);
+    info.setAttribute("victim_player", null);
+    info.setAttribute("out_player", null);
+    info.setAttribute("in_player", null);
+    info.setAttribute("detail", null);
+    info.setAttribute("match", null);
     p.textContent = name;
     removeImg.alt = "Icone de suppression";
     modifyImg.alt = "Icone de modification";
@@ -295,24 +305,86 @@ export function createEvent(name, code, socket)
     modifyImg.addEventListener("click", () =>
     {
         if (window.DEBUG)
-        console.log(`[Element] createElement - Modfication de l'évènement : ${p.textContent}`);
+            console.log(`[Element] Modification de l'évènement : ${p.textContent}`);
 
         const eventSelected = document.getElementById("event-selected");
         eventSelected.classList.remove("hidden");
+
         const h3 = eventSelected.querySelector("h3");
         const idEventSelected = eventSelected.querySelector("p");
+
         h3.textContent = p.textContent;
-        idEventSelected.textContent = id;
+        idEventSelected.textContent = info.getAttribute("id");
+
         undisplayEventInformation();
+
+        // Afficher les champs dynamiques
         for (const category of JSON.parse(window.configInformation))
         {
             const foundEvent = category.event.find(e => e.name === p.textContent);
             if (foundEvent)
             {
-                for (const info of foundEvent.data)
-                    displayEventInformation(info);
+                for (const field of foundEvent.data)
+                    displayEventInformation(field);
             }
         }
+
+        const bindInput = (name, attr) =>
+        {
+            const input = eventSelected.querySelector(`input[name='${name}']`);
+            if (!input)
+                return ;
+
+            // Définir valeur par défaut si elle existe
+            const value = info.getAttribute(attr);
+            if (value !== null)
+                input.value = value;
+
+            // Update du span au changement
+            input.oninput = () =>
+            {
+                info.setAttribute(attr, input.value);
+            };
+        };
+
+        bindInput("Timestamp", "ts");
+        bindInput("Minute de jeu", "match_minute");
+        bindInput("Nombre de minutes", "minute_number");
+        bindInput("Cause", "detail");
+
+        const bindSelect = (name, attr, optionAttr) =>
+        {
+            const select = eventSelected.querySelector(`select[name='${name}']`);
+            if (!select)
+                return ;
+
+            const value = info.getAttribute(attr);
+
+            // Définir valeur par défaut si elle existe
+            if (value !== null)
+            {
+                const option = select.querySelector(`option[${optionAttr}='${value}']`);
+                if (option)
+                    select.value = option.value;
+            }
+
+            // Update du span au changement
+            select.onchange = () =>
+            {
+                const selectedOption = select.options[select.selectedIndex];
+                if (selectedOption)
+                {
+                    info.setAttribute(attr, selectedOption.getAttribute(optionAttr));
+                }
+            };
+        };
+
+        bindSelect("Équipe", "team", "teamId");
+        bindSelect("Joueur", "player", "playerId");
+        bindSelect("Joueur fautif", "offending_player", "playerId");
+        bindSelect("Joueur victime", "victim_player", "playerId");
+        bindSelect("Joueur sortant", "out_player", "playerId");
+        bindSelect("Joueur entrant", "in_player", "playerId");
     });
 
     return div;
