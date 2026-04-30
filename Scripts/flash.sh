@@ -89,12 +89,7 @@ function mesh()
         sleep 2
     done
 
-    # Attend l'ouverture du port
-    while [ ! -e "${port}" ]
-    do
-        sleep 1
-    done
-    sleep 2
+    sleep 0.5
 
     return
 }
@@ -114,47 +109,65 @@ function flashConfiguration()
 
     debug "Configuration Bluetooth."
     mesh --set bluetooth.enabled false # Bluetooth
+    mesh --reboot
+    sleep 10
     debug "Configuration WiFi."
     mesh --set network.wifi_enabled false # WiFi
+    mesh --reboot
+    sleep 10
     debug "Configuration des tests."
     mesh --set range_test.enabled false # Test de porté
     #mesh --set range_test.save true # Sauvegarde des tests de porté
     #mesh --set range_test.sender 60 # Interval de test en seconde
+    mesh --reboot
+    sleep 10
     debug "Configuration GPS."
     mesh --set position.gps_enabled false # GPS
     mesh --set position.gps_mode DISABLED # Mode du GPS
+    mesh --reboot
+    sleep 10
     debug "Configuration série"
-    mesh --set serial.enabled true # Communication série
-    mesh --set serial.baud BAUD_115200 # Baudrate
     mesh --set serial.rxd 44 # Pin RX
     mesh --set serial.txd 43 # Pin TX
-    mesh --set serial.echo false # Renvoi des packets reçu
+    mesh --set serial.baud BAUD_115200 # Baudrate
     mesh --set serial.mode TEXTMSG # Transmission de text par UART
+    mesh --set serial.echo false # Renvoi des packets reçu
+    mesh --set serial.enabled true # Communication série
+    mesh --reboot
+    sleep 10
     debug "Configuration LoRa."
     mesh --set lora.region EU_868 # Bande de fréquence
-    mesh --set lora.modem_preset LONG_FAST # Porté et débit
     mesh --set lora.use_preset true # Utilisation du preset
+    mesh --set lora.modem_preset LONG_FAST # Porté et débit
     mesh --set lora.tx_power 14 # Puissance de transmission en dBm
     mesh --set lora.hop_limit 3 # Limite du nombre de retransmission d'un message par les autres noeuds
     mesh --set lora.override_duty_cycle false # Dépassement du duty cycle
+    mesh --reboot
+    sleep 10
     debug "Configuration des channels."
+    mesh --ch-index 0 --ch-set psk "base64:5BqoFn2cuaQFHcqnRSKANEvnt2naVyf5G51tfFkXIYA="
     mesh --ch-index 0 --ch-set name "monitoring"
-    mesh --ch-index 0 --ch-set psk default
+    mesh --reboot
+    sleep 10
     debug "Configuration du device"
     if [ "${nodeType}" = "gateway" ]
     then
+        mesh --set device.role CLIENT_MUTE # Rôle du noeud
         mesh --ch-index 0 --ch-set uplink_enabled false
         mesh --ch-index 0 --ch-set downlink_enabled true
-        mesh --set device.role CLIENT_MUTE # Rôle du noeud
     fi
     if [ "${nodeType}" = "sensor" ]
     then
+        mesh --set device.role CLIENT # Rôle du noeud
         mesh --ch-index 0 --ch-set uplink_enabled true
         mesh --ch-index 0 --ch-set downlink_enabled false
-        mesh --set device.role CLIENT # Rôle du noeud
     fi
+    mesh --reboot
+    sleep 10
     debug "Configuration de l'économie d'énergie."
     mesh --set power.is_power_saving true # Économie d'énergie
+    mesh --reboot
+    sleep 10
 
     return
 }
@@ -337,6 +350,7 @@ function main()
                     # Flash le firmware Meshtastic
                     firmware)
                         info "Flash du firmware"
+                        "${path}"/.venv/meshtastic-env/bin/esptool --chip "${chip}" --port "${port}" --baud 921600 erase-flash
                         "${path}"/.venv/meshtastic-env/bin/esptool --chip "${chip}" --port "${port}" --baud 921600 write-flash -z 0x0 "${path}/.Flash/firmware-seeed-xiao-s3-2.7.15.567b8ea.bin"
                         ;;
 

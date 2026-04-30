@@ -1,32 +1,27 @@
 [
     {
-        "index": "0",
+        "code": 0,
         "name": "default",
-        "psk": "5BqoFn2cuaQFHcqnRSKANEvnt2naVyf5G51tfFkXIYA=",
         "topic": "monitoring/default/"
     },
     {
-        "index": "1",
+        "code": 1,
         "name": "system",
-        "psk": "8/WNdPmFdGUiFHYWH6tsKYgvXdjIaeFRjmp/0zY6oGM=",
         "topic": "monitoring/system/"
     },
     {
-        "index": "2",
+        "code": 2,
         "name": "heart_rate",
-        "psk": "ijON+NAUc6Y+9DjxUbowGLsQwZOikMz5Fm7Iv5lq1F8=",
         "topic": "monitoring/heart_rate/"
     },
     {
-        "index": "3",
+        "code": 3,
         "name": "accelerometer_gyroscope",
-        "psk": "sWM+mMiBgwjA9vOx+nMYSbyDUZ0NoaiQ2NI+9v6ijaY=",
         "topic": "monitoring/accelerometer_gyroscope/"
     },
     {
-        "index": "4",
+        "code": 4,
         "name": "acoustic",
-        "psk": "icLzMT6KEDDBNiy2DMida2t0CdWXcchX8JenCQHoiZ8=",
         "topic": "monitoring/acoustic/"
     }
 ]

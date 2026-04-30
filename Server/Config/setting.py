@@ -99,12 +99,12 @@ class Config:
 #  InfluxDB
 # =============================================================================
 
-    INFLUXDB_HOST    = os.getenv("INFLUXDB_HOST", None)   ##< @brief Hôte du serveur InfluxDB (pour les messages d'erreur).
-    INFLUXDB_PORT    = int(os.getenv("INFLUXDB_PORT", 0)) ##< @brief Port du serveur InfluxDB (pour les messages d'erreur).
-    INFLUXDB_ADRESS  = os.getenv("INFLUXDB_ADRESS", None) ##< @brief URL complète du serveur InfluxDB (ex : http://localhost:8086).
-    INFLUXDB_TOKEN   = os.getenv("INFLUXDB_TOKEN", None)  ##< @brief Token d'authentification InfluxDB.
-    INFLUXDB_ORG     = os.getenv("INFLUXDB_ORG", None)    ##< @brief Organisation InfluxDB cible.
-    INFLUXDB_BUCKET  = os.getenv("INFLUXDB_BUCKET", None) ##< @brief Bucket InfluxDB cible pour l'écriture.
+    INFLUXDB_HOST     = os.getenv("INFLUXDB_HOST", None)    ##< @brief Hôte du serveur InfluxDB (pour les messages d'erreur).
+    INFLUXDB_PORT     = int(os.getenv("INFLUXDB_PORT", 0))  ##< @brief Port du serveur InfluxDB (pour les messages d'erreur).
+    INFLUXDB_ADDRESS  = os.getenv("INFLUXDB_ADDRESS", None) ##< @brief URL complète du serveur InfluxDB (ex : http://localhost:8086).
+    INFLUXDB_TOKEN    = os.getenv("INFLUXDB_TOKEN", None)   ##< @brief Token d'authentification InfluxDB.
+    INFLUXDB_ORG      = os.getenv("INFLUXDB_ORG", None)     ##< @brief Organisation InfluxDB cible.
+    INFLUXDB_BUCKET   = os.getenv("INFLUXDB_BUCKET", None)  ##< @brief Bucket InfluxDB cible pour l'écriture.
 
 # =============================================================================
 #  Meshtastic
@@ -172,12 +172,12 @@ class Config:
             "MQTT_BROKER_QOS":          cls.MQTT_BROKER_QOS,
 
             # InfluxDB
-            "INFLUXDB_HOST":   cls.INFLUXDB_HOST,
-            "INFLUXDB_PORT":   cls.INFLUXDB_PORT,
-            "INFLUXDB_ADRESS": cls.INFLUXDB_ADRESS,
-            "INFLUXDB_TOKEN":  cls.INFLUXDB_TOKEN,
-            "INFLUXDB_ORG":    cls.INFLUXDB_ORG,
-            "INFLUXDB_BUCKET": cls.INFLUXDB_BUCKET,
+            "INFLUXDB_HOST":    cls.INFLUXDB_HOST,
+            "INFLUXDB_PORT":    cls.INFLUXDB_PORT,
+            "INFLUXDB_ADDRESS": cls.INFLUXDB_ADDRESS,
+            "INFLUXDB_TOKEN":   cls.INFLUXDB_TOKEN,
+            "INFLUXDB_ORG":     cls.INFLUXDB_ORG,
+            "INFLUXDB_BUCKET":  cls.INFLUXDB_BUCKET,
 
             # Meshtastic
             "MESHTASTIC_PORT":        cls.MESHTASTIC_PORT,

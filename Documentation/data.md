@@ -10,17 +10,17 @@ Cette partie décrit l’ensemble des formats des échanges de données entre le
 
 Format d'envoi: JSON
 {
-    "t" : <string>,      # Type de capteur
-    "n" : <string>,      # Nom du capteur
-    "id": <int>,         # Identifiant du supporter
-    "hr": [<int>, ...]   # Liste de fréquences cardiaques
+    "t" : <int>,       # Type de capteur
+    "n" : <string>,    # Nom du capteur
+    "id": <int>,       # Identifiant du supporter
+    "hr": [<int>, ...] # Liste de fréquences cardiaques
 }
 
 ### MinIMU-9 v6
 
 Format d'envoi: JSON
 {
-    "t" : <string>,      # Type de capteur
+    "t" : <int>,         # Type de capteur
     "n" : <string>,      # Nom du capteur
     "id": <int>,         # Identifiant de la tribune du stade
     "a" : [<float>, ...] # Liste de valeur de la norme de vecteur accélération
@@ -30,7 +30,7 @@ Format d'envoi: JSON
 
 Format d'envoi: JSON
 {
-    "t" : <string>,      # Type de capteur
+    "t" : <int>,         # Type de capteur
     "n" : <string>,      # Nom du capteur
     "id": <int>,         # Identifiant de la tribune du stade
     "a" : [<float>, ...] # Liste de valeurs de décibel

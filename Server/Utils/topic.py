@@ -28,14 +28,14 @@ logger = Logger("Serveur/Topic")
 ##
 # @brief Retourne le topic MQTT correspondant à un type de données et à un identifiant de supporter.
 #
-# @param channelIndex Index du channel de communication.
-# @param supporterId  Identifiant numérique du supporter.
+# @param dataType    Type de données.
+# @param supporterId Identifiant numérique du supporter.
 #
 # @return str Topic MQTT résolu.
 #
 # @throws RuntimeError Si le fichier est absent, invalide ou si le type est inconnu.
 ##
-def getMQTTTopic(channelIndex, supporterId):
+def getMQTTTopic(dataType, supporterId):
     filePath = Config.PATH["data"] + "topicMQTT.json"
 
     try:
@@ -55,14 +55,14 @@ def getMQTTTopic(channelIndex, supporterId):
         raise RuntimeError(message) from e
 
     for item in topicList:
-        if item["index"] == channelIndex:
+        if item["code"] == dataType:
             topic = item["topic"] + str(supporterId)
 
-            logger.info(f"[Topic] Topic MQTT résolu : '{topic}' (channel='{channelIndex}', id={supporterId})")
+            logger.info(f"[Topic] Topic MQTT résolu : '{topic}' (type='{dataType}', id={supporterId})")
 
             return topic
 
-    message = f"[Topic] Aucun topic MQTT défini pour le channel '{channelIndex}'"
+    message = f"[Topic] Aucun topic MQTT défini pour le type de données '{dataType}'"
     logger.error(message)
     raise RuntimeError(message)
 

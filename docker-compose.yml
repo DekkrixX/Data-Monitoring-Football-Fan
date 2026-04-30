@@ -13,6 +13,12 @@ services:
             DOCKER_INFLUXDB_INIT_ORG: ${INFLUXDB_ORG}
             DOCKER_INFLUXDB_INIT_BUCKET: ${INFLUXDB_BUCKET}
             DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: ${INFLUXDB_TOKEN}
+        healthcheck:
+            test: ["CMD", "curl", "-f", "${INFLUXDB_ADDRESS}/health"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+            start_period: 10s
 
     grafana:
         image: grafana/grafana:12.4.2
@@ -78,7 +84,7 @@ services:
             mqtt:
                 condition: service_started
             influxdb:
-                condition: service_started
+                condition: service_healthy
         command: python -m Server.Bridge.bridge_MQTT_InfluxDB
 
     server:
@@ -90,7 +96,7 @@ services:
             mqtt:
                 condition: service_started
             influxdb:
-                condition: service_started
+                condition: service_healthy
             postgresql:
                 condition: service_healthy
             bridge-mqtt-influxdb:

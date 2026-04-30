@@ -54,7 +54,7 @@ def main():
         print(f"   KeepAlive : {Config.MQTT_BROKER_KEEPALIVE}")
         print(f"   QoS       : {Config.MQTT_BROKER_QOS}")
         print("\nInfluxDB:")
-        print(f"   Adresse : {Config.INFLUXDB_ADRESS}")
+        print(f"   Adresse : {Config.INFLUXDB_ADDRESS}")
         print(f"   Token   : {Config.INFLUXDB_TOKEN}")
         print(f"   Org     : {Config.INFLUXDB_ORG}")
         print(f"   Bucket  : {Config.INFLUXDB_BUCKET}")
@@ -62,7 +62,7 @@ def main():
 
     mqttClient = MQTTClientWrapper("bridge_MQTT_InfluxDB", Config.MQTT_BROKER_HOST, Config.MQTT_BROKER_PORT, Config.MQTT_BROKER_KEEPALIVE, qos=Config.MQTT_BROKER_QOS, onMessageCallback=_onMessage, onConnectCallback=_onConnect)
 
-    influxdbClient = InfluxDBClientWrapper(Config.INFLUXDB_HOST, Config.INFLUXDB_PORT, Config.INFLUXDB_ADRESS, Config.INFLUXDB_TOKEN, Config.INFLUXDB_ORG, Config.INFLUXDB_BUCKET)
+    influxdbClient = InfluxDBClientWrapper(Config.INFLUXDB_HOST, Config.INFLUXDB_PORT, Config.INFLUXDB_ADDRESS, Config.INFLUXDB_TOKEN, Config.INFLUXDB_ORG, Config.INFLUXDB_BUCKET)
 
     try:
         mqttClient.connect()
