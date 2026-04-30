@@ -147,7 +147,7 @@ def loadMatchInformation(postgresqlClient):
         lastInformation = True if not event or event[0]["code"] != 12 else False
     if not matchId or not lastInformation:
         # Création d'un nouveaux match
-        matchId = postgresqlClient.execute("INSERT INTO match (ts) VALUES (%s) RETURNING id", (datetime.now().isoformat(),), returning=True)["id"]
+        matchId = postgresqlClient.execute("INSERT INTO match (ts) VALUES (%s) RETURNING id", (datetime.now().strftime("%Y/%m/%d %H:%M:%S"),), returning=True)["id"]
         domicileId = postgresqlClient.execute("INSERT INTO team (name) VALUES (NULL) RETURNING id", returning=True)["id"]
         exterieurId = postgresqlClient.execute("INSERT INTO team (name) VALUES (NULL) RETURNING id", returning=True)["id"]
         domicilePlayerId = []

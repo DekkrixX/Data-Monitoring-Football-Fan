@@ -73,7 +73,6 @@ document.addEventListener("DOMContentLoaded", () =>
 
     inputs.forEach(input =>
     {
-        input.addEventListener("input", autoSend);
         input.addEventListener("change", autoSend);
     });
 });
@@ -230,6 +229,24 @@ function getEventInformation()
 
 
 
+socket.on("modifyEventResponse", (data) =>
+{
+	if (window.DEBUG)
+		console.log(`[Event] Récupération des modification de l'évènement : ${data.id}`);
+
+	const currentEvent = document.getElementById("event-selected");
+	const h3 = currentEvent.querySelector("h3");
+	const event = document.querySelector(`#event-list span[id='${data.id}']`).nextElementSibling;
+	currentEvent.querySelector("input[name='Timestamp']").value = data.ts;
+	currentEvent.querySelector("input[name='Minute de jeu']").value = data.match_minute;
+	event.setAttribute("ts", data.ts);
+	event.setAttribute("match_minute", data.match_minute);
+	event.textContent = `${event.getAttribute("match_minute")}' ${event.name}`;
+	h3.textContent = event.textContent;
+});
+
+
+
 /**
  * @brief Envoi automatique des données.
  */
@@ -247,7 +264,7 @@ function autoSend()
         	socket.emit("modifyEvent", info.id, data);
 
         	if (window.DEBUG)
-            	console.log("Infomation d'évènement envoyé :", data);
+            	console.log("[Event] Infomation d'évènement envoyé :", data);
         }
     }, 500);
 

@@ -344,7 +344,7 @@ export function createEvent(name, code, matchId, socket)
                 input.value = value;
 
             // Update du span au changement
-            input.oninput = () =>
+            input.onchange = () =>
             {
                 info.setAttribute(attr, input.value);
                 if (info.getAttribute("match_minute") != "null")

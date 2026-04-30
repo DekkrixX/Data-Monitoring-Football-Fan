@@ -237,7 +237,7 @@ main > div:last-child
 }
 #event-selected input[name="Timestamp"]
 {
-	width: 10vw;
+	width: 12vw;
 }
 #event-selected input[name="Cause"]
 {

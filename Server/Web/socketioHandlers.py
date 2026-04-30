@@ -12,7 +12,7 @@
 
 import json
 from flask_socketio import emit
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from Server.Config.setting import Config
 from Server.Utils.data import createSupporterHeartRateForClient, getNameOfSupporter, getColorOfSupporter, createStadiumBleacherAccelerometerForClient, createStadiumBleacherAcousticForClient, getNameOfStadiumBleacher, getColorOfStadiumBleacher
@@ -291,8 +291,7 @@ def registerSocketioHandlers(socketio, supporterList, stadiumBleacherList, postg
         events = postgresqlClient.fetch("SELECT * FROM event WHERE match = %s", (matchId,))
 
         for event in events:
-            if event["ts"]:
-                event["ts"] = event["ts"].isoformat()
+            event["ts"] = event["ts"].strftime("%Y/%m/%d %H:%M:%S");
 
         socketio.emit("getEventAllResponse", events);
         
@@ -305,30 +304,31 @@ def registerSocketioHandlers(socketio, supporterList, stadiumBleacherList, postg
     def handleNewEvent(code, matchId):
         logger.info(f"[SocketIO] Réception de 'newEvent': code:{code}, matchId:{matchId}")
 
-        ts = datetime.now()
+        ts = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
 
         # Calcul de la minute de jeu
-        events = postgresqlClient.fetch("SELECT code, ts FROM event WHERE match = %s ORDER BY ts DESC", (matchId,))
         reference = None
-        for event in events:
-            delta = ts - event["ts"]
-            minute =  delta.total_seconds() // 60
-            if event["code"] == 7:
-                reference = 106 + minute
-                break
-            elif event["code"] == 5:
-                reference = 91 + minute
-                break
-            elif event["code"] == 3:
-                reference = 46 + minute
-                break
-            elif event["code"] == 1:
-                reference = 1 + minute
-                break
+        if code not in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 32, 33, 34, 35, 36, 37, 38]:
+            events = postgresqlClient.fetch("SELECT code, ts FROM event WHERE match = %s ORDER BY ts DESC", (matchId,))
+            for event in events:
+                delta = datetime.strptime(ts, "%Y/%m/%d %H:%M:%S") - event["ts"]
+                minute =  delta.total_seconds() // 60
+                if event["code"] == 7:
+                    reference = 106 + minute
+                    break
+                elif event["code"] == 5:
+                    reference = 91 + minute
+                    break
+                elif event["code"] == 3:
+                    reference = 46 + minute
+                    break
+                elif event["code"] == 1:
+                    reference = 1 + minute
+                    break
 
         idf = postgresqlClient.execute("INSERT INTO event (code, ts, match_minute, match) VALUES (%s, %s, %s, %s) RETURNING id", (code, ts, reference, matchId), returning=True)["id"]
 
-        socketio.emit("newEventResponse", {"id": idf, "ts": ts.isoformat(), "match_minute": reference})
+        socketio.emit("newEventResponse", {"id": idf, "ts": ts, "match_minute": reference})
 
         return
 
@@ -367,7 +367,52 @@ def registerSocketioHandlers(socketio, supporterList, stadiumBleacherList, postg
         logger.info(f"[SocketIO] Réception de 'modifyEvent': id:{idf} données:{data}")
         data = json.loads(data)
 
+        # Vérifie la cohérence entre le timestamp et la minute de jeu
+        lastData = postgresqlClient.fetch("SELECT ts, match_minute FROM event WHERE id = %s", (idf,))
+        logger.warning(f"{lastData}")
+        events = postgresqlClient.fetch("SELECT code, ts FROM event WHERE match = %s ORDER BY ts DESC", (toInt(data["match"]),))
+
+        if lastData[0]["match_minute"] != toInt(data["match_minute"]) and toInt(data["match_minute"]):
+            for event in events:
+                if event["code"] == 7:
+                    data["ts"] = (event["ts"] + timedelta(minutes=toInt(data["match_minute"]) - 106)).strftime("%Y/%m/%d %H:%M:%S")
+                    break
+                elif event["code"] == 5:
+                    data["ts"] = (event["ts"] + timedelta(minutes=toInt(data["match_minute"]) - 91)).strftime("%Y/%m/%d %H:%M:%S")
+                    break
+                elif event["code"] == 3:
+                    data["ts"] = (event["ts"] + timedelta(minutes=toInt(data["match_minute"]) - 46)).strftime("%Y/%m/%d %H:%M:%S")
+                    break
+                elif event["code"] == 1:
+                    data["ts"] = (event["ts"] + timedelta(minutes=toInt(data["match_minute"]) - 1)).strftime("%Y/%m/%d %H:%M:%S")
+                    break
+
+        elif lastData[0]["ts"].strftime("%Y/%m/%d %H:%M:%S") != data["ts"]:
+            for event in events:
+                delta = datetime.strptime(data["ts"], "%Y/%m/%d %H:%M:%S") - event["ts"]
+                minute =  delta.total_seconds() // 60
+                if event["code"] == 7:
+                    data["match_minute"] = 106 + minute
+                    break
+                elif event["code"] == 5:
+                    data["match_minute"] = 91 + minute
+                    break
+                elif event["code"] == 3:
+                    data["match_minute"] = 46 + minute
+                    break
+                elif event["code"] == 1:
+                    data["match_minute"] = 1 + minute
+                    break
+
+        logger.warning(f"{data['ts']}")
+        logger.warning(f"{data['match_minute']}")
+
         postgresqlClient.execute("UPDATE event SET ts = %s, minute_number = %s, match_minute = %s, team = %s, player = %s, offending_player = %s, victim_player = %s, out_player = %s, in_player = %s, detail = %s, match = %s WHERE id = %s",(data["ts"], toInt(data["minute_number"]), toInt(data["match_minute"]), toInt(data["team"]), toInt(data["player"]), toInt(data["offending_player"]), toInt(data["victim_player"]), toInt(data["out_player"]), toInt(data["in_player"]), data["detail"], toInt(data["match"]), idf))
+
+        a = postgresqlClient.fetch("SELECT * FROM event WHERE id = %s", (idf,))
+        logger.warning(f"{a}")
+
+        socketio.emit("modifyEventResponse", {"id": idf, "ts": data["ts"], "match_minute": data["match_minute"]})
 
         return
 
