@@ -184,6 +184,8 @@ socket.on("newEventResponse", (data) =>
 		const event = document.querySelector(`#event-list span[id='${data.id}']`).nextElementSibling;
 		event.textContent = `${info.getAttribute("match_minute")}' ${event.name}`;
 	}
+
+	sortEventList();
 });
 
 window.newEvent = newEvent;
@@ -236,13 +238,17 @@ socket.on("modifyEventResponse", (data) =>
 
 	const currentEvent = document.getElementById("event-selected");
 	const h3 = currentEvent.querySelector("h3");
-	const event = document.querySelector(`#event-list span[id='${data.id}']`).nextElementSibling;
+	const event = document.querySelector(`#event-list span[id='${data.id}']`);
+	event.setAttribute("ts", data.ts);
+	event.setAttribute("match_minute", data.match_minute);
 	currentEvent.querySelector("input[name='Timestamp']").value = data.ts;
 	currentEvent.querySelector("input[name='Minute de jeu']").value = data.match_minute;
 	event.setAttribute("ts", data.ts);
 	event.setAttribute("match_minute", data.match_minute);
-	event.textContent = `${event.getAttribute("match_minute")}' ${event.name}`;
+	event.textContent = `${event.getAttribute("match_minute")}' ${event.nextElementSibling.name}`;
 	h3.textContent = event.textContent;
+
+	sortEventList();
 });
 
 
@@ -269,4 +275,35 @@ function autoSend()
     }, 500);
 
     return ;
+}
+
+
+
+/**
+ * @brief Trie les évènements de la liste par ordre croissant de timestamp.
+ */
+function sortEventList()
+{
+    const eventList = document.getElementById("event-list");
+    const events = Array.from(eventList.children);
+
+    const parseTs = (ts) =>
+    {
+        if (!ts) return 0;
+        // "2026/04/30 09:22:56" → "2026-04-30T09:22:56"
+        return new Date(ts.replace(/\//g, "-").replace(" ", "T")).getTime();
+    };
+
+    console.log("[Sort] Avant tri :", events.map(e => e.querySelector("span")?.getAttribute("ts")));
+
+    events.sort((a, b) =>
+    {
+        const tsA = parseTs(a.querySelector("span")?.getAttribute("ts"));
+        const tsB = parseTs(b.querySelector("span")?.getAttribute("ts"));
+        return tsA - tsB;
+    });
+
+    console.log("[Sort] Après tri :", events.map(e => e.querySelector("span")?.getAttribute("ts")));
+
+    events.forEach(event => eventList.appendChild(event));
 }

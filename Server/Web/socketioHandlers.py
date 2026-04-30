@@ -288,7 +288,7 @@ def registerSocketioHandlers(socketio, supporterList, stadiumBleacherList, postg
     def handleGetEventAll(matchId):
         logger.info("[SocketIO] Réception de 'getEventAll'")
 
-        events = postgresqlClient.fetch("SELECT * FROM event WHERE match = %s", (matchId,))
+        events = postgresqlClient.fetch("SELECT * FROM event WHERE match = %s ORDER BY ts", (matchId,))
 
         for event in events:
             event["ts"] = event["ts"].strftime("%Y/%m/%d %H:%M:%S");
