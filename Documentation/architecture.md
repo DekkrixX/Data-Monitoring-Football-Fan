@@ -70,6 +70,6 @@ Le projet de monitoring pour supporters de football a pour objectif de collecter
 |:-----------------------------------------------------------------:|
 | Schéma de montage du capteur MinIMU-9 v6                          |
 
-| ![Schéma INMP441](../Ressources/Images/schema_INMP441.png) |
-|:----------------------------------------------------------:|
-| Schéma de montage du capteur INMP441                       |
+| ![Schéma INMP441](../Resources/Images/schema_INMP441.png) |
+|:---------------------------------------------------------:|
+| Schéma de montage du capteur INMP441                      |
