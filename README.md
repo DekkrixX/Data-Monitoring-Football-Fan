@@ -31,3 +31,4 @@ Le projet de monitoring pour supporters de football est la réalisation d'une co
 - Collect d'information système
 - Affichage des statistiques des données des utilisateurs
 - Affichage des statistiques des données des tribunes du stade
+- Gestion des évènements du match en direct

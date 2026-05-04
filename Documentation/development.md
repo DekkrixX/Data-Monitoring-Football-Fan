@@ -29,7 +29,7 @@ Pour flash une carte utiliser la commande `bash Scripts/flash.sh` à la racine d
 
 ## Tests
 
-TODO
+- Test de simulation de données
 
 ## Collaboration sur le projet
 

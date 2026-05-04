@@ -50,8 +50,18 @@ Projet de Monitoring pour Supporters de Football
 │   │   ├── schema_MinIMU-9_v6.png
 │   │   └── architecture.png
 │   │
+│   ├── Images
+│   │   └── postgreSQL.sql
+│   │
 │   └── Data
+│       ├── Event-Configuration
+│       │   ├── Amical.json
+│       │   ├── Championat.json
+│       │   ├── Coupe de France.json
+│       │   └── Default.json
+│       │
 │       ├── capteur.json
+│       ├── event.json
 │       ├── supporter.json
 │       ├── stadiumBleacher.json
 │       └── topicMQTT.json
@@ -138,6 +148,7 @@ Projet de Monitoring pour Supporters de Football
 │   │   ├── influxdb.py
 │   │   ├── meshtastic.py
 │   │   ├── mqtt.py
+│   │   ├── postgresql.py
 │   │   └── exception.py
 │   │
 │   ├── Bridge
@@ -146,31 +157,56 @@ Projet de Monitoring pour Supporters de Football
 │   │
 │   ├── Dashboard
 │   │   ├── templates               // Fichiers HTML pour le serveur web
-│   │   │   ├── index.html
-│   │   │   ├── supporter.html
-│   │   │   ├── stadiumBleacher
-│   │   │   ├── comparaison.html
-│   │   │   └── error.html
+│   │   │   ├── Control
+│   │   │   │   ├── configuration.html
+│   │   │   │   ├── error.html
+│   │   │   │   ├── event.html
+│   │   │   │   └── preparation.html
+│   │   │   │
+│   │   │   └── Dashboard
+│   │   │       ├── index.html
+│   │   │       ├── supporter.html
+│   │   │       ├── stadiumBleacher.html
+│   │   │       └── comparison.html
 │   │   │
 │   │   ├── static                  // Fichiers utilisé par le serveur web
 │   │   │   ├── css
-│   │   │   │   ├── base.css
-│   │   │   │   ├── index.css
-│   │   │   │   ├── supporter.css
-│   │   │   │   ├── stadiumBleacher.css
-│   │   │   │   ├── comparaison.css
-│   │   │   │   └── error.css
+│   │   │   │   ├── Control
+│   │   │   │   │   ├── configuration.css
+│   │   │   │   │   ├── error.css
+│   │   │   │   │   ├── event.css
+│   │   │   │   │   └── preparation.css
+│   │   │   │   │
+│   │   │   │   ├── Dashboard
+│   │   │   │   │   ├── comparison.css
+│   │   │   │   │   ├── index.css
+│   │   │   │   │   ├── stadiumBleacher.css
+│   │   │   │   │   └── supporter.css
+│   │   │   │   │
+│   │   │   │   └── base.css
 │   │   │   │
 │   │   │   ├── js
-│   │   │   │   ├── index.js
-│   │   │   │   ├── supporter.js
-│   │   │   │   ├── stadiumBleacher.js
-│   │   │   │   ├── comparaison.js
+│   │   │   │   ├── Control
+│   │   │   │   │   ├── configuration.js
+│   │   │   │   │   ├── event.js
+│   │   │   │   │   └── preparation.js
+│   │   │   │   │
+│   │   │   │   ├── Dashboard
+│   │   │   │   │   ├── comparison.js
+│   │   │   │   │   ├── index.js
+│   │   │   │   │   ├── stadiumBleacher.js
+│   │   │   │   │   └── supporter.js
+│   │   │   │   │
 │   │   │   │   └── Utils
 │   │   │   │       ├── time.js
-│   │   │   │       ├── color.js
 │   │   │   │       ├── stringConversion.js
-│   │   │   │       └── board.js
+│   │   │   │       └── element.js
+│   │   │   │
+│   │   │   ├── icon
+│   │   │   │   ├── delete-dark.png
+│   │   │   │   ├── delete-light.png
+│   │   │   │   ├── modify-dark.png
+│   │   │   │   └── modify-light.png
 │   │   │   │
 │   │   │   └── lib                 // Fichiers de bibliothèque externe
 │   │   │       ├── chart.umd.min.js
@@ -185,13 +221,23 @@ Projet de Monitoring pour Supporters de Football
 │   │   ├── display.py
 │   │   ├── logger.py
 │   │   ├── topic.py
+│   │   ├── time.py
+│   │   ├── event.py
 │   │   └── state.py
 │   │
+│   ├── Dockerfile              // Fichier de configuration de Docker
 │   └── Doxyfile                // Fichier de configuration de Doxygen
 │
 ├── Tests
-│   ├── Software
-│   ├── Hardware
+│   ├── DataSimulationServer
+│   │   ├── Simulation
+│   │   │   ├── heartRateSimulator.py
+│   │   │   ├── acousticSimulator.py
+│   │   │   └── accelerometerGyroscopeSimulator.py 
+│   │   │
+│   │   ├── run.py
+│   │   └── Dockerfile
+│   │
 │   └── Distance
 │       ├── Flash
 │       │   ├── device.sh
@@ -213,16 +259,19 @@ Projet de Monitoring pour Supporters de Football
 │       │
 │       └── log.py
 │
+├── Scripts
+│   ├── envcrypt.sh             // Script de chiffrement de fichier
+│   ├── logviewer.sh            // Script de visualisation de log
+│   ├── readSerialLog.sh        // Script de récupération des logs des cartes ESP32
+│   ├── flash.sh                // Script de flash des cartes ESP32
+│   └── out.sh
+│
 ├── .Flash                      // Fichier de configuration des cartes
-│   ├── device.sh
-│   ├── meshtastic.sh
 │   └── firmware-seeed-xiao-s3-2.7.15.567b8ea.bin
 │
 ├── .env                        // Fichier de variables d'environnement
 ├── .env.encrypted              // Fichier de variables d'environnement chiffré
-├── envcrypt.sh                 // Script de chiffrement de fichier
-├── logviewer.sh                // Script de visualisation de log
-├── readSerialLog.sh            // Script de récupération des logs des cartes ESP32
+├── docker-compose.yml          // Fichier de configuration de docker
 ├── Makefile                    // Fichier de build automatique
 ├── user_manual.md              // Manuel utilisateur
 └── README.md                   // Fichier principal d'information

@@ -69,9 +69,10 @@ Description :
 
 # Serveur
 
-| Service   | Port | Protocole      | Usage                                  |
-|-----------|------|----------------|----------------------------------------|
-| Mosquitto | 1883 | MQTT           | Transfert de messages au broker        |
-| InfluxDB  | 8086 | HTTP           | API de la base de données              |
-| Grafana   | 3000 | HTTP           | Interface de visualisation des données |
-| Dashboard | 5001 | HTTP/WebSocket | Interface de visualisation des données |
+| Service    | Port | Protocole      | Usage                                  |
+|------------|------|----------------|----------------------------------------|
+| Mosquitto  | 1883 | MQTT           | Transfert de messages au broker        |
+| InfluxDB   | 8086 | HTTP           | API de la base de données              |
+| Grafana    | 3000 | HTTP           | Interface de visualisation des données |
+| Dashboard  | 5001 | HTTP/WebSocket | Interface de visualisation des données |
+| PostgreSQL | 5432 | TCP/IP         | Base de données                        |
