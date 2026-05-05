@@ -14,7 +14,7 @@ Ensuite, vous devez configurer les capteurs et flasher le code sur les cartes. T
 
 # Utilisation
 
-Une fois les installations et la configuration effectuées, lancez les serveurs avec la commande `make run`. Lorsque tous les serveurs sont en cours d’exécution, il ne vous reste plus qu’à accéder au tableau de bord: ouvrez votre navigateur et saisissez l’adresse suivante `http://localhost:5001/`.
+Une fois les installations et la configuration effectuées, lancez les serveurs avec la commande `make run`. Lorsque tous les serveurs sont en cours d’exécution, il ne vous reste plus qu’à accéder au tableau de bord: ouvrez votre navigateur et saisissez l’adresse suivante `http://localhost:5001/` pour la visualisation des données et l'adresse `http://localhost:5001/event` pour le contrôle des évènements du match.
 Pour arrêter proprement les serveurs exécutez la commande `make stop`.
 Attention le premier lancement du serveur require une connexion internet, mais pour les lancements suivants tous fonctionnent localement.
 

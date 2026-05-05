@@ -30,7 +30,7 @@
 // À MODIFIER
 #define NB_SENSOR 1 ///< @brief Nombre de capteurs total du système.
 
-#define ACQUISITION_TIME 1000///< @brief Temps de délais entre les acquisitions du capteur (en miliseconde).
+#define ACQUISITION_TIME 1000 ///< @brief Temps de délais entre les acquisitions du capteur (en miliseconde).
 
 /**
  * @defgroup Capteur Sélection du capteur actif
@@ -61,13 +61,7 @@
 //  Paramètres du Duty Cycle
 // ============================================================================
 
-#define DUTY_CYCLE_TIME_FOR_SENSOR 6000 ///< @brief Interval de temps d'envoi des données pour que un capteur respecte le duty cycle
-
-#if NB_SENSOR <= 0
-#error "Erreur de configuration: Le nombre de capteur est invalide"
-#else
-#define DUTY_CYCLE_TIME (DUTY_CYCLE_TIME_FOR_SENSOR * NB_SENSOR) ///< @brief Interval de temps d'envoi des données pour respecter le duty cycle
-#endif
+#define DUTY_CYCLE_TIME 15000 ///< @brief Interval de temps d'envoi des données pour respecter le duty cycle
 
 // ============================================================================
 //  Paramètres UART
@@ -88,9 +82,9 @@
 //  Paramètres I2S
 // ============================================================================
 
-#define WS_PIN 5  ///< @brief Broche WS de la carte ESP32.
+#define WS_PIN  5 ///< @brief Broche WS de la carte ESP32.
 #define SCK_PIN 6 ///< @brief Broche SCK de la carte ESP32.
-#define SD_PIN 7  ///< @brief Broche SD de la carte ESP32.
+#define SD_PIN  7 ///< @brief Broche SD de la carte ESP32.
 
 // ============================================================================
 //  Paramètres de logs
@@ -109,8 +103,12 @@
 //  Capacité du buffer de données
 // ============================================================================
 
-#define NB_VALUE_FOR_SENSOR (DUTY_CYCLE_TIME_FOR_SENSOR / ACQUISITION_TIME) ///< @brief Nombre de valeur du buffer pour un capteur
+#define NB_VALUE_FOR_SENSOR (DUTY_CYCLE_TIME / ACQUISITION_TIME) ///< @brief Nombre de valeur du buffer pour un capteur
+#if NB_SENSOR <= 0
+#error "Erreur de configuration: Le nombre de capteur est invalide"
+#else
 #define NB_VALUE (NB_VALUE_FOR_SENSOR * NB_SENSOR) ///< @brief Nombre de valeur du buffer en fonction du nombre total de capteur
+#endif
 
 
 
