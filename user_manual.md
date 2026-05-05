@@ -12,6 +12,8 @@ Tout d’abord il faut installer les dépendances. Assurez vous que le paquet `m
 Attention l'installation des dépendances requirent une connexion à internet.
 Ensuite, vous devez configurer les capteurs et flasher le code sur les cartes. Tapez les commandes suivantes: `make flash TARGET=device` pour flasher le code des capteurs et `make flash TARGET=meshtastic` pour configurer les noeuds Meshtastic.
 
+Pour configurer le code des cartes ESP32 correctement il faut modifier certaine macros dans le fichier setting.hpp (SUPPORTER_ID, STADIUM_BLEACHER_ID, NB_SENSOR) et définir le type de capteur auquel la carte est connecté.
+
 # Utilisation
 
 Une fois les installations et la configuration effectuées, lancez les serveurs avec la commande `make run`. Lorsque tous les serveurs sont en cours d’exécution, il ne vous reste plus qu’à accéder au tableau de bord: ouvrez votre navigateur et saisissez l’adresse suivante `http://localhost:5001/` pour la visualisation des données et l'adresse `http://localhost:5001/event` pour le contrôle des évènements du match.
