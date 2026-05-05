@@ -93,12 +93,6 @@ function usage()
     echo -e "\t\t\tDéchiffre le fichier spécifié (requiert la clé privée correspondante importée)."
     echo -e "\t\t\tProduit un fichier dont l'extension .encrypted est retirée."
     echo -e "\t\t\tExemple: ${name} --decrypt .env.encrypted"
-    echo -e "\t\t--add <fichier_cle.asc> <fichier>" 
-    echo -e "\t\t\tAjoute un utilisateur capable de déchiffrer le fichier spécifié."
-    echo -e "\t\t\tExemple: ${name} --add ${publicKeyDirectory}/User.asc .env.encrypted"
-    echo -e "\t\t--remove <fichier_cle.asc> <fichier>"
-    echo -e "\t\t\tSupprime un utilisateur capable de déchiffrer le fichier spécifié."
-    echo -e "\t\t\tExemple: ${name} --remove ${publicKeyDirectory}/User.asc .env.encrypted"
     echo ""
     echo -e "${_WHITE}AUTEUR${_RESET}"
     echo -e "\tÉcrit par DekkrixX."
@@ -209,7 +203,7 @@ function encryptFile()
 
     # Chiffrement du fichier
     debug "Chiffrement du fichier '${file}'."
-    if sops --encrypt --input-type dotenv --output-type dotenv $(echo "${keys}" | sed 's/,/ --pgp /g' | sed 's/^/--pgp /') "${file}" > "${encryptedFile}"
+    if sops --encrypt --input-type dotenv --output-type dotenv --pgp "${keys}" "${file}" > "${encryptedFile}"
     then
         info "Fichier chiffré avec succès: '${encryptedFile}'."
     else
@@ -270,73 +264,6 @@ function decryptFile()
 }
 
 
-##
-# @brief Ajoute une clé publique à associer au fichier chiffré.
-#
-# @param key  Clé publique.
-# @param file Nom du fichier chiffré.
-#
-# @pre file Doit pouvoir être ouvert en lecture.
-#
-# @since 1.0.0
-# @date 11 avril 2026
-# @author DekkrixX
-##
-function add()
-{
-    local key="${1}"
-    local file="${2}"
-
-    # Ajout d'une clé publique au fichier
-    debug "Ajout d'une clé '${key}' au fichier '${file}'."
-    if sops --add-pgp "${key}" "${file}"
-    then
-        info "Destinataire '${key}' ajouté avec succès au fichier '${file}'."
-    else
-        error "${addErrorCode}" "Impossible d'ajouter le destinataire '${key}' au fichier '${file}'. Vérifiez que le fingerprint est valide et que la clé publique est présente dans le trousseau GPG."
-    fi
-
-    # Déchiffrement et chiffrement du fichier pour prendre la nouvelle clé en compte
-    decryptedFile "${file}"
-    encryptedFile "${file}"
-
-    return
-}
-
-
-##
-# @brief Supprime une clé publique associée au fichier chiffré.
-#
-# @param key  Clé publique.
-# @param file Nom du fichier chiffré.
-#
-# @pre file Doit pouvoir être ouvert en lecture.
-#
-# @since 1.0.0
-# @date 11 avril 2026
-# @author DekkrixX
-##
-function remove()
-{
-    local key="${1}"
-    local file="${2}"
-
-    # Suppression d'une clé publique du fichier
-    debug "Suppression d'une clé '${key}' du fichier '${file}'."
-    if sops --rm-pgp "${key}" "${file}"
-    then
-        info "Destinataire '${key}' supprimé avec succès du fichier '${file}'."
-    else
-        error "${removeErrorCode}" "Impossible de supprimer le destinataire '${key}' du fichier '${file}'. Vérifiez que le fingerprint est valide et qu'il était bien destinataire du fichier."
-    fi
-
-    # Déchiffrement et chiffrement du fichier pour prendre en compte la clé supprimé
-    decryptedFile "${file}"
-    encryptedFile "${file}"
-
-    return
-}
-
 
 ##
 # @brief Lit tous les fichiers de clé .asc et afficher la clé publique de chaque fichier.
@@ -368,39 +295,6 @@ function readKeys()
     done
 
     echo -e "${keys}"
-
-    return
-}
-
-
-##
-# @brief Affichage de la clé publique d'un fichier .asc.
-#
-# @param file Nom du fichier de clé .asc.
-#
-# @pre file Doit pouvoir être ouvert en lecture.
-#
-# @since 1.0.0
-# @date 11 avril 2026
-# @author DekkrixX
-##
-function getKeyFromFile()
-{
-    local file="${1}"
-
-    debug "Extraction du fingerprint depuis le fichier '${file}'."
-
-    # Extraction du fingerprint depuis le fichier .asc sans l'importer dans le trousseau
-    local fpr=$(gpg --with-colons --import-options show-only --import "${file}" | awk -F: '/^fpr:/ {print $10; exit}')
-
-    if [ -z "${fpr}" ]
-    then
-        warning "${readKeyErrorCode}" "Impossible d'extraire le fingerprint depuis '${file}'."
-    fi
-
-    debug "Fingerprint extrait depuis '${file}' -> '${fpr}'."
-
-    echo "${fpr}"
 
     return
 }
@@ -464,6 +358,7 @@ function main()
 
             exportKey "${key}" "${file}"
             ;;
+
         --import)
             # --import requiert exactement 2 arguments: opération, fingerprint
             if [ ${#} -ne 2 ]
@@ -476,6 +371,7 @@ function main()
 
             importKey "${key}"
             ;;
+
         --encrypt)
             # --encrypt requiert exactement 2 arguments: opération, fichier
             if [ "${#}" -ne 2 ]
@@ -493,6 +389,7 @@ function main()
 
             encryptFile "${file}"
             ;;
+
         --decrypt)
             # --decrypt requiert exactement 2 arguments: opération, fichier
             if [ "${#}" -ne 2 ]
@@ -510,56 +407,7 @@ function main()
 
             decryptFile "${file}"
             ;;
-        --add)
-            # --add requiert exactement 3 arguments : opération, fichier clé, fichier chiffré
-            if [ "${#}" -ne 3 ]
-            then
-                error "${argumentErrorCode}" "L'opération --add requiert exactement 3 arguments : --add <fichier_cle.asc> <fichier.encrypted>. Reçu : ${#} argument(s)."
-            fi
 
-            local fileKey="${2}"
-            local file="${3}"
-            debug "Ajout du destinataire '$(basename "${fileKey}")' au fichier '${file}'."
-
-            if [ ! -f "${file}" ]
-            then
-                error "${fileNotFoundErrorCode}" "Le fichier '${file}' est introuvable. Vérifiez le chemin et les permissions."
-            fi
-            if [ ! -f "${fileKey}" ]
-            then
-                error "${fileNotFoundErrorCode}" "Le fichier '${fileKey}' est introuvable. Vérifiez le chemin et les permissions."
-            fi
-
-            local key
-            key=$(getKeyFromFile "${fileKey}")
-
-            add "${key}" "${file}"
-            ;;
-        --remove)
-            # --remove requiert exactement 3 arguments : opération, fichier clé, fichier chiffré
-            if [ "${#}" -ne 3 ]
-            then
-                error "${argumentErrorCode}" "L'opération --remove requiert exactement 3 arguments : --remove <fichier_cle.asc> <fichier.encrypted>. Reçu : ${#} argument(s)."
-            fi
-
-            local fileKey="${2}"
-            local file="${3}"
-            debug "Suppression du destinataire '$(basename "${fileKey}")' du fichier '${file}'."
-
-            if [ ! -f "${file}" ]
-            then
-                error "${fileNotFoundErrorCode}" "Le fichier '${file}' est introuvable. Vérifiez le chemin et les permissions."
-            fi
-            if [ ! -f "${fileKey}" ]
-            then
-                error ${fileNotFoundErrorCode} "Le fichier '${fileKey}' est introuvable. Vérifiez le chemin et les permissions."
-            fi
-
-            local key
-            key=$(getKeyFromFile "${fileKey}")
-            
-            remove "${key}" "${file}"
-            ;;
         *)
             error "${argumentErrorCode}" "Opération inconnue: '${operation}'. Opérations valides: --export, --import, --encrypt, --decrypt."
             ;;
