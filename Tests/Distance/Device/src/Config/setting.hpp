@@ -13,7 +13,6 @@
 //  Message de test
 // ============================================================================
 
-// À MODIFIER
 #define MESSAGE "Message 1" ///< @brief Message de test de la transmission.
 
 // ============================================================================
@@ -21,6 +20,12 @@
 // ============================================================================
 
 #define TOPIC_MQTT "system" ///< @brief Topic MQTT sur lequel sera publié le message.
+
+// ============================================================================
+//  Paramètres du Duty Cycle
+// ============================================================================
+
+#define DUTY_CYCLE_TIME 15000 ///< @brief Interval de temps d'envoi des données pour respecter le duty cycle
 
 // ============================================================================
 //  Paramètres UART

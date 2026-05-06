@@ -90,7 +90,7 @@ void loop()
     }
 
     // Délai entre chaque envoi
-    delay(1000); // 1s
+    delay(DUTY_CYCLE_TIME);
 
     return ;
 }

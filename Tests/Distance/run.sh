@@ -1,7 +1,7 @@
 ##
-# @file flash.sh
+# @file run.sh
 #
-# @brief Flash un binaire sur une carte ESP32.
+# @brief Lance le test de distance.
 #
 # @see out.sh
 # @see Fonction usage() ou lancer le script avec --help
@@ -11,7 +11,7 @@
 #  Import
 # =============================================================================
 
-source "$(dirname "${BASH_SOURCE[0]}")/out.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/../../Script/out.sh"
 
 # =============================================================================
 #  Code de sortie
@@ -34,8 +34,9 @@ VERBOSE=0 ##< @brief Mode verbeux (désactivé par défaut, activé par -v / --v
 #  Variable globale
 # =============================================================================
 
-path="$(dirname "${BASH_SOURCE[0]}")/.." ##< @brief Chemin du projet.
-port=""                                  ##< @brief Port série à utilisé.
+path="$(dirname "${BASH_SOURCE[0]}")/../.." ##< @brief Chemin du projet.
+port=""                                     ##< @brief Port série à utilisé.
+step="R"                                    ##< @brief Code de retour de l'étape.
 
 # =============================================================================
 #  Fonctions utilitaires
@@ -105,6 +106,7 @@ function mesh()
 function flashConfiguration()
 {
     local nodeType="${1}"
+    local preset="${2}"
 
     debug "Configuration Bluetooth."
     mesh --set bluetooth.enabled false # Bluetooth
@@ -120,7 +122,7 @@ function flashConfiguration()
     sleep 11
     debug "Configuration LoRa."
     mesh --set lora.region EU_868 # Bande de fréquence
-    mesh --set lora.modem_preset LONG_FAST # Porté et débit
+    mesh --set lora.modem_preset "${preset}" # Porté et débit
     mesh --set lora.tx_power 14 # Puissance de transmission en dBm
     mesh --set lora.hop_limit 3 # Limite du nombre de retransmission d'un message par les autres noeuds
     mesh --reboot
@@ -223,6 +225,22 @@ function selectNodeType()
     return
 }
 
+
+
+##
+# @brief Affiche la boîte de dialogue pour la sélection de type de test.
+##
+function selectTestOption()
+{
+    echo "Quelle est le type de test à configurer (LONG_FAST/MEDIUM_FAST/SHORT_FAST/SHORT_TURBO) ?" >&2
+    echo -n "> " >&2
+    read testOptionType
+
+    echo "${testOptionType}"
+
+    return
+}
+
 # =============================================================================
 #  Point d'entrée du script
 # =============================================================================
@@ -283,12 +301,9 @@ function main()
                 debug "Flash du device."
 
                 # Efface la mémoire flash
-                "${path}"/.venv/platformio-env/bin/pio run -t erase --upload-port "${port}" --project-dir Device
-                # Montage du système de fichier LittleFS
-                mkdir -p "${path}/Device/data"
-                "${path}"/.venv/platformio-env/bin/pio run -t uploadfs --upload-port "${port}" --project-dir Device
+                "${path}"/.venv/platformio-env/bin/pio run -t erase --upload-port "${port}" --project-dir Tests/DistanceDevice
                 # Flash de la carte
-                "${path}"/.venv/platformio-env/bin/pio run -t upload --upload-port "${port}" --project-dir Device
+                "${path}"/.venv/platformio-env/bin/pio run -t upload --upload-port "${port}" --project-dir Tests/Distance/Device
             else
                 error "${portNotFoundErrorCode}" "Le port série '${port}' sélectionné n'est pas ouvert."
             fi
@@ -335,46 +350,29 @@ function main()
                     configuration)
                         debug "Flash de la configuration de Meshtastic."
 
+                        local testOptionType=$(selectTestOption)
+                        case "${testOptionType}" in
+                        	LONG_FAST | MEDIUM_FAST | SHORT_FAST | SHORT_TURBO)
+                        		debug "Option de test sélectionné ${testOptionType}"
+                        		;;
+
+                        	*)
+                        		testOptionType="LONG_FAST"
+                        		;;
+                        esac
+
                         local nodeType=$(selectNodeType)
                         case "${nodeType}" in
                             # Flash de la configuration de la gateway Meshtastic
                             gateway)
                                 info "Flash de la configuration de la gateway."
-                                mesh --export-config "${path}"/Resources/Data/currentConfig.yml
-                                sleep 2
-                                echo $(sed "1,3d;40,49d;59d" "${path}"/Resources/Data/currentConfig.yml | head -n -2) > "${path}"/Resources/Data/currentConfig.yml
-                                while ! diff "${path}"/Resources/Data/currentConfig.yml "${path}"/Resources/Data/refConfigGateway.yml
-                                do
-                                    debug "La configuration n'est pas à jour."
-                                    debug "Flash de la configuration."
-                                    flashConfiguration "gateway"
-                                    sleep 2
-                                    mesh --export-config "${path}"/Resources/Data/currentConfig.yml
-                                    sleep 2
-                                    echo $(sed "1,3d;40,49d;59d" "${path}"/Resources/Data/currentConfig.yml | head -n -2) > "${path}"/Resources/Data/currentConfig.yml
-                                done
-
-                                rm "${path}"/Resources/Data/currentConfig.yml
+                                flashConfiguration "gateway" "${testOptionType}"
                                 ;;
 
                             # Flash de la configuration d'un capteur Meshtastic
                             sensor)
                                 info "Flash de la configuration d'un capteur."
-                                mesh --export-config "${path}"/Resources/Data/currentConfig.yml
-                                sleep 2
-                                echo $(sed "1,3d;40,49d;59d" "${path}"/Resources/Data/currentConfig.yml | head -n -2) > "${path}"/Resources/Data/currentConfig.yml
-                                while ! diff "${path}"/Resources/Data/currentConfig.yml "${path}"/Resources/Data/refConfigSensor.yml
-                                do
-                                    debug "La configuration n'est pas à jour."
-                                    debug "Flash de la configuration."
-                                    flashConfiguration "sensor"
-                                    sleep 2
-                                    mesh --export-config "${path}"/Resources/Data/currentConfig.yml
-                                    sleep 2
-                                    echo $(sed "1,3d;40,49d;59d" "${path}"/Resources/Data/currentConfig.yml | head -n -2) > "${path}"/Resources/Data/currentConfig.yml
-                                done
-
-                                rm "${path}"/Resources/Data/currentConfig.yml
+                                flashConfiguration "sensor" "${testOptionType}"
                                 ;;
 
                             *)
