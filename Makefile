@@ -67,7 +67,7 @@ log:
 #  Lancement des conteneurs Docker de test
 # =============================================================================
 test:
-	@echo "${_YELLOW}Lancement des conteneurs Docker de test${_RESET}"
+	@echo "$(_YELLOW)Lancement des conteneurs Docker de test$(_RESET)"
 	@docker compose --profile test up -d
 
 # =============================================================================
