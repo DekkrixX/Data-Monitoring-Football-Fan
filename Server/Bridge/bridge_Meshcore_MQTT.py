@@ -1,9 +1,9 @@
 ##
-# @file bridge_Meshtastic_MQTT.py
+# @file bridge_Meshcore_MQTT.py
 #
-# @brief Point d'entrée du bridge Meshtastic vers MQTT.
+# @brief Point d'entrée du bridge Meshcore vers MQTT.
 #
-# Reçoit les paquets du noeud Meshtastic, décode leur payload JSON et publie les données sur le topic MQTT approprié selon le type de données.
+# Reçoit les paquets du noeud Meshcore, décode leur payload et publie les données sur le topic MQTT approprié selon le type de données.
 ##
 
 # =============================================================================
@@ -13,7 +13,7 @@
 import json
 
 from Server.Config.setting import Config
-from Server.Core.meshtastic import MeshtasticClientWrapper
+from Server.Core.meshcore import MeshcoreClientWrapper
 from Server.Core.mqtt import MQTTClientWrapper
 from Server.Utils.display import printBanner
 from Server.Utils.topic import getMQTTTopic
@@ -23,7 +23,7 @@ from Server.Utils.logger import Logger
 #  Création du logger
 # =============================================================================
 
-logger = Logger("Serveur/Bridge_Meshtastic-MQTT")
+logger = Logger("Serveur/Bridge_Meshcore-MQTT")
 
 # =============================================================================
 #  Variable globale
@@ -36,41 +36,37 @@ mqttClient = None ##< @brief Client MQTT partagé entre main() et le callback _o
 # =============================================================================
 
 ##
-# @brief Initialise le bridge Meshtastic vers MQTT et démarre la boucle d'attente de paquets.
+# @brief Initialise le bridge Meshcore vers MQTT et démarre la boucle d'attente de paquets.
 ##
 def main():
     global mqttClient
 
-    printBanner("   Bridge Meshtastic → MQTT")
+    printBanner("   Bridge Meshcore → MQTT")
 
     if Config.DEBUG:
-        print("\nMeshtastic:")
-        print(f"   Host  : {Config.MESHTASTIC_HOST}")
-        print(f"   Topic : {Config.MESHTASTIC_TOPIC}")
-        print("\nMQTT:")
+        print("\nMQTT")
         print(f"   Host      : {Config.MQTT_BROKER_HOST}")
         print(f"   Port      : {Config.MQTT_BROKER_PORT}")
         print(f"   KeepAlive : {Config.MQTT_BROKER_KEEPALIVE}")
         print(f"   QoS       : {Config.MQTT_BROKER_QOS}")
-        print()
 
-    meshtasticClient = MeshtasticClientWrapper(Config.MESHTASTIC_HOST, Config.MESHTASTIC_TOPIC, onReceiveCallback=_onReceive)
+    meshcoreClient = MeshcoreClientWrapper(onReceiveCallback=_onReceive)
 
     mqttClient = MQTTClientWrapper("bridge_Meshtastic_MQTT", Config.MQTT_BROKER_HOST, Config.MQTT_BROKER_PORT, Config.MQTT_BROKER_KEEPALIVE, qos=Config.MQTT_BROKER_QOS)
 
     try:
-        meshtasticClient.connect()
+        meshcoreClient.connect()
         mqttClient.connect()
 
         # MQTT en mode non bloquant pour que waitForever() puisse tourner ensuite
         mqttClient.start(blocking=False)
 
-        meshtasticClient.waitForever()
+        meshcoreClient.waitForever()
 
     except KeyboardInterrupt:
-        logger.info("[Bridge Meshtastic-MQTT] Arrêt demandé par l'utilisateur (Ctrl+C)")
+        logger.info("[Bridge Meshcore-MQTT] Arrêt demandé par l'utilisateur (Ctrl+C)")
 
-        meshtasticClient.close()
+        meshcoreClient.close()
         mqttClient.stop()
 
     except Exception as e:
@@ -79,37 +75,31 @@ def main():
     return
 
 # =============================================================================
-#  Callback Meshtastic
+#  Callback Meshcore
 # =============================================================================
 
 ##
-# @brief Décode le payload JSON du champ "text", détermine le topic MQTT correspondant au type de données et publie le message. Appelé à chaque paquet reçu depuis le noeud Meshtastic.
+# @brief Décode le payload JSON du paquet Meshcore, determine le topic MQTT correspondant au topic de données et publie le message. Appelé à chaque paquet reçu depuis le noeud Meshcore.
 #
-# @param packet    Paquet Meshtastic reçu (dict).
-# @param interface Interface série source.
+# @param packet Paquet Meshcore reçu (dict).
 ##
-def _onReceive(packet, interface):
+def _onReceive(packet):
     global mqttClient
 
-    logger.info(f"[Bridge Meshtastic-MQTT] Paquet brut reçu : {packet}")
-
-    # Seuls les paquets décodés avec un champ texte nous intéressent
-    if "decoded" not in packet:
-        logger.warning("[Bridge Meshtastic-MQTT] Paquet sans champ 'decoded' ignoré")
-        return
+    logger.info(f"[Bridge Meshcore-MQTT] Paquet brut reçu : {packet}")
 
     try:
-        data = json.loads(packet["decoded"].get("text", ""))
+        data = json.loads(packet.get("payload", ""))
 
     except (json.JSONDecodeError, TypeError):
-        logger.warning("[Bridge Meshtastic-MQTT] Champ 'text' absent ou non-JSON, paquet ignoré")
+        logger.warning("[Bridge Meshcore-MQTT] Champ 'payload' absent ou non-JSON, paquet ignoré")
         return
 
     channelIndex = data.get("t")
     topic        = getMQTTTopic(channelIndex, data.get("id"))
 
     if not mqttClient.publish(topic, json.dumps(data)):
-        logger.warning(f"[Bridge Meshtastic-MQTT] Échec de la publication sur le topic '{topic}'")
+        logger.warning(f"[Bridge Meshcore-MQTT] Échec de la publication sur le topic '{topic}")
 
     return
 

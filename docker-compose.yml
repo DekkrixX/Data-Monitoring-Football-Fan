@@ -73,6 +73,25 @@ services:
             - 'c 166:* rmw'
         command: python -m Server.Bridge.bridge_Meshtastic_MQTT
 
+    bridge-meshcore-mqtt:
+        build:
+            context: .
+            dockerfile: Server/Dockerfile
+        container_name: bridge-meshcore-mqtt
+        env_file:
+            - .env
+        environment:
+            PYTHONUNBUFFERED: 1
+        depends_on:
+            mqtt:
+                condition: service_started
+        volumes:
+            - /dev:/dev
+        device_cgroup_rules:
+            - 'c 188:* rmw'
+            - 'c 166:* rmw'
+        command: python -m Server.Bridge.bridge_Meshcore_MQTT
+
     bridge-mqtt-influxdb:
         build:
             context: .

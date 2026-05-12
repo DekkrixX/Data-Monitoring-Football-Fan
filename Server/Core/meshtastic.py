@@ -3,7 +3,7 @@
 #
 # @brief Déclaration et implémentation de la classe MeshtasticClientWrapper.
 #
-# Fournit une abstraction haut niveau de l'interface série Meshtastic pour détecter automatiquement le port du nœud, établir la connexion et s'abonner aux paquets reçus via le système pubsub.
+# Fournit une abstraction haut niveau de l'interface série Meshtastic pour détecter automatiquement le port du noeud, établir la connexion et s'abonner aux paquets reçus via le système pubsub.
 ##
 
 # =============================================================================
@@ -35,7 +35,7 @@ logger = Logger("Serveur/Meshtastic")
 ##
 # @class MeshtasticClientWrapper
 #
-# @brief Gestionnaire de connexion à un nœud Meshtastic via port série.
+# @brief Gestionnaire de connexion à un noeud Meshtastic via port série.
 ##
 class MeshtasticClientWrapper:
 
@@ -110,7 +110,7 @@ class MeshtasticClientWrapper:
     # @throws PortNotFoundError Si aucun port ne correspond aux mots-clés.
     ##
     def _findPort(self):
-        logger.info("[Meshtastic] Recherche du port série du nœud")
+        logger.info("[Meshtastic] Recherche du port série du noeud")
 
         keywords = Config.MESHTASTIC_DESCRIPTION
         ports    = serial.tools.list_ports.comports()
@@ -123,7 +123,7 @@ class MeshtasticClientWrapper:
                     logger.info(f"[Meshtastic] Port trouvé : {self.port} ({port.description})")
                     return
 
-        logger.error(f"Aucun port série trouvé pour 'Meshtastic'")
+        logger.error("Aucun port série trouvé pour 'Meshtastic'")
         raise PortNotFoundError("Meshtastic")
 
         return

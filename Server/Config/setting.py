@@ -116,6 +116,12 @@ class Config:
     MESHTASTIC_DESCRIPTION = os.getenv("MESHTASTIC_DESCRIPTION", "").split(",") ##< @brief Mots-clés de description de port série pour la détection automatique du noeud.
 
 # =============================================================================
+#  Meshcore
+# =============================================================================
+
+    MESHCORE_DESCRIPTION = os.getenv("MESHCORE_DESCRIPTION", "").split(",") ##< @brief Mots-clés de description de port série pour la détection automatique du noeud.
+
+# =============================================================================
 #  Grafana
 # =============================================================================
 
@@ -184,6 +190,9 @@ class Config:
             "MESHTASTIC_HOST":        cls.MESHTASTIC_HOST,
             "MESHTASTIC_TOPIC":       cls.MESHTASTIC_TOPIC,
             "MESHTASTIC_DESCRIPTION": cls.MESHTASTIC_DESCRIPTION,
+
+            # Meshcore
+            "MESHCORE_DESCRIPTION": cls.MESHCORE_DESCRIPTION,
 
             # Grafana
             "GRAFANA_HOST": cls.GRAFANA_HOST,

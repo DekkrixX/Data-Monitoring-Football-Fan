@@ -17,12 +17,13 @@ source "$(dirname "${BASH_SOURCE[0]}")/out.sh"
 #  Code de sortie
 # =============================================================================
 
-argumentErrorCode=1             ##< @brief Arguments manquants ou invalides.
-portNotFoundErrorCode=2         ##< @brief Port série introuvable.
-targetNotSupportErrorCode=3     ##< @brief Cible non supporté.
-choiceNotSupportErrorCode=4     ##< @brief Choix non supporté.
-nodeTypeNotSupportErrorCode=5   ##< @brief Type de noeud non supporté.
-sensorTypeNotSupportErrorCode=6 ##< @brief Type de capteur non supporté.
+argumentErrorCode=1                ##< @brief Arguments manquants ou invalides.
+portNotFoundErrorCode=2            ##< @brief Port série introuvable.
+targetNotSupportErrorCode=3        ##< @brief Cible non supporté.
+choiceNotSupportErrorCode=4        ##< @brief Choix non supporté.
+nodeTypeNotSupportErrorCode=5      ##< @brief Type de noeud non supporté.
+sensorTypeNotSupportErrorCode=6    ##< @brief Type de capteur non supporté.
+gatewayNoneConfiguratedErrorCode=7 ##< @brief La gateway du réseau n'a pas été configuré.
 
 # =============================================================================
 #  Flag
@@ -79,7 +80,7 @@ function usage()
 ##
 # @brief Raccourci de la commande pour la configuration de Meshtastic.
 ##
-function mesh()
+function meshtastic()
 {
     # Execute le commande meshtastic
     until "${path}/.venv/meshtastic-env/bin/meshtastic" --port "${port}" "$@"
@@ -100,51 +101,109 @@ function mesh()
 # @brief Flash la configuration Meshtastic.
 #
 # @param nodeType   Type de noeud à configurer.
-# @param sensorType Type de capteur à configurer.
 ##
-function flashConfiguration()
+function flashMeshtasticConfiguration()
 {
     local nodeType="${1}"
 
     debug "Configuration Bluetooth."
-    mesh --set bluetooth.enabled false # Bluetooth
-    mesh --reboot
+    meshtastic --set bluetooth.enabled false # Bluetooth
+    meshtastic --reboot
     sleep 11
     debug "Configuration série"
-    mesh --set serial.rxd 44 # Pin RX
-    mesh --set serial.txd 43 # Pin TX
-    mesh --set serial.baud BAUD_115200 # Baudrate
-    mesh --set serial.mode TEXTMSG # Transmission de text par UART
-    mesh --set serial.enabled true # Communication série
-    mesh --reboot
+    meshtastic --set serial.rxd 44 # Pin RX
+    meshtastic --set serial.txd 43 # Pin TX
+    meshtastic --set serial.baud BAUD_115200 # Baudrate
+    meshtastic --set serial.mode TEXTMSG # Transmission de text par UART
+    meshtastic --set serial.enabled true # Communication série
+    meshtastic --reboot
     sleep 11
     debug "Configuration LoRa."
-    mesh --set lora.region EU_868 # Bande de fréquence
-    mesh --set lora.modem_preset LONG_FAST # Porté et débit
-    mesh --set lora.tx_power 14 # Puissance de transmission en dBm
-    mesh --set lora.hop_limit 3 # Limite du nombre de retransmission d'un message par les autres noeuds
-    mesh --reboot
+    meshtastic --set lora.region EU_868 # Bande de fréquence
+    meshtastic --set lora.modem_preset LONG_FAST # Porté et débit
+    meshtastic --set lora.tx_power 14 # Puissance de transmission en dBm
+    meshtastic --set lora.hop_limit 3 # Limite du nombre de retransmission d'un message par les autres noeuds
+    meshtastic --reboot
     sleep 11
     debug "Configuration des channels."
-    mesh --ch-index 0 --ch-set psk "base64:5BqoFn2cuaQFHcqnRSKANEvnt2naVyf5G51tfFkXIYA="
-    mesh --ch-index 0 --ch-set name "monitoring"
-    mesh --reboot
+    meshtastic --ch-index 0 --ch-set psk "base64:5BqoFn2cuaQFHcqnRSKANEvnt2naVyf5G51tfFkXIYA="
+    meshtastic --ch-index 0 --ch-set name "monitoring"
+    meshtastic --reboot
     sleep 11
     debug "Configuration du device"
     if [ "${nodeType}" = "gateway" ]
     then
-        mesh --set device.role CLIENT_MUTE # Rôle du noeud
+        meshtastic --set device.role CLIENT_MUTE # Rôle du noeud
     fi
     if [ "${nodeType}" = "sensor" ]
     then
-        mesh --set device.role CLIENT # Rôle du noeud
+        meshtastic --set device.role CLIENT # Rôle du noeud
     fi
-    mesh --reboot
+    meshtastic --reboot
     sleep 11
     debug "Configuration de l'économie d'énergie."
-    mesh --set power.is_power_saving true # Économie d'énergie
-    mesh --reboot
+    meshtastic --set power.is_power_saving true # Économie d'énergie
+    meshtastic --reboot
     sleep 11
+
+    return
+}
+
+# =============================================================================
+#  Configuration Meshcore
+# =============================================================================
+
+##
+# @brief Raccourci de la commande pour la configuration de Meshcore.
+##
+function meshcore()
+{
+    # Execute le commande meshcore
+    until "${path}/.venv/meshcore-env/bin/meshcli" -s "${port}" "$@"
+    do
+        debug "Échec de la commande."
+        debug "Nouvelle tentative."
+        sleep 2
+    done
+
+    sleep 2
+
+    return
+}
+
+
+
+##
+# @brief Flash la configuration Meshcore.
+#
+# @param nodeType   Type de noeud à configurer.
+##
+function flashMeshcoreConfiguration()
+{
+    local nodeType="${1}"
+
+    debug "Configuration LoRa."
+    meshcore set radio 868.3,125,7,5,off
+    meshcore set tx 14
+    debug "Configuration du device"
+    meshcore set name "${nodeType}"
+    debug "Configuration des contacts"
+    meshcore set auto_update_contacts off
+    debug "Configuration des channels."
+    meshcore add_channel monitoring "063cf652b2c888f3bb001a7b431f993b"
+    debug "Ajout des contacts"
+    if [ "${nodeType}" = "gateway" ]
+    then
+        meshcore card > "${path}"/Resources/Data/gatewayContact.txt
+    else
+        if [ -f "${path}/Resources/Data/gatewayContact.txt" ]
+        then
+            contact="$(head -n1 "${path}/Resources/Data/gatewayContact.txt")"
+            meshcore import_contact "${contact}"
+        else
+            error "${gatewayNoneConfiguratedErrorCode}" "La gateway du réseau n'a pas encore été configuré."
+        fi
+    fi
 
     return
 }
@@ -302,7 +361,7 @@ function main()
             # Vérifie l'installation de l'environnement virtuel
             if [ ! -e "${path}/.venv/meshtastic-env" ]
             then
-                info "Installation de l'environnement virtuel 'platformio-env'"
+                info "Installation de l'environnement virtuel 'meshtastic-env'"
                 debug "Package: Python3"
                 sudo apt install -y python3
                 debug "Package: Python3-venv"
@@ -347,7 +406,7 @@ function main()
                                 do
                                     debug "La configuration n'est pas à jour."
                                     debug "Flash de la configuration."
-                                    flashConfiguration "gateway"
+                                    flashMeshtasticConfiguration "gateway"
                                     sleep 2
                                     mesh --export-config "${path}"/Resources/Data/currentConfig.yml
                                     sleep 2
@@ -367,7 +426,7 @@ function main()
                                 do
                                     debug "La configuration n'est pas à jour."
                                     debug "Flash de la configuration."
-                                    flashConfiguration "sensor"
+                                    flashMeshtasticConfiguration "sensor"
                                     sleep 2
                                     mesh --export-config "${path}"/Resources/Data/currentConfig.yml
                                     sleep 2
@@ -375,6 +434,73 @@ function main()
                                 done
 
                                 rm "${path}"/Resources/Data/currentConfig.yml
+                                ;;
+
+                            *)
+                                error "${nodeTypeNotSupportErrorCode}" "Le type de noeud '${nodeType}' sélectionné n'est pas supporté."
+                                ;;
+                        esac
+                        ;;
+
+                    *)
+                        error "${choiceNotSupportErrorCode}" "Le choix '${choice}' sélectionné n'est pas supporté."
+                        ;;
+                    esac
+            fi
+            ;;
+
+        meshcore)
+            local chip="esp32s3" # Chip de la carte à flasher
+            selectPort
+
+            # Vérifie l'installation de l'environnement virtuel
+            if [ ! -e "${path}/.venv/meshcore-env" ]
+            then
+                info "Installation de l'environnement virtuel 'meshcore-env'"
+                debug "Package: Python3"
+                sudo apt install -y python3
+                debug "Package: Python3-venv"
+                sudo apt install -y python3-venv
+                debug "Création des environnements virtuels python"
+                mkdir -p "${path}/.venv"
+                debug "Environement virtuel: Meshcore"
+                python3 -m venv "${path}/.venv/meshcore-env"
+                debug "Package: Meshcore"
+                "${path}"/.venv/meshcore-env/bin/pip install meshcore-cli
+                debug "Package: ESPtool"
+                "${path}"/.venv/meshcore-env/bin/pip install esptool
+            fi
+
+            # Vérifie que le port série sélectionné est ouvert
+            if [ -e "${port}" ]
+            then
+                debug "Flash de Meshcore."
+
+                local choice=$(selectChoice)
+                case "${choice}" in
+                    # Flash le firmware Meshcore
+                    firmware)
+                        info "Flash du firmware"
+                        "${path}"/.venv/meshcore-env/bin/esptool --chip "${chip}" --port "${port}" --baud 921600 erase-flash
+                        "${path}"/.venv/meshcore-env/bin/esptool --chip "${chip}" --port "${port}" --baud 921600 write-flash -z 0x0 "${path}/.Flash/firmware_Xiao_S3_WIO_companion_radio_usb-v1.15.0-dee3e26.bin"
+                        ;;
+
+                    # Flash de la configuration Meshcore
+                    configuration)
+                        debug "Flash de la configuration de Meshcore."
+
+                        local nodeType=$(selectNodeType)
+                        case "${nodeType}" in
+                            # Flash de la configuration de la gateway Meshcore
+                            gateway)
+                                info "Flash de la configuration de la gateway."
+                                flashMeshcoreConfiguration "gateway"
+                                ;;
+
+                            # Flash de la configuration d'un capteur Meshcore
+                            sensor)
+                                info "Flash de la configuration d'un capteur."
+                                flashMeshcoreConfiguration "sensor"
                                 ;;
 
                             *)

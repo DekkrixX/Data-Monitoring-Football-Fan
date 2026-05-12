@@ -13,4 +13,5 @@ RUN pip install --no-cache-dir \
     flask \
     flask-socketio \
     python-dotenv \
-    psycopg
+    psycopg \
+    meshcore-cli
