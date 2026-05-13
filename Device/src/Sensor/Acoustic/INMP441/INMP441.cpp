@@ -20,6 +20,7 @@
 // ============================================================================
 
 const std::string INMP441::name = "INMP441";
+int32_t INMP441::audioSample[I2S_BUFFER_SIZE];
 Logger * INMP441::logger = nullptr;
 
 // ============================================================================
@@ -54,16 +55,15 @@ INMP441::~INMP441()
 std::string INMP441::formatData(INMP441Data & data, int stadiumBleacherId)
 {
 #if DEBUG == 1
-    char str[LOGGER_MAX_MESSAGE_SIZE];
-    snprintf(str, sizeof(str), "[INMP441] formatData - DB: [ ");
+    std::string str = "[INMP441] formatData - DB: [ ";
     for (int i=0; i < NB_VALUE; i++)
     {
-        char val[317];
+        char val[32];
         snprintf(val, sizeof(val), "%f ", data.decibel[i]);
-        strcat(str, val);
+        str += val;
     }
-    strcat(str, "] db\n");
-    INMP441::logger->info(str);
+    str += "] db\n";
+    INMP441::logger->info(str.c_str());
 #endif
 
     std::string jsonString;
@@ -167,11 +167,10 @@ void INMP441::update()
     INMP441::logger->info(Logger::logString("[INMP441] update - Mise à jour du capteur\n"));
 #endif
 
-    int32_t audioSample[I2S_BUFFER_SIZE];
     size_t bytesRead = 0;
 
     // Lecture de la trame
-    i2s_read(I2S_PORT, audioSample, sizeof(audioSample), &bytesRead, 100 / portTICK_PERIOD_MS);
+    i2s_read(I2S_PORT, INMP441::audioSample, sizeof(INMP441::audioSample), &bytesRead, 100 / portTICK_PERIOD_MS);
 
     int samples = bytesRead / sizeof(int32_t);
     if (samples > 0)
@@ -184,7 +183,7 @@ void INMP441::update()
         double sum = 0;
         for (int i=0; i < samples; i++)
         {
-            double sample = audioSample[i];
+            double sample = INMP441::audioSample[i];
             sum += sample * sample;
         }
 

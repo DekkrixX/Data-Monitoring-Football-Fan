@@ -99,6 +99,8 @@ class INMP441: public Acoustic
         
         int stadiumBleacherId; ///< @brief Identifiant de la tribune.
 
+        static int32_t audioSample[I2S_BUFFER_SIZE];
+
 // ============================================================================
 //  Constructeur
 // ============================================================================
