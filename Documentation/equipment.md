@@ -8,7 +8,7 @@
 | 63028A2F | CF:5C:1E:1B:04:CE |
 | 65AB7621 | FE:02:9D:9F:22:1F |
 | 65C1312C | DA:DC:91:B1:19:19 |
-| 6302862B |                   |
+| 6302862B | E3:BC:7E:55:74:C2 |
 
 Description :
 - Capteur cardiaque pectoral ECG, très haute précision
@@ -51,12 +51,6 @@ Description:
 - Consommation : ~1,4 mA
 
 ## Noeuds LoRa
-
-| Nom             | Adresse MAC       | Description physique             |
-|-----------------|-------------------|----------------------------------|
-| Meshtastic 9964 | 98:3D:AE:60:99:65 | Fils jaune, bleu, blanc, rouge   |
-| Meshtastic 8ec8 | 98:3D:AE:60:8E:C9 | Fils jaune, orange, noir, marron |
-| Meshtastic 4b98 | 98:3D:AE:61:4B:99 | Gateway                          |
 
 Description :
 - Définition : petits appareils radio utilisant la technologie LoRa pour créer un réseau maillé décentralisé sans infrastructure (pas de réseau mobile/Wi-Fi).
