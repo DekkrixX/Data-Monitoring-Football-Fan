@@ -36,3 +36,8 @@ Si le script automatique de la configuration de Meshtastic ne configure pas enti
 - channel psk : 5Bqo...YA=
 - channel name : monitoring
 Si ce n'est pas le cas relancer la configuration ou ajouter la manuellemnt.
+
+# Problème de flash du firmware Meshcore
+
+Si vous rencontrez des problèmes suite au flash du firmware de Meshcore utiliser le flasher Meshcore en ligne (https://meshcore.io/flasher) et sélectionné la cible Seeed Studio Xiao S3 WIO, firmware Companion USB, sélectionné l'option Erase device et flasher le firmware sur la carte.
+Attention le flasher n'est pas compatible avec tous les navigateurs. (Liste des navigateurs compatibles: chrome, edge)
