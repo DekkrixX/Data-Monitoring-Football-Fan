@@ -12,13 +12,6 @@
 // ============================================================================
 
 #include "./Logger.hpp"
-#include "../LEDManager/LEDManager.hpp"
-
-// ============================================================================
-//  Variable externe
-// ============================================================================
-
-extern LEDManager * ledManager;
 
 // ============================================================================
 //  Constructeur
@@ -91,10 +84,6 @@ void Logger::warning(const std::string & message)
 void Logger::error(const std::string & message)
 {
     this->write(Level::ERROR, message.c_str());
-
-    ledManager->changeColor(LED_COLOR_ERROR);
-    ledManager->turnOn();
-
     return ;
 }
 

@@ -92,10 +92,6 @@
 
 #define LED_PIN 21 ///< @brief Broche GPIO de la LED de la carte ESP32.
 
-#define LED_COLOR_ON    0,255,0 ///< @brief Couleur de la LED en cours de fonctionnement.
-#define LED_COLOR_ERROR 255,0,0 ///< @brief Couleur de la LED en cas d'erreur.
-#define LED_COLOR_DATA  0,0,255 ///< @brief Couleur de la LED en cas d'envoie de données.
-
 // ============================================================================
 //  Paramètres de logs
 // ============================================================================

@@ -85,7 +85,7 @@ void setup()
     uartManager->begin();
 
     // Création d'une interface LED
-    ledManager = new LEDManager(LED_PIN, 1);
+    ledManager = new LEDManager(LED_PIN);
 
     // Démarrage de l'interface LED
     ledManager->begin();
@@ -125,7 +125,6 @@ void setup()
 void loop()
 {
     // Mise à jour de la LED
-    ledManager->changeColor(LED_COLOR_ON);
     ledManager->toggle();
 
     // Mise à jour du capteur
@@ -148,9 +147,6 @@ void loop()
 
             if (size != 0)
             {
-                ledManager->changeColor(LED_COLOR_DATA);
-                ledManager->turnOn();
-
                 // Formatage des données: conversion std::string -> buffer uint8_t
                 uint8_t * data = new uint8_t[size];
                 memcpy(data, dataString.c_str(), size);

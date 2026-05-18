@@ -25,10 +25,8 @@ Logger * LEDManager::logger = nullptr;
 //  Constructeur
 // ============================================================================
 
-LEDManager::LEDManager(int ledPin, int ledNumber):
-ledPin(ledPin),
-ledNumber(ledNumber),
-led(ledNumber, ledPin, NEO_RGB + NEO_KHZ800)
+LEDManager::LEDManager(int ledPin):
+ledPin(ledPin)
 {
 	if (LEDManager::logger == nullptr)
     	LEDManager::logger = new Logger("LEDManager", true);
@@ -50,13 +48,11 @@ LEDManager::~LEDManager()
 void LEDManager::begin()
 {
 #if DEBUG == 1
-    LEDManager::logger->info(Logger::logString("[LED] begin - Ouverture du port de la LED (PIN: %d, nombre de LED: %d)\n", this->ledPin, this->ledNumber));
+    LEDManager::logger->info(Logger::logString("[LED] begin - Ouverture du port de la LED (PIN: %d)\n", this->ledPin));
 #endif
 
     // Initialisation de la LED
-    this->led.begin();
-    this->led.clear();
-    this->led.show();
+    pinMode(this->ledPin, OUTPUT);
 
 #if DEBUG == 1
     LEDManager::logger->info(Logger::logString("[LED] begin - LED prête\n"));
@@ -74,9 +70,8 @@ void LEDManager::end()
 #endif
 
     // Extinction de la LED
-	this->led.clear();
-    this->led.show();
-    this->isOn = false;
+	if (this->isOn)
+		this->turnOff();
 
 #if DEBUG == 1
     LEDManager::logger->info(Logger::logString("[LED] end - LED fermé\n"));
@@ -90,8 +85,7 @@ void LEDManager::end()
 void LEDManager::turnOn()
 {
 	// Allume la LED
-	this->led.setPixelColor(0, this->led.Color(red, green, blue));
-	this->led.show();
+	digitalWrite(this->ledPin, LOW);
 	this->isOn = true;
 
 #if DEBUG == 1
@@ -106,8 +100,7 @@ void LEDManager::turnOn()
 void LEDManager::turnOff()
 {
 	// Éteind la LED
-	this->led.clear();
-	this->led.show();
+	digitalWrite(this->ledPin, HIGH);
 	this->isOn = false;
 
 #if DEBUG == 1
@@ -131,23 +124,6 @@ void LEDManager::toggle()
 #endif
 
     return ;
-}
-
-
-void LEDManager::changeColor(uint8_t red, uint8_t green, uint8_t blue)
-{
-	// Changement de la couleur de la LED
-	this->led.setPixelColor(0, this->led.Color(red, green, blue));
-
-	this->red = red;
-	this->green = green;
-	this->blue = blue;
-
-#if DEBUG == 1
-    LEDManager::logger->info(Logger::logString("[LED] changeColor - Changement de la couleur de la LED (r:%d, g:%d, b:%d)\n", this->red, this->green, this->blue));
-#endif
-
-	return ;
 }
 
 

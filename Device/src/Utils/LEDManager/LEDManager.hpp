@@ -13,7 +13,7 @@
 //  Import des headers externes
 // ============================================================================
 
-#include <Adafruit_NeoPixel.h>
+#include <Arduino.h>
 
 // ============================================================================
 //  Import des headers internes
@@ -45,14 +45,8 @@ class LEDManager
 
     private:
         const int ledPin;        ///< @brief Numéro de broche de la LED.
-        const int ledNumber;     ///< @brief Nombre de LED associé à la broche.
 
         bool isOn = false;       ///< @brief État courant de la LED.
-        uint8_t red = 0;         ///< @brief Niveau courant de rouge de la LED.
-        uint8_t green = 255;     ///< @brief Niveau courant de vert de la LED.
-        uint8_t blue = 0;        ///< @brief Niveau courant de bleu de la LED.
-
-        Adafruit_NeoPixel led; ///< @brief Référence vers le port de la LED.
 
 // ============================================================================
 //  Constructeur
@@ -63,9 +57,8 @@ class LEDManager
          * @brief Construit un LEDManager avec les paramètres matériels donnés.
          *
          * @param ledPin    Broche de la LED.
-         * @param ledNumber Nombre de LED associé à la broche.
          */
-        LEDManager(int ledPin, int ledNumber);
+        LEDManager(int ledPin);
 
 // ============================================================================
 //  Destructeur
@@ -102,14 +95,6 @@ class LEDManager
     	 * @brief Change l'état de la LED.
     	 */
     	void toggle();
-    	/**
-    	 * @brief Change la couleur de la LED.
-    	 * 
-    	 * @param red   Niveau de rouge.
-    	 * @param green Niveau de vert.
-    	 * @param blue  Niveau de bleu.
-    	 */
-    	void changeColor(uint8_t red, uint8_t green, uint8_t blue);
 
 };
 
