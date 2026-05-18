@@ -30,7 +30,8 @@ rxPin(rxPin),
 txPin(txPin),
 baudRate(baudRate)
 {
-    UARTManager::logger = new Logger("UARTManager", true);
+    if (UARTManager::logger == nullptr)
+        UARTManager::logger = new Logger("UARTManager", true);
 }
 
 // ============================================================================

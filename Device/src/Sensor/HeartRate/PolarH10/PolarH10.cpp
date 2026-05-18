@@ -39,7 +39,8 @@ isSubscribed(false),
 isNotify(false),
 bleManager(nullptr)
 {
-    PolarH10::logger = new Logger("PolarH10", true);
+    if (PolarH10::logger == nullptr)
+        PolarH10::logger = new Logger("PolarH10", true);
 
 #if DEBUG == 1
     PolarH10::logger->info(Logger::logString("[POLARH10] Instanciation pour le supporter. id: %d, adresse MAC cible: %s\n", supporterId, MAC_ADDRESS));

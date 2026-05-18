@@ -34,7 +34,8 @@ device(nullptr),
 scanCallbacks(nullptr),
 clientCallbacks(nullptr)
 {
-    BluetoothLowEnergyManager::logger = new Logger("BluetoothLowEnergyManager", true);
+    if (BluetoothLowEnergyManager::logger == nullptr)
+        BluetoothLowEnergyManager::logger = new Logger("BluetoothLowEnergyManager", true);
 }
 
 // ============================================================================

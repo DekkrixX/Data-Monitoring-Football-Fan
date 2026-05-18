@@ -31,7 +31,8 @@ MinIMU_9_v6::MinIMU_9_v6(int stadiumBleacherId):
 AccelerometerGyroscope(MinIMU_9_v6::name),
 stadiumBleacherId(stadiumBleacherId)
 {
-    MinIMU_9_v6::logger = new Logger("MinIMU-9 v6", true);
+    if (MinIMU_9_v6::logger == nullptr)
+        MinIMU_9_v6::logger = new Logger("MinIMU-9 v6", true);
 
 #if DEBUG == 1
     MinIMU_9_v6::logger->info(Logger::logString("[MinIMU-9 V6] Instanciation du capteur %s\n", MinIMU_9_v6::name.c_str()));

@@ -126,7 +126,7 @@ void loop()
 {
     // Mise à jour de la LED
     ledManager->changeColor(LED_COLOR_ON);
-    ledManager->turnOn();
+    ledManager->toggle();
 
     // Mise à jour du capteur
     sensor->update();
@@ -183,7 +183,7 @@ void loop()
     }
 
     // Délai entre chaque acquisition
-    delay(ACQUISITION_TIME);
+    delay(5000);
 
     return ;
 }

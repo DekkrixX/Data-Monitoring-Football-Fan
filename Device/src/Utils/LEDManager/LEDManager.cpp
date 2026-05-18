@@ -30,7 +30,8 @@ ledPin(ledPin),
 ledNumber(ledNumber),
 led(ledNumber, ledPin, NEO_GRB + NEO_KHZ800)
 {
-    LEDManager::logger = new Logger("LEDManager", true);
+	if (LEDManager::logger == nullptr)
+    	LEDManager::logger = new Logger("LEDManager", true);
 }
 
 // ============================================================================
@@ -135,6 +136,10 @@ void LEDManager::changeColor(uint8_t red, uint8_t green, uint8_t blue)
 {
 	// Changement de la couleur de la LED
 	this->led.setPixelColor(0, this->led.Color(red, green, blue));
+
+	this->red = red;
+	this->green = green;
+	this->blue = blue;
 
 #if DEBUG == 1
     LEDManager::logger->info(Logger::logString("[LED] changeColor - Changement de la couleur de la LED (r:%d, g:%d, b:%d)\n", this->red, this->green, this->blue));

@@ -31,7 +31,8 @@ INMP441::INMP441(int stadiumBleacherId):
 Acoustic(INMP441::name),
 stadiumBleacherId(stadiumBleacherId)
 {
-    INMP441::logger = new Logger("INMP441", true);
+    if (INMP441::logger == nullptr)
+        INMP441::logger = new Logger("INMP441", true);
 
     char str[LOGGER_MAX_MESSAGE_SIZE];
     snprintf(str, sizeof(str), "[INMP441] Instanciation du capteur %s\n", INMP441::name.c_str());
