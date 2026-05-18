@@ -30,9 +30,15 @@
 //  Import des capteurs
 // ============================================================================
 
+#ifdef POLARH10
 #include "./Sensor/HeartRate/PolarH10/PolarH10.hpp"
+#endif // POLATH10
+#ifdef MINIMU_9_V6
 #include "./Sensor/AccelerometerGyroscope/MinIMU-9_v6/MinIMU-9_v6.hpp"
+#endif // MINIMU_9_V6
+#ifdef _INMP441_
 #include "./Sensor/Acoustic/INMP441/INMP441.hpp"
+#endif // _INMP441_
 
 // ============================================================================
 //  Variable globale
