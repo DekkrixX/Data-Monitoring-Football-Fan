@@ -183,7 +183,7 @@ function flashMeshcoreConfiguration()
     local nodeType="${1}"
 
     debug "Configuration LoRa."
-    meshcore set radio 868.3,125,7,5,off
+    meshcore set radio 868.0,125,7,5,off
     meshcore set tx 14
     debug "Configuration du device"
     meshcore set name "${nodeType}"

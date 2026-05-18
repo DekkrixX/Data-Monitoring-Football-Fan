@@ -39,10 +39,10 @@
 
 // Définir exactement UNE de ces macros pour activer le capteur correspondant.
 
-#define POLARH10 1 ///< @brief Active le capteur Polar H10.
+//#define POLARH10 1 ///< @brief Active le capteur Polar H10.
 #define MAC_ADDRESS "c7:6f:37:f6:01:36" ///< @brief Adresse MAC Bluetooth Low Energy du Polar H10 cible (format "xx:xx:xx:xx:xx:xx").
 
-//#define MINIMU_9_V6 1 ///< @brief Active le capteur MinIMU-9 v6.
+#define MINIMU_9_V6 1 ///< @brief Active le capteur MinIMU-9 v6.
 
 //#define _INMP441_ 1 ///< @brief Active le capteur INMP441.
 
@@ -85,6 +85,16 @@
 #define WS_PIN  5 ///< @brief Broche WS de la carte ESP32.
 #define SCK_PIN 6 ///< @brief Broche SCK de la carte ESP32.
 #define SD_PIN  7 ///< @brief Broche SD de la carte ESP32.
+
+// ============================================================================
+//  Paramètres LED
+// ============================================================================
+
+#define LED_PIN 21 ///< @brief Broche GPIO de la LED de la carte ESP32.
+
+#define LED_COLOR_ON    0,255,0 ///< @brief Couleur de la LED en cours de fonctionnement.
+#define LED_COLOR_ERROR 255,0,0 ///< @brief Couleur de la LED en cas d'erreur.
+#define LED_COLOR_DATA  0,0,255 ///< @brief Couleur de la LED en cas d'envoie de données.
 
 // ============================================================================
 //  Paramètres de logs

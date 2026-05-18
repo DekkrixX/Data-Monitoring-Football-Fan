@@ -146,16 +146,6 @@ function parseDump()
         # Nettoyage des caractères de contrôle résiduels
         line="$(echo "${line}" | tr -d '\r')"
 
-        # Ignorer tout ce qui précède le marqueur de début de dump
-        [[ "${inDump}" == false ]] && continue
-
-        # Erreur remontée par le firmware
-        if [[ "${line}" == "${dumpErrorPrefix}"* ]]
-        then
-            echo -e ${_RED}"[ERROR] Firmware : ${line}"${_RESET}
-            continue
-        fi
-
         # Début du dump
         if [[ "${line}" == "${dumpStart}" ]]
         then
@@ -163,6 +153,16 @@ function parseDump()
             mkdir -p "${logDir}"
             info "Dump démarré"
 
+            continue
+        fi
+
+        # Ignorer tout ce qui précède le marqueur de début de dump
+        [[ "${inDump}" == false ]] && continue
+
+        # Erreur remontée par le firmware
+        if [[ "${line}" == "${dumpErrorPrefix}"* ]]
+        then
+            echo -e ${_RED}"[ERROR] Firmware : ${line}"${_RESET}
             continue
         fi
 
