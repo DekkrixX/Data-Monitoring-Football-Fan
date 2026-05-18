@@ -28,7 +28,7 @@ Logger * LEDManager::logger = nullptr;
 LEDManager::LEDManager(int ledPin, int ledNumber):
 ledPin(ledPin),
 ledNumber(ledNumber),
-led(ledNumber, ledPin, NEO_GRB + NEO_KHZ800)
+led(ledNumber, ledPin, NEO_RGB + NEO_KHZ800)
 {
 	if (LEDManager::logger == nullptr)
     	LEDManager::logger = new Logger("LEDManager", true);
@@ -41,7 +41,6 @@ led(ledNumber, ledPin, NEO_GRB + NEO_KHZ800)
 LEDManager::~LEDManager()
 {
     this->end();
-    delete LEDManager::logger;
 };
 
 // ============================================================================
@@ -56,6 +55,8 @@ void LEDManager::begin()
 
     // Initialisation de la LED
     this->led.begin();
+    this->led.clear();
+    this->led.show();
 
 #if DEBUG == 1
     LEDManager::logger->info(Logger::logString("[LED] begin - LED prête\n"));
@@ -89,6 +90,7 @@ void LEDManager::end()
 void LEDManager::turnOn()
 {
 	// Allume la LED
+	this->led.setPixelColor(0, this->led.Color(red, green, blue));
 	this->led.show();
 	this->isOn = true;
 

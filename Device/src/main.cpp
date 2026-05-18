@@ -183,7 +183,7 @@ void loop()
     }
 
     // Délai entre chaque acquisition
-    delay(5000);
+    delay(ACQUISITION_TIME);
 
     return ;
 }

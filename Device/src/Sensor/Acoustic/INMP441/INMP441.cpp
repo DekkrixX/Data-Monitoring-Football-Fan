@@ -46,7 +46,6 @@ stadiumBleacherId(stadiumBleacherId)
 INMP441::~INMP441()
 {
     this->end();
-    delete INMP441::logger;
 }
 
 // ============================================================================

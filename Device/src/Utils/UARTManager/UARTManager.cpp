@@ -41,7 +41,6 @@ baudRate(baudRate)
 UARTManager::~UARTManager()
 {
     this->end();
-    delete UARTManager::logger;
 };
 
 // ============================================================================

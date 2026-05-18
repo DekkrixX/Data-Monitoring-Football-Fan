@@ -46,7 +46,6 @@ stadiumBleacherId(stadiumBleacherId)
 MinIMU_9_v6::~MinIMU_9_v6()
 {
     this->end();
-    delete MinIMU_9_v6::logger;
 }
 
 // ============================================================================

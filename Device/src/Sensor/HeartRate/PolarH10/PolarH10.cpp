@@ -58,7 +58,6 @@ PolarH10::~PolarH10()
 {
     this->end();
     delete this->bleManager;
-    delete PolarH10::logger;
 }
 
 // ============================================================================

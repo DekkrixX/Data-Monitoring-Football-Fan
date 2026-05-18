@@ -45,7 +45,6 @@ clientCallbacks(nullptr)
 BluetoothLowEnergyManager::~BluetoothLowEnergyManager()
 {
     this->end();
-    delete BluetoothLowEnergyManager::logger;
 }
 
 // ============================================================================
