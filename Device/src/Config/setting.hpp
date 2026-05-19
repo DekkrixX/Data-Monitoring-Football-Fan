@@ -96,7 +96,11 @@
 //  Paramètres de logs
 // ============================================================================
 
-#define NB_LOGGER                 4 ///< @brief Nombre de logger présent sur la carte.
+#if DEBUG = 0
+#define NB_LOGGER                 1 ///< @brief Nombre de logger présent sur la carte.
+#else
+#define NB_LOGGER                 5 ///< @brief Nombre de logger présent sur la carte.
+#endif
 #define LOGGER_MAX_MESSAGE_SIZE 256 ///< @brief Taille maximale d'un message de log en caractères.
 
 #if NB_LOGGER <= 0
