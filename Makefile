@@ -48,7 +48,8 @@ stop:
 	@docker volume prune -f
 	@if docker ps -a --format "{{.Names}}" | grep -w test > /dev/null; \
 	then \
-		docker rm -f test; \
+		docker rm -f test-data; \
+		docker rm -f test-distance; \
 	fi
 
 # =============================================================================
@@ -78,7 +79,8 @@ clear:
 	@docker compose down -v
 	@if docker ps -a --format "{{.Names}}" | grep -w test > /dev/null; \
 	then \
-		docker rm -f test; \
+		docker rm -f test-data; \
+		docker rm -f test-distance; \
 	fi
 
 # =============================================================================
