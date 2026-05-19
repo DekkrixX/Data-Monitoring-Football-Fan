@@ -5,6 +5,7 @@
 body
 {
     background-color: var(--body-background);
+    overflow-y: hidden;
 }
 
 /* =========================================================================

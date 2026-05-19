@@ -5,6 +5,37 @@
 body
 {
     background-color: var(--body-background);
+    overflow-y: hidden;
+}
+
+/* =========================================================================
+    Bouton de sélection
+   ========================================================================= */
+
+#prev, #next
+{
+    position: absolute;
+    top: 7.5vh;
+    height: 6vh;
+    width: 3vw;
+    font-size: 30px;
+    background-color: var(--card-background);
+    border-radius: 20px;
+    border: 5px solid var(--card-border);
+    cursor: pointer;
+}
+#prev:hover, #next:hover
+{
+    background-color: var(--card-hover-background);
+    border-color: var(--card-hover-border);
+}
+#prev
+{
+    left: 3vw;
+}
+#next
+{
+    right: 3vw;
 }
 
 /* =========================================================================
@@ -105,4 +136,11 @@ h2
     width: 90%;
     height: 60vh;
     margin: 5vh auto 5vh auto;
+}
+
+
+
+.hidden
+{
+    display: none;
 }

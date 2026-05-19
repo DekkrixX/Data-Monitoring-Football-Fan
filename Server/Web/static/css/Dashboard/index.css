@@ -53,10 +53,19 @@ h2
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: center;
-	gap: 5vw;
+	gap: 2.5vh 5vw;
 	align-items: center;
-	padding: 5vh 5vw;
-	margin-bottom: 5vh;
+	padding: 3vh 5vw;
+	margin-bottom: 2.5vh;
+	overflow-y: auto;
+}
+#gridSupporter
+{
+	height: 40vh;
+}
+#gridStadiumBleacher
+{
+	height: 25vh;
 }
 
 

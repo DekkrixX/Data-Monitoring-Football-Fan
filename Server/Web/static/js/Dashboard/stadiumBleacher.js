@@ -22,6 +22,9 @@ const socket = io();
 if (window.DEBUG)
     console.log(`[StadiumBleacher] Initialisation - Demande des données de la tribune id=${window.id}`);
 
+let selectedGraph = 0;
+changeDisplayGraph(selectedGraph);
+
 // Création du graphique d'accélération
 const canvaAccelerometer = document.getElementById("chart_accelerometer");
 const ctxAccelerometer   = canvaAccelerometer.getContext("2d");
@@ -157,6 +160,34 @@ socket.on("serverClose", () =>
     window.location.href = "/";
 });
 
+
+
+// Bouton de sélection
+const prev = document.getElementById("prev");
+const next = document.getElementById("next");
+prev.addEventListener("click", () =>
+{
+    if (selectedGraph != 0)
+    {
+        selectedGraph--;
+        changeDisplayGraph(selectedGraph);
+    }
+    if (selectedGraph == 0)
+        prev.classList.add("hidden");
+    next.classList.remove("hidden");
+});
+next.addEventListener("click", () =>
+{
+    if (selectedGraph != window.numberGraph - 1)
+    {
+        selectedGraph++;
+        changeDisplayGraph(selectedGraph);
+    }
+    if (selectedGraph == window.numberGraph - 1)
+        next.classList.add("hidden");
+    prev.classList.remove("hidden");
+});
+
 // ============================================================================
 //  Fonctions internes
 // ============================================================================
@@ -277,6 +308,38 @@ function _fillGraphicData(chart, data, type)
 
     // Mise à jour sans animation pour un rendu temps réel fluide
     chart.update("none");
+
+    return ;
+}
+
+
+
+/**
+ * @brief Change le graphe à afficher
+ * 
+ * @param selectedGraph Indice du graphe sélectionné.
+ */
+function changeDisplayGraph(selectedGraph)
+{
+    if (window.DEBUG)
+        console.log("[StadiumBleacher] Changement de graphe");
+
+    const main = document.querySelector("main");
+
+    for (let index=0; index < main.childElementCount; index+=2)
+    {
+        console.log(`index=${index} (mod2=${index / 2})`);
+        if (index / 2 == selectedGraph)
+        {
+            main.children[index].classList.remove("hidden");
+            main.children[index + 1].classList.remove("hidden");
+        }
+        else
+        {
+            main.children[index].classList.add("hidden");
+            main.children[index + 1].classList.add("hidden");
+        }
+    }
 
     return ;
 }

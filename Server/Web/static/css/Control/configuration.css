@@ -103,6 +103,8 @@ form > button:active
 	border: 5px solid var(--card-border);
 	border-radius: 15px;
 	padding: 2vh 1vw;
+	overflow-y: auto;
+	height: 65vh;
 }
 .category h2
 {

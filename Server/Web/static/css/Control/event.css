@@ -100,6 +100,8 @@ main > div:last-child
 	border: 5px solid var(--card-border);
 	border-radius: 15px;
 	padding: 2vh 1vw;
+	overflow-y: auto;
+	height: 70vh;
 }
 .category h2, .event-list h2
 {

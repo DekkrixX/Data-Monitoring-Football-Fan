@@ -13,6 +13,8 @@
         </style>
     </head>
     <body>
+        <button id="prev" class="hidden"><</button>
+        <button id="next">></button>
         <header>
             <h2>{{ name }}</h2>
             <h1>Tribune n°{{ id }}</h1>
@@ -71,6 +73,7 @@
             window.name = "{{ name }}";
             window.color = "{{ color }}";
             window.sensorDelay = {{ sensorDelay }};
+            window.numberGraph = 2;
         </script>
         <script type="module" src="{{ url_for('static', filename='js/Dashboard/stadiumBleacher.js') }}"></script>
     </body>
