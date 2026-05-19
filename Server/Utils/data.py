@@ -255,3 +255,23 @@ def createStadiumBleacherAcousticForClient(stadiumBleacherId, name, color, acous
         "color":     color,
         "acoustic":  acoustic,
     }
+
+
+
+##
+# @brief Créer un message système formaté.
+#
+# @param data Dictionnaire de données reçu depuis le broker MQTT.
+#
+# @return Le message système formaté.
+##
+def makeMessageSystem(data):
+    match data.get('t'):
+        case "PolarH10":
+            messageSystem = f"Capteur: {data.get('n')} du supporter n°{data.get('id')} - "
+            messageSystem += f"Niveau de batterie du capteur: {data.get('bl')}% - "
+            messageSystem += f"Location du capteur sur le corps: {data.get('bsl')}"
+        case _:
+            messageSystem = f"Pas de message formater pour ce type de capteur: {data}"
+
+    return messageSystem

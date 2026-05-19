@@ -15,6 +15,13 @@ Format d'envoi: JSON
     "id": <int>,       # Identifiant du supporter
     "hr": [<int>, ...] # Liste de fréquences cardiaques
 }
+{
+    "t"   : <int>,    # Type de capteur
+    "n"   : <string>, # Nom du capteur
+    "id"  : <int>,    # Identifiant du supporter
+    "bsl" : <string>, # Location du capteur sur le corps
+    "bl"  : <int>     # Niveau de batterie
+}
 
 ### MinIMU-9 v6
 

@@ -1,0 +1,56 @@
+/* =========================================================================
+    Body
+   ========================================================================= */
+
+body
+{
+    background-color: var(--body-background);
+}
+
+/* =========================================================================
+    Header
+   ========================================================================= */
+
+header
+{
+	background-color: var(--header-background);
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    justify-content: space-between;
+    align-items: center;
+    justify-items: center;
+    margin: 3vh 10vw 5vh 10vw;
+    padding: 2vh 2vw;
+    border-radius: 15px;
+    border: 5px solid var(--header-border);
+}
+
+
+
+h1
+{
+    font-size: 50px;
+    grid-column: 1 / 4;
+}
+
+/* =========================================================================
+    Main
+   ========================================================================= */
+
+/* ----------  Log ---------- */
+#log
+{
+	background-color: var(--card-background);
+	border: 5px solid var(--card-border);
+	border-radius: 15px;
+	margin: 0 10vw;
+	padding: 2.5vh 2.5vw;
+	height: 75vh;
+	overflow-y: auto;
+}
+
+p
+{
+	font-size: 25px;
+	margin: 1vh 0;
+}

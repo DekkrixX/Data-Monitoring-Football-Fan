@@ -128,6 +128,15 @@ def registerRoutes(app, supporterList, stadiumBleacherList, postgresqlClient):
         config = loadConfiguration(matchInformation["config"])
         return render_template("Control/configuration.html", debug=int(Config.DEBUG), events=config)
 
+
+
+    ##
+    # @brief Page de log d'informations systèmes.
+    ##
+    @app.route("/system")
+    def systemPage():
+        return render_template("Control/system.html", debug=int(Config.DEBUG))
+
 # =============================================================================
 #  Gestionnaires d'erreurs HTTP
 # =============================================================================

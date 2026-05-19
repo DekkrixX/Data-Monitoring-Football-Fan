@@ -18,7 +18,7 @@ from Server.Config.setting import Config
 from Server.Core.Supporter.supporter import Supporter
 from Server.Core.StadiumBleacher.stadiumBleacher import StadiumBleacher
 from Server.Utils.display import printBanner
-from Server.Utils.data import createSupporterHeartRateForClient, getNameOfSupporter, getColorOfSupporter, createStadiumBleacherAccelerometerForClient, createStadiumBleacherAcousticForClient, getNameOfStadiumBleacher, getColorOfStadiumBleacher
+from Server.Utils.data import createSupporterHeartRateForClient, getNameOfSupporter, getColorOfSupporter, createStadiumBleacherAccelerometerForClient, createStadiumBleacherAcousticForClient, getNameOfStadiumBleacher, getColorOfStadiumBleacher, makeMessageSystem
 from Server.Core.mqtt import MQTTClientWrapper
 from Server.Core.postgresql import PostgreSQLClientWrapper
 from Server.Web.routes import registerRoutes
@@ -130,6 +130,8 @@ def _onMqttMessage(message):
         if not _stadiumBleacherExists(idf):
             _createStadiumBleacher(idf, dataType)
         _addStadiumBleacherAcoustic(idf, data)
+    elif dataType == "system":
+        socketio.emit("newSystemInfo", makeMessageSystem(data))
     else:
         logger.warning(f"[APP] Topic MQTT non reconnu : {message.topic}")
 
