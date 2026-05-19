@@ -9,7 +9,7 @@ export APP_DEVICE = $(APP) - Device
 export APP_SERVER = $(APP) - Server
 
 # Fichiers générés
-GEN_FILES = Device/doc Server/doc Device/.pio Device/data .venv Resources/Data/gatewayContact.txt
+GEN_FILES = Device/doc Server/doc Device/.pio Device/data Tests/Distance/.pio Tests/Distance/data .venv Resources/Data/gatewayContact.txt
 
 # Définition des couleurs
 _RESET = \033[m

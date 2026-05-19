@@ -128,11 +128,11 @@ services:
         ports:
             - "${WEB_PORT}:${WEB_PORT}"
 
-    test:
+    test-data:
         build:
             context: .
             dockerfile: Tests/DataSimulationServer/Dockerfile
-        container_name: test
+        container_name: test-data
         depends_on:
             mqtt:
                 condition: service_started
@@ -144,6 +144,18 @@ services:
         profiles:
             - test
         command: python -m Tests.DataSimulationServer.run
+
+    test-distance:
+        build:
+            context: .
+            dockerfile: Tests/Distance/Dockerfile
+        container_name: test-distance
+        env_file:
+            - .env
+        restart: "no"
+        profiles:
+            - test
+        command: python -m Tests.Distance.run
 
 volumes:
     influxdb-data:

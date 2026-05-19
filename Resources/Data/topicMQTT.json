@@ -1,8 +1,8 @@
 [
     {
         "code": 0,
-        "name": "default",
-        "topic": "monitoring/default/"
+        "name": "test",
+        "topic": "monitoring/test/"
     },
     {
         "code": 1,

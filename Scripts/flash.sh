@@ -63,7 +63,7 @@ function usage()
     echo -e "\t\tExemple: ${name} --help"
     echo -e "\t-v | --verbose"
     echo -e "\t\tActive les messages de debug détaillés."
-    echo -e "\t\tExemple: ${name} --verbose file.log"
+    echo -e "\t\tExemple: ${name} --verbose device"
     echo ""
     echo -e "${_WHITE}ARGUMENTS${_RESET}"
     echo -e "\t<cible>"

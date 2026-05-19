@@ -96,7 +96,7 @@
 //  Paramètres de logs
 // ============================================================================
 
-#if DEBUG = 0
+#if DEBUG == 0
 #define NB_LOGGER                 1 ///< @brief Nombre de logger présent sur la carte.
 #else
 #define NB_LOGGER                 5 ///< @brief Nombre de logger présent sur la carte.

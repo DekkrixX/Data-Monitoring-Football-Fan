@@ -1,0 +1,17 @@
+Ordre de test des configurations:
+
+LONG_FAST
+.venv/meshtastic-env/bin/meshtastic --port /dev/ttyACM0 --set lora.modem_preset LONG_FAST
+Longue portée mais peu d'envoi de message
+
+MEDIUM_FAST
+.venv/meshtastic-env/bin/meshtastic --port /dev/ttyACM0 --set lora.modem_preset MEDIUM_FAST
+Moyenne portée avec un peu plus d'envoi de message
+
+SHORT_FAST
+.venv/meshtastic-env/bin/meshtastic --port /dev/ttyACM0 --set lora.modem_preset SHORT_FAST
+Courte portée avec plus d'envoi de message
+
+SHORT_TURBO
+.venv/meshtastic-env/bin/meshtastic --port /dev/ttyACM0 --set lora.modem_preset SHORT_TURBO
+Très courte portée avec encore un peu plus d'envoi de message

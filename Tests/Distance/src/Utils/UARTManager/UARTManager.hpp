@@ -22,6 +22,7 @@
 // ============================================================================
 
 #include "../../Config/setting.hpp"
+#include "../Logger/Logger.hpp"
 
 
 
@@ -34,13 +35,20 @@ class UARTManager
 {
 
 // ============================================================================
+//  Attribut static
+// ============================================================================
+
+    private:
+        static Logger * logger; ///< @brief Logger qui écrit les logs dans un fichier
+
+// ============================================================================
 //  Attribut
 // ============================================================================
 
     private:
-        const int rxPin;                           ///< Numéro de broche RX.
-        const int txPin;                           ///< Numéro de broche TX.
-        const uint32_t baudRate;                   ///< Vitesse de communication en bauds.
+        const int rxPin;                           ///< @brief Numéro de broche RX.
+        const int txPin;                           ///< @brief Numéro de broche TX.
+        const uint32_t baudRate;                   ///< @brief Vitesse de communication en bauds.
 
         HardwareSerial & externalSerial = Serial1; ///< @brief Référence vers le port série physique externe (Serial1).
 

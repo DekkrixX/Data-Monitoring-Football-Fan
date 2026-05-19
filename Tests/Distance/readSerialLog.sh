@@ -11,7 +11,7 @@
 #  Import
 # =============================================================================
 
-source "$(dirname "${BASH_SOURCE[0]}")/out.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/../../Scripts/out.sh"
 
 # =============================================================================
 #  Code de sortie
@@ -29,8 +29,8 @@ VERBOSE=0 ##< @brief Mode verbeux (désactivé par défaut, activé par -v / --v
 #  Configuration du port série
 # =============================================================================
 
-baudRate=115200                                        ##< @brief Baud rate de la transmission UART.
-logDir="$(dirname "${BASH_SOURCE[0]}")/../Logs/Device" ##< @brief Dossier de destination des logs.
+baudRate=115200                                         ##< @brief Baud rate de la transmission UART.
+logDir="$(dirname "${BASH_SOURCE[0]}")/../../Logs/Test" ##< @brief Dossier de destination des logs.
 
 # =============================================================================
 #  Marqueurs de protocole (doivent correspondre au firmware)
