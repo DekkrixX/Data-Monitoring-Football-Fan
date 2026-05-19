@@ -77,11 +77,16 @@ test:
 clear:
 	@echo "$(_YELLOW)Suppression des volumes Docker$(_RESET)"
 	@docker compose down -v
-	@if docker ps -a --format "{{.Names}}" | grep -w test > /dev/null; \
-	then \
-		docker rm -f test-data; \
-		docker rm -f test-distance; \
-	fi
+	@docker rmi data-monitoring-football-fan-bridge-meshcore-mqtt
+	@docker rmi data-monitoring-football-fan-bridge-meshtastic-mqtt
+	@docker rmi data-monitoring-football-fan-bridge-mqtt-influxdb
+	@docker rmi data-monitoring-football-fan-server
+	@docker rmi data-monitoring-football-fan-test-data || true
+	@docker rmi data-monitoring-football-fan-test-distance || true
+	@docker rmi eclipse-mosquitto
+	@docker rmi grafana/grafana:12.4.2
+	@docker rmi influxdb:2.7
+	@docker rmi postgres:16
 
 # =============================================================================
 #  Création de la documentation
