@@ -155,6 +155,11 @@ services:
         restart: "no"
         profiles:
             - test
+        volumes:
+            - /dev:/dev
+        device_cgroup_rules:
+            - 'c 188:* rmw'
+            - 'c 166:* rmw'
         command: python -m Tests.Distance.run
 
 volumes:
