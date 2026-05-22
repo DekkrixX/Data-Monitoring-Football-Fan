@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Supporter n°{{ id }}</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/Tracking/tracker.css') }}">
+        <style>
+            :root 
+            {
+                --color: {{ color }};
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <h2>{{ name }}</h2>
+            <h1>Tracker n°{{ id }}</h1>
+            <a href="/tracking" class="button">← Retour</a>
+        </header>
+        <main>
+            <div class="graph-container">
+                <canvas id="graph"></canvas>
+            </div>
+        </main>
+        <script src="{{ url_for('static', filename='lib/socket.io.min.js') }}"></script>
+        <script>
+            // Définition des variables dynamiques
+            window.DEBUG = {{ debug }};
+            window.id = {{ id }};
+            window.name = "{{ name }}";
+            window.color = "{{ color }}";
+        </script>
+        <script type="module" src="{{ url_for('static', filename='js/Tracking/tracker.js') }}"></script>
+    </body>
+</html>

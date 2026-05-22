@@ -15,7 +15,7 @@ import json
 from flask import render_template, request, redirect, url_for, session
 
 from Server.Config.setting import Config
-from Server.Utils.data import getColorOfSupporter, getColorOfStadiumBleacher
+from Server.Utils.data import getColorOfSupporter, getColorOfStadiumBleacher, getColorOfTracker
 from Server.Utils.event import loadConfiguration, getConfigurationList, loadMatchInformation, loadConfigurationInformation
 from Server.Utils.logger import Logger
 
@@ -35,9 +35,10 @@ logger = Logger("Serveur/Routes")
 # @param app                 Instance Flask de l'application.
 # @param supporterList       Liste partagée des objets Supporter actifs.
 # @param stadiumBleacherList Liste partagée des objets StadiumBleacher actifs.
+# @param trackerList         Liste partagée des objets Tracker actifs.
 # @param postgresqlClient    Client PostgreSQL.
 ##
-def registerRoutes(app, supporterList, stadiumBleacherList, postgresqlClient):
+def registerRoutes(app, supporterList, stadiumBleacherList, trackerList, postgresqlClient):
     logger.info("[Routes] Enregistrement des routes et gestionnaires d'erreurs")
 
 # =============================================================================
@@ -136,6 +137,30 @@ def registerRoutes(app, supporterList, stadiumBleacherList, postgresqlClient):
     @app.route("/system")
     def systemPage():
         return render_template("Control/system.html", debug=int(Config.DEBUG))
+
+# =============================================================================
+#  Page de tracking
+# =============================================================================
+
+    ##
+    # @brief Page de tracking d'objet.
+    ##
+    @app.route("/tracking")
+    def trackingPage():
+        return render_template("Tracking/index.html", debug=int(Config.DEBUG))
+
+
+
+    ##
+    # @brief Page de visualisation d'un tracker
+    ##
+    @app.route("/tracker/<int:tracker_id>")
+    def trackerPage(tracker_id):
+        for tracker in trackerList:
+            if tracker.getId() == tracker_id:
+                return render_template("Tracking/tracker.html", debug=int(Config.DEBUG), id=tracker.getId(), name=tracker.getName(), color=getColorOfTracker(tracker.getId()))
+
+        return render_template("Tracking/tracker.html", debug=int(Config.DEBUG)), 404
 
 # =============================================================================
 #  Gestionnaires d'erreurs HTTP

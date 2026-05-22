@@ -17,6 +17,8 @@
     --button-background: #E2E2E4;
     --button-border: #D1D1D3;
     --back-button-background: #EAEAEA;
+    --graph-background: #FFFFFF;
+    --graph-zone: #000000;
 }
 @media (prefers-color-scheme: dark)
 {
@@ -35,6 +37,8 @@
         --button-background: #5E5E5E;
         --button-border: #A3A3A3;
         --back-button-background: #4E5760;
+        --graph-background: #000000;
+        --graph-zone: #FFFFFF;
     }
 }
 

@@ -15,7 +15,7 @@ from flask_socketio import emit
 from datetime import datetime, timedelta
 
 from Server.Config.setting import Config
-from Server.Utils.data import createSupporterHeartRateForClient, getNameOfSupporter, getColorOfSupporter, createStadiumBleacherAccelerometerForClient, createStadiumBleacherAcousticForClient, getNameOfStadiumBleacher, getColorOfStadiumBleacher
+from Server.Utils.data import createSupporterHeartRateForClient, getNameOfSupporter, getColorOfSupporter, createStadiumBleacherAccelerometerForClient, createStadiumBleacherAcousticForClient, getNameOfStadiumBleacher, getColorOfStadiumBleacher, createTrackerPositionForClient, getNameOfTracker, getColorOfTracker, getZoneOfTracker
 from Server.Utils.event import createNewEventConfiguration
 from Server.Utils.logger import Logger
 
@@ -35,9 +35,10 @@ logger = Logger("Serveur/SocketIO")
 # @param socketio            Instance SocketIO de l'application.
 # @param supporterList       Liste partagée des objets Supporter actifs.
 # @param stadiumBleacherList Liste partagée des objets StadiumBleacher actifs.
+# @param trackerList         Liste partagée des objets Tracker actifs.
 # @param postgresqlClient    Client PosgreSQL.
 ##
-def registerSocketioHandlers(socketio, supporterList, stadiumBleacherList, postgresqlClient):
+def registerSocketioHandlers(socketio, supporterList, stadiumBleacherList, trackerList, postgresqlClient):
 
 # =============================================================================
 #  Liste des supporters
@@ -223,6 +224,53 @@ def registerSocketioHandlers(socketio, supporterList, stadiumBleacherList, postg
             payload.append(data)
 
         socketio.emit("getStadiumBleacherAcousticAllResponse", payload)
+
+        return
+
+# =============================================================================
+#  Liste des trackers
+# =============================================================================
+
+    ##
+    # @brief Envoie la liste de tous les trackers actifs au client.
+    ##
+    @socketio.on("getTracker")
+    def handleGetTracker():
+        logger.info("[SocketIO] Réception de 'getTracker'")
+
+        payload = [{"id": t.trackerId, "name": t.trackingName, "color": getColorOfTracker(t.trackerId)} for t in trackerList]
+        socketio.emit("getTrackerResponse", payload)
+
+        return
+
+# =============================================================================
+#  Données d'un tracker spécifique
+# =============================================================================
+
+    ##
+    # @brief Envoie les données complètes d'un tracker (position, zone, lastPositions).
+    #
+    # @param trackerId Identifiant du tracker demandé.
+    ##
+    @socketio.on("getTrackerPosition")
+    def handleGetTrackerPosition(trackerId):
+        logger.info(f"[SocketIO] Réception de 'getTrackerPosition' pour le tracker id={trackerId}")
+
+        name  = getNameOfTracker(trackerId)
+        color = getColorOfTracker(trackerId)
+        zone  = getZoneOfTracker(trackerId)
+
+        for tracker in trackerList:
+            if tracker.getId() == int(trackerId):
+                payload = createTrackerPositionForClient(trackerId, name, color, tracker.getPosition())
+                payload.update({
+                    "zone": zone,
+                    "lastPositions": tracker.getLastPositions(),
+                })
+                socketio.emit("getTrackerPositionResponse", payload)
+                return
+
+        logger.warning(f"[SocketIO] Aucun tracker trouvé avec l'id={trackerId}")
 
         return
 

@@ -24,7 +24,7 @@ if (window.DEBUG)
 // Demande de la liste des supporters actuellement connectés
 socket.emit("getSupporter");
 // Demande de la liste des tribunes actuellement connectés
-socket.emit("getStadiumBleacher")
+socket.emit("getStadiumBleacher");
 
 // ============================================================================
 //  Événements SocketIO
@@ -44,12 +44,12 @@ socket.on("getSupporterResponse", (dataList) =>
 
     for (const data of dataList)
     {
-            if (window.DEBUG)
-                console.log(`[Index] getSupporterResponse - Ajout du supporter id=${data.id} (${data.name})`);
+        if (window.DEBUG)
+            console.log(`[Index] getSupporterResponse - Ajout du supporter id=${data.id} (${data.name})`);
 
-            const element = supporterCard(data.id, data.name, data.color);
-            grid.appendChild(element);
-        }
+        const element = supporterCard(data.id, data.name, data.color);
+        grid.appendChild(element);
+    }
 
     // La carte de comparaison n'est pertinente qu'à partir de 2 supporters
     if (dataList.length >= 2)

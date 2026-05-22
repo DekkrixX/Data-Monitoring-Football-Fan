@@ -3,7 +3,7 @@
 #
 # @brief Utilitaires de lecture des données supporters et de formatage pour le client web.
 #
-# Fournit les accesseurs getNameOfSupporter() et getColorOfSupporter() qui lisent le fichier supporter.json, ainsi que createDataForClient() qui formate les données pour l'envoi via SocketIO.
+# Fournit les accesseurs getNameOf...() et getColorOf...() qui lisent le fichier supporter.json, ainsi que create...ForClient() qui formate les données pour l'envoi via SocketIO.
 ##
 
 # =============================================================================
@@ -136,6 +136,63 @@ def _getStadiumBleacherField(stadiumBleacherId, field):
     return
 
 # =============================================================================
+#  Lecture du fichier tracker.json
+# =============================================================================
+
+##
+# @brief Charge et retourne le contenu du fichier tracker.json.
+#
+# @return list Liste de dictionnaires représentant les trackers.
+#
+# @throws RuntimeError Si le fichier est absent ou malformé.
+##
+def _loadTrackerFile():
+    filePath = Config.PATH["data"] + "tracker.json"
+
+    try:
+        logger.info(f"[Data] Lecture du fichier des trackers : '{filePath}'")
+
+        with open(filePath, "r") as file:
+            return json.load(file)
+
+    except FileNotFoundError:
+        message = f"[Data] Fichier des trackers introuvable : '{filePath}'"
+        logger.error(message)
+        raise RuntimeError(message)
+
+    except json.JSONDecodeError as e:
+        message = f"[Data] Fichier des trackers invalide (JSON malformé) : '{filePath}'"
+        logger.error(message)
+        raise RuntimeError(message) from e
+
+    return
+
+
+
+##
+# @brief Retourne la valeur d'un champ donné pour le tracker identifié.
+#
+# @param trackerId Identifiant du tracker recherché.
+# @param field     Nom du champ à retourner.
+#
+# @return Valeur du champ pour le tracker correspondant.
+#
+# @throws RuntimeError Si aucun tracker ne correspond à l'identifiant.
+##
+def _getTrackerField(trackerId, field):
+    trackers = _loadTrackerFile()
+
+    for item in trackers:
+        if item["id"] == trackerId:
+            return item[field]
+
+    message = f"[Data] Aucun tracker trouvé avec l'id '{trackerId}'"
+    logger.error(message)
+    raise RuntimeError(message)
+
+    return
+
+# =============================================================================
 #  Accesseurs publics
 # =============================================================================
 
@@ -194,6 +251,50 @@ def getColorOfStadiumBleacher(stadiumBleacherId):
     return _getStadiumBleacherField(stadiumBleacherId, "color")
 
 
+
+##
+# @brief Retourne le nom du tracker correspondant à l'identifiant donné.
+#
+# @param trackerId Identifiant numérique du tracker.
+#
+# @return str Nom du tracker.
+#
+# @throws RuntimeError Si aucun tracker ne correspond à l'identifiant.
+##
+def getNameOfTracker(trackerId):
+    return _getTrackerField(trackerId, "name")
+
+
+
+##
+# @brief Retourne la couleur du tracker correspondant à l'identifiant donné.
+#
+# @param trackerId Identifiant numérique du tracker.
+#
+# @return str Couleur du tracker.
+#
+# @throws RuntimeError Si aucun tracker ne correspond à l'identifiant.
+##
+def getColorOfTracker(trackerId):
+    return _getTrackerField(trackerId, "color")
+
+
+
+##
+# @brief Retourne la zone du tracker correspondant à l'identifiant donné.
+#
+# @param trackerId Identifiant numérique du tracker.
+#
+# @return List Zone du tracker.
+#
+# @throws RuntimeError Si aucun tracker ne correspond à l'identifiant.
+##
+def getZoneOfTracker(trackerId):
+    return _getTrackerField(trackerId, "zone")
+
+
+
+
 # =============================================================================
 #  Formatage pour le client web
 # =============================================================================
@@ -244,7 +345,7 @@ def createStadiumBleacherAccelerometerForClient(stadiumBleacherId, name, color, 
 # @param stadiumBleacherId Identifiant de la tribune.
 # @param name              Nom de la tribune.
 # @param color             Couleur associée à la tribune.
-# @param acostic           Dernière mesure acoustic.
+# @param acoustic           Dernière mesure acoustic.
 #
 # @return dict Données formatées pour le client. Format : { "id": …, "name": …, "color": …, "acoustic": … }
 ##
@@ -275,3 +376,23 @@ def makeMessageSystem(data):
             messageSystem = f"Pas de message formater pour ce type de capteur: {data}"
 
     return messageSystem
+
+
+
+##
+# @brief Construit le dictionnaire de données envoyé au client web via SocketIO.
+#
+# @param trackerId Identifiant du tracker.
+# @param name      Nom du tracker.
+# @param color     Couleur associée au tracker.
+# @param position  Nouvelle mesure de la position.
+#
+# @return dict Données formatées pour le client. Format : { "id": …, "name": …, "color": …, "position": … }
+##
+def createTrackerPositionForClient(trackerId, name, color, position):
+    return {
+        "id":        trackerId,
+        "name":      name,
+        "color":     color,
+        "position":  position,
+    }

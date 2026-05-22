@@ -148,6 +148,52 @@ export function comparisonCard(type, data, titre)
 
 
 /**
+ * @brief Crée et retourne une carte HTML cliquable représentant un tracker.
+ *
+ * @param {number} id    Identifiant unique du tracker.
+ * @param {string} name  Nom d'affichage du tracker.
+ * @param {string} color Code couleur du tracker
+ *
+ * @returns {HTMLDivElement} Élément div prêt à être inséré dans le DOM.
+ */
+export function trackerCard(id, name, color)
+{
+    if (DEBUG)
+        console.log(`[Element] trackerCard - Création de la carte pour le tracker id=${id} (${name})`);
+
+    // Création de la carte
+    const card = document.createElement("div");
+    card.id = "t" + id;
+    card.classList.add("card");
+
+    // Redirection vers la page de détail du supporter au clic
+    card.addEventListener("click", () =>
+        {
+            if (DEBUG)
+                console.log(`[Element] trackerCard - Clic sur la carte du tracker id=${id}, redirection vers /tracker/${id}`);
+
+            window.location.href = "/tracker/" + id;
+        });
+
+    // Création des éléments texte
+    const pName = document.createElement("p");
+    pName.textContent = name;
+    pName.classList.add("name");
+    pName.style.color = color;
+
+    const pId = document.createElement("p");
+    pId.textContent = "Tracker n°" + id;
+    pId.classList.add("id");
+
+    card.appendChild(pName);
+    card.appendChild(pId);
+
+    return card;
+}
+
+
+
+/**
  * @brief Crée et retourne un graphique Chart.js de type "line" configuré
  *        pour afficher des données en temps réel.
  *

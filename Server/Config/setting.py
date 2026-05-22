@@ -145,6 +145,14 @@ class Config:
 
     SENSOR_DELAY = float(os.getenv("SENSOR_DELAY", 0)) ##< @brief Délais d'échantillonage des capteurs.
 
+# =============================================================================
+#  Tracking
+# =============================================================================
+
+    MAX_POINTS_TRACKING = int(os.getenv("MAX_POINTS_TRACKING", 0)) ##< @brief Nombre maximum de points dans l'historique des positions trackées.
+
+
+
     ##
     # @brief Vérifie que toutes les variables d'environnement requises sont définies et non vides.
     #
@@ -207,7 +215,10 @@ class Config:
             "POSTGRESQL_DATABASE_FILE": cls.POSTGRESQL_DATABASE_FILE,
 
             # Délais d'échantillonage des capteurs
-            "SENSOR_DELAY": cls.SENSOR_DELAY
+            "SENSOR_DELAY": cls.SENSOR_DELAY,
+
+            # Tracking
+            "MAX_POINTS_TRACKING": cls.MAX_POINTS_TRACKING
         }
 
         if cls.DEBUG:

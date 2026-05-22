@@ -46,10 +46,17 @@ stop:
 	@echo "$(_YELLOW)Arrêt des conteneurs Docker$(_RESET)"
 	@docker compose down
 	@docker volume prune -f
-	@if docker ps -a --format "{{.Names}}" | grep -w test > /dev/null; \
+	@if docker ps -a --format "{{.Names}}" | grep -w data > /dev/null; \
 	then \
 		docker rm -f test-data; \
-		docker rm -f test-distance; \
+	fi
+	@if docker ps -a --format "{{.Names}}" | grep -w tracking > /dev/null; \
+	then \
+		docker rm -f test-tracking; \
+	fi
+	@if docker ps -a --format "{{.Names}}" | grep -w distance > /dev/null; \
+	then \
+		docker rm -f test-distance || true; \
 	fi
 
 # =============================================================================
@@ -68,8 +75,13 @@ log:
 #  Lancement des conteneurs Docker de test
 # =============================================================================
 test:
-	@echo "$(_YELLOW)Lancement des conteneurs Docker de test$(_RESET)"
-	@docker compose --profile test up -d
+	@if [ -z "$(TARGET)" ]; \
+	then \
+		echo "$(_RED)Aucun cible spécifiée.$(_RESET)"; \
+	else \
+		echo "$(_YELLOW)Lancement des conteneurs Docker de test$(_RESET)"; \
+		docker compose --profile $(TARGET) up -d; \
+	fi
 
 # =============================================================================
 #  Suppression des volumes Docker
@@ -82,6 +94,7 @@ clear:
 	@docker rmi data-monitoring-football-fan-bridge-mqtt-influxdb
 	@docker rmi data-monitoring-football-fan-server
 	@docker rmi data-monitoring-football-fan-test-data || true
+	@docker rmi data-monitoring-football-fan-test-tracking || true
 	@docker rmi data-monitoring-football-fan-test-distance || true
 	@docker rmi eclipse-mosquitto
 	@docker rmi grafana/grafana:12.4.2
@@ -188,6 +201,7 @@ help:
 	@echo "   - run     : Lance les conteneurs Docker."
 	@echo "   - stop    : Arrête les conteneurs Docker."
 	@echo "   - log     : Affiche les logs des conteneurs Docker. (TARGET=<conteneur>)"
+	@echo "   - test    : Lance les conteneurs Docker de test. (TARGET=<conteneur>)"
 	@echo "   - clear   : Supprime les volumes Docker."
 	@echo "   - doc     : Créer la documentation."
 	@echo "   - clean   : Nettoie l'environnement."

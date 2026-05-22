@@ -17,8 +17,9 @@ from flask_socketio import SocketIO
 from Server.Config.setting import Config
 from Server.Core.Supporter.supporter import Supporter
 from Server.Core.StadiumBleacher.stadiumBleacher import StadiumBleacher
+from Server.Core.Tracker.tracker import Tracker
 from Server.Utils.display import printBanner
-from Server.Utils.data import createSupporterHeartRateForClient, getNameOfSupporter, getColorOfSupporter, createStadiumBleacherAccelerometerForClient, createStadiumBleacherAcousticForClient, getNameOfStadiumBleacher, getColorOfStadiumBleacher, makeMessageSystem
+from Server.Utils.data import createSupporterHeartRateForClient, getNameOfSupporter, getColorOfSupporter, createStadiumBleacherAccelerometerForClient, createStadiumBleacherAcousticForClient, getNameOfStadiumBleacher, getColorOfStadiumBleacher, makeMessageSystem, createTrackerPositionForClient, getNameOfTracker, getColorOfTracker, getZoneOfTracker
 from Server.Core.mqtt import MQTTClientWrapper
 from Server.Core.postgresql import PostgreSQLClientWrapper
 from Server.Web.routes import registerRoutes
@@ -37,6 +38,7 @@ logger = Logger("Serveur/App")
 
 supporterList = []       ##< @brief Liste des supporters actifs, alimentée par les messages MQTT.
 stadiumBleacherList = [] ##< @brief Liste des tribunes du stade actives, alimentée par les messages MQTT.
+trackerList = []         ##< @brief Liste des trackers actifs.
 socketio = None          ##< @brief Instance SocketIO partagée entre main() et les callbacks MQTT.
 
 # =============================================================================
@@ -67,8 +69,8 @@ def main():
     # Connexion à la base de données PostgreSQL
     postgresqlClient = PostgreSQLClientWrapper(Config.POSTGRESQL_HOST, Config.POSTGRESQL_PORT, Config.POSTGRESQL_DATABASE, Config.POSTGRESQL_USER, Config.POSTGRESQL_PASSWORD)
 
-    registerRoutes(app, supporterList, stadiumBleacherList, postgresqlClient)
-    registerSocketioHandlers(socketio, supporterList, stadiumBleacherList, postgresqlClient)
+    registerRoutes(app, supporterList, stadiumBleacherList, trackerList, postgresqlClient)
+    registerSocketioHandlers(socketio, supporterList, stadiumBleacherList, trackerList, postgresqlClient)
 
     mqttClient.connect()
     mqttClient.subscribe(Config.MQTT_BROKER_TOPICS_DATA)
@@ -132,6 +134,10 @@ def _onMqttMessage(message):
         _addStadiumBleacherAcoustic(idf, data)
     elif dataType == "system":
         socketio.emit("newSystemInfo", makeMessageSystem(data))
+    elif dataType == "tracker":
+        if not _trackerExists(idf):
+            _createTracker(idf)
+        _addTrackerPosition(idf, data)
     else:
         logger.warning(f"[APP] Topic MQTT non reconnu : {message.topic}")
 
@@ -342,6 +348,79 @@ def _addStadiumBleacherAcoustic(stadiumBleacherId, data):
             return
 
     logger.warning(f"[APP] Données reçues pour une tribune inconnu (id={stadiumBleacherId}), message ignoré")
+
+    return
+
+# =============================================================================
+#  Gestion des trackers
+# =============================================================================
+
+##
+# @brief Indique si un Tracker avec cet identifiant est déjà présent dans trackerList.
+#
+# @param trackerId Identifiant du tracker recherché.
+#
+# @return bool True si le tracker existe.
+# @return bool False sinon.
+##
+def _trackerExists(trackerId):
+    for tracker in trackerList:
+        if tracker.getId() == trackerId:
+            return True
+    return False
+
+
+
+##
+# @brief Crée un nouveau Tracker, l'ajoute à trackerList et notifie les clients web de sa connexion via SocketIO.
+#
+# @param trackerId Identifiant du nouveau tracker.
+##
+def _createTracker(trackerId):
+    global socketio
+
+    logger.info(f"[APP] Nouveau tracker détecté (id={trackerId})")
+
+    name  = getNameOfTracker(trackerId)
+    color = getColorOfTracker(trackerId)
+    zone  = getZoneOfTracker(trackerId)
+
+    trackerList.append(Tracker(trackerId, name, zone))
+
+    # position=None: valeur initiale avant la première mesure
+    payload = createTrackerPositionForClient(trackerId, name, color, None)
+
+    socketio.emit("trackerConnection", payload)
+
+    return
+
+
+
+##
+# @brief Enregistre une nouvelle mesure pour le tracker correspondant et pousse la mise à jour aux clients web via SocketIO.
+#
+# @param tarckerId Identifiant du nouveau tracker.
+# @param data      Dictionnaire de données reçu depuis le broker MQTT.
+##
+def _addTrackerPosition(trackerId, data):
+    name  = getNameOfTracker(trackerId)
+    color = getColorOfTracker(trackerId)
+    zone  = getZoneOfTracker(trackerId)
+
+    for tracker in trackerList:
+        if tracker.getId() == trackerId:
+            tracker.addPosition((data["p"][-1]["x"], data["p"][-1]["y"]))
+
+            payload = createTrackerPositionForClient(tracker.getId(), name, color, tracker.getPosition())
+            payload.update({
+                "zone": zone,
+                "lastPositions": tracker.getLastPositions(),
+            })
+
+            socketio.emit("newTrackerPosition", payload)
+            return
+
+    logger.warning(f"[APP] Données reçues pour un tracker inconnu (id={trackerId}), message ignoré")
 
     return
 

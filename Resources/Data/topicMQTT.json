@@ -23,5 +23,10 @@
         "code": 4,
         "name": "acoustic",
         "topic": "monitoring/acoustic/"
+    },
+    {
+        "code": 5,
+        "name": "tracker",
+        "topic": "monitoring/tracker/"
     }
 ]

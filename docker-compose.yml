@@ -142,8 +142,25 @@ services:
             - .env
         restart: "no"
         profiles:
-            - test
+            - data
         command: python -m Tests.DataSimulationServer.run
+
+    test-tracking:
+        build:
+            context: .
+            dockerfile: Tests/TrackingSimulationServer/Dockerfile
+        container_name: test-tracking
+        depends_on:
+            mqtt:
+                condition: service_started
+            server:
+                condition: service_started
+        env_file:
+            - .env
+        restart: "no"
+        profiles:
+            - tracking
+        command: python -m Tests.TrackingSimulationServer.run
 
     test-distance:
         build:
@@ -154,7 +171,7 @@ services:
             - .env
         restart: "no"
         profiles:
-            - test
+            - distance
         volumes:
             - /dev:/dev
         device_cgroup_rules:

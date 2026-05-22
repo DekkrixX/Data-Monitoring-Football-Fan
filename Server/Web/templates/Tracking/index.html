@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Tracking Dashboard</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/Tracking/index.css') }}">
+    </head>
+    <body>
+        <header>
+            <h1>Dashboard de tracking</h1>
+        </header>
+        <main>
+            <h2>Objet tracké en temps réel</h2>
+            <div id="grid">
+            </div>
+        </main>
+        <script src="{{ url_for('static', filename='lib/socket.io.min.js') }}"></script>
+        <script>
+            // Définition des variables dynamiques
+            window.DEBUG = {{ debug }};
+        </script>
+        <script type="module" src="{{ url_for('static', filename='js/Tracking/index.js') }}"></script>
+    </body>
+</html>
