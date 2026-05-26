@@ -20,10 +20,10 @@ import math
 
 # Vitesses en cm/s
 _SPEED_STOPPED   = 0.0
-_SPEED_WALK_MIN  = 80.0    # ~0.8 m/s (marche lente)
-_SPEED_WALK_MAX  = 160.0   # ~1.6 m/s (marche normale)
-_SPEED_RUN_MIN   = 300.0   # ~3 m/s   (trot)
-_SPEED_RUN_MAX   = 600.0   # ~6 m/s   (sprint)
+_SPEED_WALK_MIN  = 80.0
+_SPEED_WALK_MAX  = 160.0
+_SPEED_RUN_MIN   = 300.0
+_SPEED_RUN_MAX   = 600.0
 
 # Durées des états (secondes)
 _STOP_MIN        = 1.0
@@ -34,8 +34,8 @@ _RUN_MIN         = 1.0
 _RUN_MAX         = 5.0
 
 # Accélération / décélération (cm/s²)
-_ACCEL           = 60.0    # Accélération vers la vitesse cible
-_TURN_RATE       = 1.2     # Radians/s max de rotation (virage progressif)
+_ACCEL           = 60.0
+_TURN_RATE       = 1.2
 
 # Probabilité de transition entre états (par seconde)
 _PROB_STOP_TO_WALK  = 0.8
@@ -46,6 +46,11 @@ _PROB_RUN_TO_STOP   = 0.05
 
 # Bruit de mesure (cm) — simule imprécision capteur
 _NOISE_SIGMA     = 0.5
+
+# Dépassement des bords autorisé, exprimé en fraction de la largeur/hauteur
+# de la zone.  Ex : 0.1 = 10 % de débordement possible de chaque côté.
+# Mettre à 0.0 pour un rebond strict sur le bord exact.
+_OVERSHOOT_RATIO = 0.1
 
 # =============================================================================
 #  Simulateur
@@ -198,24 +203,27 @@ class PositionSimulator:
         new_x = self._x + vx * dt
         new_y = self._y + vy * dt
 
-        # Rebond sur les bords : inverser la composante perpendiculaire au mur
-        # et choisir une nouvelle direction
+        # Dépassement possible des bords (simule une imprécision de zone ou un
+        # débordement momentané).  Au-delà de la marge, rebond strict.
+        overshoot_x = (self._maxX - self._minX) * _OVERSHOOT_RATIO
+        overshoot_y = (self._maxY - self._minY) * _OVERSHOOT_RATIO
+
         bounced = False
-        if new_x < self._minX:
-            new_x = self._minX
+        if new_x < self._minX - overshoot_x:
+            new_x = self._minX - overshoot_x
             self._angle = math.pi - self._angle
             bounced = True
-        elif new_x > self._maxX:
-            new_x = self._maxX
+        elif new_x > self._maxX + overshoot_x:
+            new_x = self._maxX + overshoot_x
             self._angle = math.pi - self._angle
             bounced = True
 
-        if new_y < self._minY:
-            new_y = self._minY
+        if new_y < self._minY - overshoot_y:
+            new_y = self._minY - overshoot_y
             self._angle = -self._angle
             bounced = True
-        elif new_y > self._maxY:
-            new_y = self._maxY
+        elif new_y > self._maxY + overshoot_y:
+            new_y = self._maxY + overshoot_y
             self._angle = -self._angle
             bounced = True
 
