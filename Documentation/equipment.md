@@ -61,6 +61,34 @@ Description :
 - Connectivité smartphone : configuration et utilisation via une app mobile (Bluetooth).
 - LoRa (long range low power) : portée typique de plusieurs kilomètres avec très faible consommation.
 
+## Carte UWB DWM3001CDK
+
+Description :
+- Carte de développement UWB (Ultra-Wideband) pour localisation précise en temps réel et communication courte portée
+- Fonction principale : mesure de distance très haute précision (quelques centimètres) entre appareils compatibles UWB
+- Module intégré : DWM3001C de Qorvo basé sur la puce DW3110 conforme IEEE 802.15.4z
+- Microcontrôleur embarqué : Nordic nRF52833 avec Bluetooth Low Energy intégré
+- Technologies de communication :
+    - UWB pour le ranging et la localisation
+    - Bluetooth Low Energy (BLE) pour configuration et communication mobile
+    - USB pour programmation et alimentation
+- Précision de localisation : typiquement ±10 cm dans de bonnes conditions
+- Fréquence radio UWB : bande 6,5 GHz (canaux UWB)
+- Modes de fonctionnement :
+    - Tag (objet mobile localisé)
+    - Anchor (balise fixe de référence)
+    - Communication peer-to-peer
+- Interfaces disponibles :
+    - GPIO
+    - UART
+    - SPI
+    - I2C
+    - USB
+- Antennes intégrées : antenne UWB + antenne Bluetooth sur le module
+- Alimentation : via USB ou alimentation externe basse tension
+- Consommation : faible consommation adaptée aux systèmes embarqués et IoT
+- Format : carte de développement compacte avec connecteurs de prototypage et boutons intégrés
+
 # Serveur
 
 | Service    | Port | Protocole      | Usage                                  |
