@@ -22,7 +22,7 @@ _MAGENTA = \033[1;35m
 _CYAN = \033[1;36m
 _WHITE = \033[1;37m
 
-.PHONY: build run stop logs clean help
+.PHONY: build run stop logs test clear doc clean script install remove help
 .DEFAULT_GOAL := help
 
 # =============================================================================
@@ -163,6 +163,16 @@ install:
 	@curl -fsSL https://get.docker.com -o get-docker.sh
 	@sudo sh ./get-docker.sh
 	@rm get-docker.sh
+	@echo "Package: Python3.10"
+	@sudo apt install -y python3.10
+	@echo "Package: Pip"
+	@sudo apt install -y python3-pip
+	@python3.10 -m pip install --upgrade pip
+	@echo "Package: venv"
+	@sudo apt install -y python3-venv
+	@echo "Création de l'environnement virtuel"
+	@python3.10 -m venv Ultra-Wide-Band/uwb-qorvo-tools/.venv
+	@Ultra-Wide-Band/uwb-qorvo-tools/.venv/bin/pip install Ultra-Wide-Band/uwb-qorvo-tools
 	@echo "$(_YELLOW)Les dépendances ont été installées$(_NO_COLOR)"
 
 # =============================================================================
@@ -182,10 +192,14 @@ remove:
 	@sudo rm /etc/apt/keyrings/docker.asc
 	@echo "Package: Python3-venv"
 	@sudo apt remove -y python3-venv
+	@echo "Package: Pip"
+	@sudo apt remove -y python3-pip
+	@echo "Package: Python3.10"
+	@sudo apt remove -y python3.10
 	@echo "Package: Python3"
 	@sudo apt remove -y python3
 	@echo "Suppression des environnements virtuels python"
-	@rm -rf .venv
+	@rm -rf .venv Ultra-Wide-Band/uwb-qorvo-tools/.venv
 	@sudo apt autoremove -y
 	@echo "$(_YELLOW)Les dépendances ont été supprimées$(_NO_COLOR)"
 
