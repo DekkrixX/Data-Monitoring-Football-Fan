@@ -44,7 +44,7 @@ class Tracker:
         self.trackerId = trackerId       ##< @brief Id du tracker.
         self.trackingName = trackingName ##< @brief Nom de l'objet tracké.
         self.trackingZone = trackingZone ##< @brief Liste de point de la délimitation de la zone de tracking.
-        self.currentPosition = (0, 0)    ##< @brief Position courante de l'objet tracké.
+        self.currentPosition = None      ##< @brief Position courante de l'objet tracké.
         self.lastPositions = []          ##< @brief Liste des dernières position de l'objet tracké.
 
         return
@@ -100,8 +100,11 @@ class Tracker:
     # @param position La nouvelle position de l'objet.
     ##
     def addPosition(self, position):
-        self.lastPositions.append(self.currentPosition)
+        # Mise à jour de l'historique si la position courante existe
+        if self.currentPosition:
+            self.lastPositions.append(self.currentPosition)
         self.currentPosition = position
+        # Suppression des données d'historique si la taille maximum est atteinte
         if len(self.lastPositions) > Config.MAX_POINTS_TRACKING:
             self.lastPositions.pop(0)
 

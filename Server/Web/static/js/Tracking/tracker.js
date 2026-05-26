@@ -251,18 +251,18 @@ function _drawTrace(position, lastPositions, color)
     ctx.beginPath();
 
     // Dessiner le chemin entre tous les points stockés dans lastPositions
-    const firstPoint = _convertToCanvas(lastPositions[0], lastPositions[1]);
-    ctx.moveTo(firstPoint.x, firstPoint.y);
+    const first = _convertToCanvas(lastPositions[0][0], lastPositions[0][1]);
+    ctx.moveTo(first.x, first.y);
 
-    for (let index = 2; index < lastPositions.length; index += 2)
+    for (let index = 1; index < lastPositions.length; index++)
     {
-        const point = _convertToCanvas(lastPositions[index], lastPositions[index + 1]);
+        const point = _convertToCanvas(lastPositions[index][0], lastPositions[index][1]);
         ctx.lineTo(point.x, point.y);
     }
 
     // Ajouter le segment final vers la position actuelle
-    const currentPoint = _convertToCanvas(position[0], position[1]);
-    ctx.lineTo(currentPoint.x, currentPoint.y);
+    const point = _convertToCanvas(position[0], position[1]);
+    ctx.lineTo(point.x, point.y);
 
     ctx.strokeStyle = color;
     ctx.lineWidth = 2;

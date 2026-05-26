@@ -23,7 +23,7 @@ from Server.Utils.logger import Logger
 #  Création du logger
 # =============================================================================
 
-logger = Logger("Test/Meshtastic")
+logger = Logger("Tests/Meshtastic")
 
 # =============================================================================
 #  Variable global
