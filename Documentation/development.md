@@ -27,9 +27,20 @@ Attention seul le premier lancement du serveur nécessite une connexion à inter
 
 Pour flash une carte utiliser la commande `bash Scripts/flash.sh` à la racine du projet. Attention à bien entrer le bon port série USB pour ne pas flasher malencontreusement la mauvaise carte.
 
+Pour flash le firmware des cartes UWB de Qorvo il faut installer [J-Link](https://www.segger.com/products/debug-probes/j-link/technology/flash-download/). Puis lancez la commande `JFlashLite` et séléctionnez les paramètres suivant:
+- Target device: NRF52833_XXAA
+- Target interface: SWD
+- Speed: 4000 kHz
+Puis cliquez sur OK et séléctionez le firmware (.Flash/DWM3001CDK-UCI-FreeRTOS.hex) et cliquez sur Program Device pour flash le firmware sur la carte.
+
 ## Tests
 
 - Test de simulation de données
+- Test de simulation de tracker
+- Test de distance LoRa
+
+Pour lancer les tests tapez la commande `make test TARGET=<cible>` pour lancer le test que vous souhaitez lancer.
+Attention il faut bien lancer les serveurs avant de démarrer un test.
 
 ## Collaboration sur le projet
 
@@ -84,12 +95,17 @@ Pour générer la documentation tapez `make doc` à la racine du projet puis ouv
 
 Matériel:
 - [Esp32-S3](https://wiki.seeedstudio.com/xiao_esp32s3_getting_started/)
+- [Qorvo DWM3001CDK](https://www.qorvo.com/products/p/DWM3001CDK)
 
 Platforme de développement:
 - [PlatformIO](https://docs.platformio.org/en/latest/)
 
 Firmware:
-- [Meshtastic](https://registry.platformio.org/libraries/bblanchon/ArduinoJson)
+- [Meshtastic](https://meshtastic.org/docs/development/docs/)
+- [MeshCore](https://meshtastic.org/docs/development/docs/)
+
+Logiciel:
+- [J-Link](https://www.segger.com/products/debug-probes/j-link/)
 
 Bibliothèque:
 - [NimBLE](https://h2zero.github.io/NimBLE-Arduino/md__new__user__guide.html)
