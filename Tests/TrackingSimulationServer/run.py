@@ -67,7 +67,7 @@ def main():
         print(f"   QoS       : {Config.MQTT_BROKER_QOS}")
 
     mqttClient = MQTTClientWrapper(
-        "MQTT_data_simulation",
+        "MQTT_tracking_simulation",
         Config.MQTT_BROKER_HOST,
         Config.MQTT_BROKER_PORT,
         Config.MQTT_BROKER_KEEPALIVE,

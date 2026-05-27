@@ -9,7 +9,7 @@ export APP_DEVICE = $(APP) - Device
 export APP_SERVER = $(APP) - Server
 
 # Fichiers générés
-GEN_FILES = Device/doc Server/doc Device/.pio Device/data Tests/Distance/.pio Tests/Distance/data .venv Resources/Data/gatewayContact.txt
+GEN_FILES = Device/doc Server/doc Device/.pio Device/data Tests/Distance/.pio Tests/Distance/data .venv Resources/Data/gatewayContact.txt UltraWideBand/uwb-qorvo-tools/.venv
 
 # Définition des couleurs
 _RESET = \033[m
@@ -22,7 +22,7 @@ _MAGENTA = \033[1;35m
 _CYAN = \033[1;36m
 _WHITE = \033[1;37m
 
-.PHONY: build run stop logs test clear doc clean script install remove help
+.PHONY: build run stop logs test tracking clear doc clean script install remove help
 .DEFAULT_GOAL := help
 
 # =============================================================================
@@ -58,6 +58,10 @@ stop:
 	then \
 		docker rm -f test-distance || true; \
 	fi
+	@if docker ps -a --format "{{.Names}}" | grep -w tracker > /dev/null; \
+	then \
+		docker ps -aq --filter "name=tracker-" | xargs -r docker rm -f; \
+	fi
 
 # =============================================================================
 #  Affichage des logs des conteneurs Docker
@@ -84,22 +88,29 @@ test:
 	fi
 
 # =============================================================================
+#  Lancement d'une carte avec communication UWB pour le tracking
+# =============================================================================
+tracker:
+	@docker run -d --name "tracker-$(shell date +%s)" --env-file .env --device $(PORT):$(PORT) --network data-monitoring-football-fan_default data-monitoring-football-fan-tracker python3.10 -m UltraWideBand.tracking $(PORT) $(TYPE) $(ADDRESS) $(if $(DEST),--destAddress $(DEST),)
+
+# =============================================================================
 #  Suppression des volumes Docker
 # =============================================================================
 clear:
 	@echo "$(_YELLOW)Suppression des volumes Docker$(_RESET)"
 	@docker compose down -v
-	@docker rmi data-monitoring-football-fan-bridge-meshcore-mqtt
-	@docker rmi data-monitoring-football-fan-bridge-meshtastic-mqtt
-	@docker rmi data-monitoring-football-fan-bridge-mqtt-influxdb
-	@docker rmi data-monitoring-football-fan-server
+	@docker rmi data-monitoring-football-fan-bridge-meshcore-mqtt || true
+	@docker rmi data-monitoring-football-fan-bridge-meshtastic-mqtt || true
+	@docker rmi data-monitoring-football-fan-bridge-mqtt-influxdb || true
+	@docker rmi data-monitoring-football-fan-server || true
 	@docker rmi data-monitoring-football-fan-test-data || true
 	@docker rmi data-monitoring-football-fan-test-tracking || true
 	@docker rmi data-monitoring-football-fan-test-distance || true
-	@docker rmi eclipse-mosquitto
-	@docker rmi grafana/grafana:12.4.2
-	@docker rmi influxdb:2.7
-	@docker rmi postgres:16
+	@docker rmi data-monitoring-football-fan-tracker || true
+	@docker rmi eclipse-mosquitto || true
+	@docker rmi grafana/grafana:12.4.2 || true
+	@docker rmi influxdb:2.7 || true
+	@docker rmi postgres:16 || true
 
 # =============================================================================
 #  Création de la documentation
@@ -171,8 +182,9 @@ install:
 	@echo "Package: venv"
 	@sudo apt install -y python3-venv
 	@echo "Création de l'environnement virtuel"
-	@python3.10 -m venv Ultra-Wide-Band/uwb-qorvo-tools/.venv
-	@Ultra-Wide-Band/uwb-qorvo-tools/.venv/bin/pip install Ultra-Wide-Band/uwb-qorvo-tools
+	@python3.10 -m venv UltraWideBand/uwb-qorvo-tools/.venv
+	@UltraWideBand/uwb-qorvo-tools/.venv/bin/pip install UltraWideBand/uwb-qorvo-tools
+	@UltraWideBand/uwb-qorvo-tools/.venv/bin/pip install paho-mqtt python-dotenv numpy 
 	@echo "$(_YELLOW)Les dépendances ont été installées$(_NO_COLOR)"
 
 # =============================================================================
@@ -198,8 +210,6 @@ remove:
 	@sudo apt remove -y python3.10
 	@echo "Package: Python3"
 	@sudo apt remove -y python3
-	@echo "Suppression des environnements virtuels python"
-	@rm -rf .venv Ultra-Wide-Band/uwb-qorvo-tools/.venv
 	@sudo apt autoremove -y
 	@echo "$(_YELLOW)Les dépendances ont été supprimées$(_NO_COLOR)"
 
@@ -216,6 +226,7 @@ help:
 	@echo "   - stop    : Arrête les conteneurs Docker."
 	@echo "   - log     : Affiche les logs des conteneurs Docker. (TARGET=<conteneur>)"
 	@echo "   - test    : Lance les conteneurs Docker de test. (TARGET=<conteneur>)"
+	@echo "   - tracker : Lance de la communication UWB pour le tracker. (PORT=<port_série>, TYPE=<type_de_carte>, ADDRESS=<adresse_de_la_carte>, DEST=<liste_adresse_destinataire>)"
 	@echo "   - clear   : Supprime les volumes Docker."
 	@echo "   - doc     : Créer la documentation."
 	@echo "   - clean   : Nettoie l'environnement."

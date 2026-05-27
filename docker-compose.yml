@@ -128,6 +128,24 @@ services:
         ports:
             - "${WEB_PORT}:${WEB_PORT}"
 
+    tracker:
+        build:
+            context: .
+            dockerfile: UltraWideBand/Dockerfile
+        container_name: tracker
+        depends_on:
+            mqtt:
+                condition: service_started
+            server:
+                condition: service_started
+        env_file:
+            - .env
+        volumes:
+            - /dev:/dev
+        device_cgroup_rules:
+            - 'c 188:* rmw'
+            - 'c 166:* rmw'
+
     test-data:
         build:
             context: .
