@@ -34,7 +34,7 @@ Ingénieur du Lab-STICC :
 ```
 Projet de Monitoring pour Supporters de Football
 │
-├── Documentation               // Fichiers de documentation du projet
+├── Documentation/              // Fichiers de documentation du projet
 │   ├── main.md
 │   ├── architecture.md
 │   ├── equipment.md
@@ -43,60 +43,42 @@ Projet de Monitoring pour Supporters de Football
 │   ├── test.md
 │   └── debug.md
 │
-├── Resources                   // Fichiers de données
-│   ├── Images
-│   │   ├── schema_esp32_LoRa.png
-│   │   ├── schema_INMP441.png
-│   │   ├── schema_MinIMU-9_v6.png
-│   │   └── architecture.png
-│   │
-│   ├── Images
-│   │   └── postgreSQL.sql
-│   │
-│   └── Data
-│       ├── Event-Configuration
-│       │   ├── Amical.json
-│       │   ├── Championat.json
-│       │   ├── Coupe de France.json
-│       │   └── Default.json
-│       │
-│       ├── capteur.json
-│       ├── event.json
-│       ├── supporter.json
-│       ├── stadiumBleacher.json
-│       └── topicMQTT.json
+├── Resources/                  // Fichiers de données
+│   ├── Images/
+│   ├── Database/
+│   └── Data/
 │
-├── Logs                        // Fichiers de logs
+├── Logs/                       // Fichiers de logs
 │
-├── Device                      // Code source du dispositif embarqué
-│   ├── src
-│   │   ├── Config
-│   │   │   ├── Log
+├── Device/                     // Code source du dispositif embarqué
+│   ├── src/
+│   │   ├── Config/
+│   │   │   ├── Log/
 │   │   │   │   ├── Log.cpp
 │   │   │   │   └── Log.hpp
 │   │   │   │
 │   │   │   ├── initSensor.hpp
 │   │   │   └── setting.hpp
 │   │   │
-│   │   ├── Sensor
-│   │   │   ├── AccelerometerGyroscope
-│   │   │   │   ├── MinIMU-9_v6
+│   │   ├── Sensor/
+│   │   │   ├── AccelerometerGyroscope/
+│   │   │   │   ├── MinIMU-9_v6/
 │   │   │   │   │   ├── MinIMU-9_v6.cpp
 │   │   │   │   │   └── MinIMU-9_v6.hpp
 │   │   │   │   │
 │   │   │   │   ├── AccelerometerGyroscope.cpp
 │   │   │   │   └── AccelerometerGyroscope.hpp
 │   │   │   │
-│   │   │   ├── Acoustic
-│   │   │   │   ├── INMP441
+│   │   │   ├── Acoustic/
+│   │   │   │   ├── INMP441/
 │   │   │   │   │   ├── INMP441.cpp
 │   │   │   │   │   └── INMP441.hpp
 │   │   │   │   │
 │   │   │   │   ├── Acoustic.cpp
 │   │   │   │   └── Acoustic.hpp
 │   │   │   │
-│   │   │   ├── HeartRate
-│   │   │   │   ├── PolarH10
+│   │   │   ├── HeartRate/
+│   │   │   │   ├── PolarH10/
 │   │   │   │   │   ├── PolarH10.cpp
 │   │   │   │   │   └── PolarH10.hpp
 │   │   │   │   │
@@ -106,16 +88,16 @@ Projet de Monitoring pour Supporters de Football
 │   │   │   ├── Sensor.cpp
 │   │   │   └── Sensor.hpp
 │   │   │
-│   │   ├── Utils
-│   │   │   ├── BluetoothLowEnergyManager
+│   │   ├── Utils/
+│   │   │   ├── BluetoothLowEnergyManager/
 │   │   │   │   ├── BluetoothLowEnergyManager.cpp
 │   │   │   │   └── BluetoothLowEnergyManager.hpp
 │   │   │   │
-│   │   │   ├── Logger
+│   │   │   ├── Logger/
 │   │   │   │   ├── Logger.cpp
 │   │   │   │   └── Logger.hpp
 │   │   │   │
-│   │   │   ├── UARTManager
+│   │   │   ├── UARTManager/
 │   │   │   │   ├── UARTManager.cpp
 │   │   │   │   └── UARTManager.hpp
 │   │   │   │
@@ -129,21 +111,24 @@ Projet de Monitoring pour Supporters de Football
 │   ├── partition.csv           // Fichier de configuration de la partition de la carte ESP32
 │   └── Doxyfile                // Fichier de configuration de Doxygen
 │
-├── Server
-│   ├── Config
+├── Server/
+│   ├── Config/
 │   │   └── config.py
 │   │
-│   ├── Core
-│   │   ├── Supporter
+│   ├── Core/
+│   │   ├── Supporter/
 │   │   │   ├── supporter.py
-│   │   │   └── Data
+│   │   │   └── Data/
 │   │   │       └── heartRate.py
 │   │   │
-│   │   ├── StadiumBleacher
+│   │   ├── StadiumBleacher/
 │   │   │   ├── stadiumBleacher.py
-│   │   │   └── Data
+│   │   │   └── Data/
 │   │   │       ├── accelerometer.py
 │   │   │       └── acoustic.py
+│   │   │
+│   │   ├── Tracker/
+│   │   │   └── tracker.py
 │   │   │
 │   │   ├── influxdb.py
 │   │   ├── meshtastic.py
@@ -151,33 +136,42 @@ Projet de Monitoring pour Supporters de Football
 │   │   ├── postgresql.py
 │   │   └── exception.py
 │   │
-│   ├── Bridge
+│   ├── Bridge/
 │   │   ├── bridge_Meshtastic_MQTT.py
+│   │   ├── bridge_Meshcore_MQTT.py
 │   │   └── bridge_MQTT_InfluxDB.py
 │   │
-│   ├── Dashboard
-│   │   ├── templates               // Fichiers HTML pour le serveur web
-│   │   │   ├── Control
+│   ├── Web/
+│   │   ├── templates/              // Fichiers HTML pour le serveur web
+│   │   │   ├── Control/
 │   │   │   │   ├── configuration.html
 │   │   │   │   ├── error.html
 │   │   │   │   ├── event.html
 │   │   │   │   └── preparation.html
 │   │   │   │
-│   │   │   └── Dashboard
+│   │   │   ├── Tracking/
+│   │   │   │   ├── index.html
+│   │   │   │   └── tracker.html
+│   │   │   │
+│   │   │   └── Dashboard/
 │   │   │       ├── index.html
 │   │   │       ├── supporter.html
 │   │   │       ├── stadiumBleacher.html
 │   │   │       └── comparison.html
 │   │   │
-│   │   ├── static                  // Fichiers utilisé par le serveur web
-│   │   │   ├── css
-│   │   │   │   ├── Control
+│   │   ├── static/                 // Fichiers utilisé par le serveur web
+│   │   │   ├── css/
+│   │   │   │   ├── Control/
 │   │   │   │   │   ├── configuration.css
 │   │   │   │   │   ├── error.css
 │   │   │   │   │   ├── event.css
 │   │   │   │   │   └── preparation.css
 │   │   │   │   │
-│   │   │   │   ├── Dashboard
+│   │   │   │   ├── Tracking/
+│   │   │   │   │   ├── index.css
+│   │   │   │   │   └── tracker.css
+│   │   │   │   │
+│   │   │   │   ├── Dashboard/
 │   │   │   │   │   ├── comparison.css
 │   │   │   │   │   ├── index.css
 │   │   │   │   │   ├── stadiumBleacher.css
@@ -185,30 +179,34 @@ Projet de Monitoring pour Supporters de Football
 │   │   │   │   │
 │   │   │   │   └── base.css
 │   │   │   │
-│   │   │   ├── js
-│   │   │   │   ├── Control
+│   │   │   ├── js/
+│   │   │   │   ├── Control/
 │   │   │   │   │   ├── configuration.js
 │   │   │   │   │   ├── event.js
 │   │   │   │   │   └── preparation.js
 │   │   │   │   │
-│   │   │   │   ├── Dashboard
+│   │   │   │   ├── Tracking/
+│   │   │   │   │   ├── index.js
+│   │   │   │   │   └── tracker.js
+│   │   │   │   │
+│   │   │   │   ├── Dashboard/
 │   │   │   │   │   ├── comparison.js
 │   │   │   │   │   ├── index.js
 │   │   │   │   │   ├── stadiumBleacher.js
 │   │   │   │   │   └── supporter.js
 │   │   │   │   │
-│   │   │   │   └── Utils
+│   │   │   │   └── Utils/
 │   │   │   │       ├── time.js
 │   │   │   │       ├── stringConversion.js
 │   │   │   │       └── element.js
 │   │   │   │
-│   │   │   ├── icon
+│   │   │   ├── icon/
 │   │   │   │   ├── delete-dark.png
 │   │   │   │   ├── delete-light.png
 │   │   │   │   ├── modify-dark.png
 │   │   │   │   └── modify-light.png
 │   │   │   │
-│   │   │   └── lib                 // Fichiers de bibliothèque externe
+│   │   │   └── lib/                // Fichiers de bibliothèque externe
 │   │   │       ├── chart.umd.min.js
 │   │   │       └── socket.io.min.js
 │   │   │
@@ -216,7 +214,7 @@ Projet de Monitoring pour Supporters de Football
 │   │   ├── routes.py
 │   │   └── socketioHandlers.py
 │   │
-│   ├── Utils
+│   ├── Utils/
 │   │   ├── data.py
 │   │   ├── display.py
 │   │   ├── logger.py
@@ -228,46 +226,27 @@ Projet de Monitoring pour Supporters de Football
 │   ├── Dockerfile              // Fichier de configuration de Docker
 │   └── Doxyfile                // Fichier de configuration de Doxygen
 │
-├── Tests
-│   ├── DataSimulationServer
-│   │   ├── Simulation
-│   │   │   ├── heartRateSimulator.py
-│   │   │   ├── acousticSimulator.py
-│   │   │   └── accelerometerGyroscopeSimulator.py 
-│   │   │
-│   │   ├── run.py
-│   │   └── Dockerfile
-│   │
-│   └── Distance
-│       ├── Flash
-│       │   ├── device.sh
-│       │   └── meshtastic.sh
-│       │
-│       ├── Device
-│       │   ├── src
-│       │   │   ├── Config
-│       │   │   │   └── setting.hpp
-│       │   │   │
-│       │   │   ├── Utils
-│       │   │   │   └── UARTManager
-│       │   │   │       ├── UARTManager.cpp
-│       │   │   │       └── UARTManager.hpp
-│       │   │   │
-│       │   │   └── main.cpp
-│       │   │
-│       │   └── platformio.ini  // Fichier de configuration de PlatformIO
-│       │
-│       └── log.py
+├── UltraWideBand/
+│   ├── uwb-qorvo-tools/
+│   ├── tracking.py
+│   └── Dockerfile
 │
-├── Scripts
+├── Tests/
+│   ├── DataSimulationServer/
+│   ├── TrackingSimulationServer/
+│   └── Distance/
+│
+├── Scripts/
 │   ├── envcrypt.sh             // Script de chiffrement de fichier
 │   ├── logviewer.sh            // Script de visualisation de log
 │   ├── readSerialLog.sh        // Script de récupération des logs des cartes ESP32
 │   ├── flash.sh                // Script de flash des cartes ESP32
 │   └── out.sh
 │
-├── .Flash                      // Fichier de configuration des cartes
-│   └── firmware-seeed-xiao-s3-2.7.15.567b8ea.bin
+├── .Flash/                     // Fichier de configuration des cartes
+│   ├── firmware-seeed-xiao-s3-2.7.15.567b8ea.bin
+│   ├── firmware_Xiao_S3_WIO_companion_radio_usb-v1.15.0-dee3e26.bin
+│   └── DWM3001CDK-UCI-FreeRTOS.hex
 │
 ├── .env                        // Fichier de variables d'environnement
 ├── .env.encrypted              // Fichier de variables d'environnement chiffré

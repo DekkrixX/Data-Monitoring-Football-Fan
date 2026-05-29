@@ -2,7 +2,9 @@
 
 Installation des dépendances `make install`.
 
-Flash des cartes ESP32 utilisez le script flash.sh `make script TARGET=flash`.
+Construction des images Docker `make build`.
+
+Flash des cartes ESP32 utilisez le script flash.sh `bash Scripts/flash.sh <cible>`.
 
 Lancement des serveurs `make run`.
 

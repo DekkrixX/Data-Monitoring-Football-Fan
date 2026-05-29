@@ -8,9 +8,9 @@
 
 # Installation
  
-Tout d’abord il faut installer les dépendances. Assurez vous que le paquet `make` est installé. Si ce n'est pas le cas exécutez la commande `sudo apt install make` avant de lancer l'installation automatique avec la commande `make install` dans la racine du projet.
+Tout d’abord il faut installer les dépendances. Assurez vous que le paquet `make` est installé. Si ce n'est pas le cas exécutez la commande `sudo apt install make` avant de lancer l'installation automatique avec la commande `make install` dans la racine du projet. Pour construire les images Docker lancez la commande `make build`.
 Attention l'installation des dépendances requirent une connexion à internet.
-Ensuite, vous devez configurer les capteurs et flasher le code sur les cartes. Tapez les commandes suivantes: `make flash TARGET=device` pour flasher le code des capteurs et `make flash TARGET=meshtastic` pour configurer les noeuds Meshtastic.
+Ensuite, vous devez configurer les capteurs et flasher le code sur les cartes. Tapez les commandes suivantes: `bash Scripts/flash.sh device` pour flasher le code des capteurs et `bash Scripts/flash.sh meshtastic` pour configurer les noeuds Meshtastic.
 
 Pour configurer le code des cartes ESP32 correctement il faut modifier certaine macros dans le fichier setting.hpp (SUPPORTER_ID, STADIUM_BLEACHER_ID, NB_SENSOR) et définir le type de capteur auquel la carte est connecté.
 
@@ -22,4 +22,4 @@ Attention le premier lancement du serveur require une connexion internet, mais p
 
 # Désintallation
 
-Pour tout désinstaller, il suffit de taper la commande `make remove` à la racine du projet.
+Pour tout désinstaller, il suffit de taper la commande `make remove` à la racine du projet, ou `make clear` pour nettoyer les images Docker.

@@ -67,7 +67,7 @@ function usage()
     echo ""
     echo -e "${_WHITE}ARGUMENTS${_RESET}"
     echo -e "\t<cible>"
-    echo -e "\t\tNom de la cible à flahser."
+    echo -e "\t\tNom de la cible à flahser. [ device | meshtastic | meshcore ]"
     echo -e "\t\tExemple: ${name} device"
 
     return

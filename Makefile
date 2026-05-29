@@ -9,7 +9,7 @@ export APP_DEVICE = $(APP) - Device
 export APP_SERVER = $(APP) - Server
 
 # Fichiers générés
-GEN_FILES = Device/doc Server/doc Device/.pio Device/data Tests/Distance/.pio Tests/Distance/data .venv Resources/Data/gatewayContact.txt UltraWideBand/uwb-qorvo-tools/.venv
+GEN_FILES = Device/doc Server/doc Device/.pio Device/data Tests/Distance/.pio Tests/Distance/data .venv Resources/Data/gatewayContact.txt
 
 # Définition des couleurs
 _RESET = \033[m
@@ -142,19 +142,23 @@ script:
 	else \
 		if [ "$(TARGET)" = "envcrypt" ]; \
 		then \
-			echo "$(_YELLOW)Menu d'aide du script envcrypt$(_RESET)"; \
+			echo "$(_YELLOW)Menu d'aide du script envcrypt.$(_RESET)"; \
+			echo "$(_YELLOW)Utilisation: bash $(SCRIPT_PATH)$(TARGET).sh$(_RESET)"; \
 			bash "$(SCRIPT_PATH)envcrypt.sh" "--help"; \
 		elif [ "$(TARGET)" = "flash" ]; \
 		then \
 			echo "$(_YELLOW)Menu d'aide du script flash$(_RESET)"; \
+			echo "$(_YELLOW)Utilisation: bash $(SCRIPT_PATH)$(TARGET).sh$(_RESET)"; \
 			bash "$(SCRIPT_PATH)flash.sh" "--help"; \
 		elif [ "$(TARGET)" = "logviewer" ]; \
 		then \
 			echo "$(_YELLOW)Menu d'aide du script logviewer$(_RESET)"; \
+			echo "$(_YELLOW)Utilisation: bash $(SCRIPT_PATH)$(TARGET).sh$(_RESET)"; \
 			bash "$(SCRIPT_PATH)logviewer.sh" "--help"; \
 		elif [ "$(TARGET)" = "readSerialLog" ]; \
 		then \
 			echo "$(TARGET)Menu d'aide du script readSerialLog$(_RESET)"; \
+			echo "$(_YELLOW)Utilisation: bash $(SCRIPT_PATH)$(TARGET).sh$(_RESET)"; \
 			bash "$(SCRIPT_PATH)readSerialLog.sh" "--help"; \
 		else \
 			echo "$(_RED)Aucun menu d'aide n'est disponible pour le script $(TARGET)$(_RESET)"; \
@@ -174,17 +178,6 @@ install:
 	@curl -fsSL https://get.docker.com -o get-docker.sh
 	@sudo sh ./get-docker.sh
 	@rm get-docker.sh
-	@echo "Package: Python3.10"
-	@sudo apt install -y python3.10
-	@echo "Package: Pip"
-	@sudo apt install -y python3-pip
-	@python3.10 -m pip install --upgrade pip
-	@echo "Package: venv"
-	@sudo apt install -y python3-venv
-	@echo "Création de l'environnement virtuel"
-	@python3.10 -m venv UltraWideBand/uwb-qorvo-tools/.venv
-	@UltraWideBand/uwb-qorvo-tools/.venv/bin/pip install UltraWideBand/uwb-qorvo-tools
-	@UltraWideBand/uwb-qorvo-tools/.venv/bin/pip install paho-mqtt python-dotenv numpy 
 	@echo "$(_YELLOW)Les dépendances ont été installées$(_NO_COLOR)"
 
 # =============================================================================
@@ -204,10 +197,6 @@ remove:
 	@sudo rm /etc/apt/keyrings/docker.asc
 	@echo "Package: Python3-venv"
 	@sudo apt remove -y python3-venv
-	@echo "Package: Pip"
-	@sudo apt remove -y python3-pip
-	@echo "Package: Python3.10"
-	@sudo apt remove -y python3.10
 	@echo "Package: Python3"
 	@sudo apt remove -y python3
 	@sudo apt autoremove -y
