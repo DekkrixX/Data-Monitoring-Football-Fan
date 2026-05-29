@@ -15,3 +15,10 @@ Courte portée avec plus d'envoi de message
 SHORT_TURBO
 .venv/meshtastic-env/bin/meshtastic --port /dev/ttyACM0 --set lora.modem_preset SHORT_TURBO
 Très courte portée avec encore un peu plus d'envoi de message
+
+
+Modification du nombre de saut:
+.venv/meshtastic-env/bin/meshtastic --port /dev/ttyACM0 --set lora.hop_limit <nb>
+
+Modification de la puissance:
+.venv/meshtatsic-env/bin/meshtastic --port /dev/ttyACM0 --set lora.tx_power <nb>

@@ -21,7 +21,7 @@ Lancement des serveurs `make run`.
 
 ## Description du projet
 
-Le projet de monitoring pour supporters de football est la réalisation d'une collaboration entre le Lab-STICC (le centre de recherche de Lorient) et le FCL (le Football Club de Lorient). L'objectif de ce projet est de développer une solution IoT performante, économique et à gestion locale des données pour analyser les données des supporters pendant les matchs de football. Les données collectées seront utilisées pour réaliser une vidéo promotionnelle valorisant le club, de la ville et du laboratoire de recherche de Lorient. Le projet est réalisé par des étudiants du Master Systèmes Embarqués - Systèmes Intégrés à Lorient sous la supervision de deux ingénieurs du Lab-STICC.
+Le projet de monitoring pour supporters de football est la réalisation d'une collaboration entre le Lab-STICC (le centre de recherche de Lorient) et le FCL (le Football Club de Lorient). L'objectif de ce projet est de développer une solution IoT performante, économique et à gestion locale des données pour analyser les données des supporters pendant les matchs de football. Les données collectées seront utilisées pour réaliser une vidéo promotionnelle valorisant le club, la ville et le laboratoire de recherche de Lorient. Le projet est réalisé par des étudiants du Master Systèmes Embarqués - Systèmes Intégrés à Lorient sous la supervision de deux ingénieurs du Lab-STICC.
 
 ## Fonctionnalitées du projet
 
