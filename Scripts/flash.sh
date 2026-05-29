@@ -408,7 +408,7 @@ function main()
                                     debug "Flash de la configuration."
                                     flashMeshtasticConfiguration "gateway"
                                     sleep 2
-                                    mesh --export-config "${path}"/Resources/Data/currentConfig.yml
+                                    meshtastic --export-config "${path}"/Resources/Data/currentConfig.yml
                                     sleep 2
                                     echo $(sed "1,3d;40,49d;59d" "${path}"/Resources/Data/currentConfig.yml | head -n -2) > "${path}"/Resources/Data/currentConfig.yml
                                 done
@@ -419,7 +419,7 @@ function main()
                             # Flash de la configuration d'un capteur Meshtastic
                             sensor)
                                 info "Flash de la configuration d'un capteur."
-                                mesh --export-config "${path}"/Resources/Data/currentConfig.yml
+                                meshtastic --export-config "${path}"/Resources/Data/currentConfig.yml
                                 sleep 2
                                 echo $(sed "1,3d;40,49d;59d" "${path}"/Resources/Data/currentConfig.yml | head -n -2) > "${path}"/Resources/Data/currentConfig.yml
                                 while ! diff "${path}"/Resources/Data/currentConfig.yml "${path}"/Resources/Data/refConfigSensor.yml
@@ -428,7 +428,7 @@ function main()
                                     debug "Flash de la configuration."
                                     flashMeshtasticConfiguration "sensor"
                                     sleep 2
-                                    mesh --export-config "${path}"/Resources/Data/currentConfig.yml
+                                    meshtastic --export-config "${path}"/Resources/Data/currentConfig.yml
                                     sleep 2
                                     echo $(sed "1,3d;40,49d;59d" "${path}"/Resources/Data/currentConfig.yml | head -n -2) > "${path}"/Resources/Data/currentConfig.yml
                                 done
