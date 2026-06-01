@@ -19,6 +19,8 @@
 
 #define TIME_INTERVAL 10 * 1000 ///< @brief Temps d'interval entre les envoi de paquets.
 
+#define DATA_SIMULATION 1 ///< @brief Activation des envoies de messages de données.
+
 // ============================================================================
 //  Paramètres de debug
 // ============================================================================

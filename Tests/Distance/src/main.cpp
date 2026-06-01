@@ -100,10 +100,17 @@ void loop()
 	std::string jsonString;
 	JsonDocument json;
 
-	json["t"] = TOPIC_TEST;
-	json["n"] = NAME;
-	json["id"] = ID;
+	json["t"]   = TOPIC_TEST;
+	json["n"]   = NAME;
+	json["id"]  = ID;
 	json["msg"] = packageCounter;
+
+#if DATA_SIMULATION == 1
+	const int data[10] = {102, 99, 95, 97, 92, 90, 88, 85, 80, 86};
+	JsonArray array = json["d"].to<JsonArray>();
+    for (int i=0; i < 10; i++)
+        array.add(data[i]);
+#endif
 
 	serializeJson(json, jsonString);
 	jsonString += '\n';

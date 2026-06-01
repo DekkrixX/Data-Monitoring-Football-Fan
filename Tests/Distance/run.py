@@ -29,7 +29,7 @@ logger = Logger("Tests/Meshtastic")
 #  Variable global
 # =============================================================================
 
-listPackage = [] ##< @brief Liste des paquets reçus.
+listPackage = [] ##< @brief Liste des paquets non reçus.
 lastPackage = -1 ##< @brief Dernier message reçus.
 
 # =============================================================================
@@ -61,13 +61,11 @@ def main():
         meshtasticClient.close()
 
         printBanner("   Résultat du test de distance des paquets Meshtastic")
-        check = -1
         for package in listPackage.sort():
-        	if package != check + 1:
-        		print(f"Paquet n°{package} a été perdu.")
+        	print(f"Paquet n°{package} a été perdu.")
 
     except Exception as e:
-        logger.error(f"Erreur fatale: {e}", exc_info=True)
+        logger.error(f"Erreur fatale: {e}")
 
     return
 
@@ -107,6 +105,8 @@ def _onReceive(packet, interface):
     	print(f"{Fore.GREEN}[OK]{Style.RESET_ALL} Paquet n°{message} reçus.")
     else:
     	print(f"{Fore.RED}[ERREUR]{Style.RESET_ALL} Paquet n°{message} reçus, paquet n°{lastPackage} attendu.")
+
+    lastPackage = message
 
     return
 
