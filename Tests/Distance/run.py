@@ -11,6 +11,7 @@
 # =============================================================================
 
 import json
+import statistics
 from colorama import Fore, Style
 
 from Server.Config.setting import Config
@@ -29,8 +30,12 @@ logger = Logger("Tests/Meshtastic")
 #  Variable global
 # =============================================================================
 
-listPackage = [] ##< @brief Liste des paquets non reçus.
-lastPackage = -1 ##< @brief Dernier message reçus.
+listPackage  = [] ##< @brief Liste des paquets non reçus.
+lastPackage  = -1 ##< @brief Dernier message reçus.
+listLastSNR  = [] ##< @brief Dernière mesure du SNR.
+listAllSNR   = [] ##< @brief Liste des mesures du SNR.
+listLastRSSI = [] ##< @brief Dernière mesure du RSSI.
+listAllRSSI  = [] ##< @brief Liste des mesures du RSSI.
 
 # =============================================================================
 #  Programme principal
@@ -61,8 +66,13 @@ def main():
         meshtasticClient.close()
 
         printBanner("   Résultat du test de distance des paquets Meshtastic")
-        for package in listPackage.sort():
-        	print(f"Paquet n°{package} a été perdu.")
+        print(f"Nombre de paquets envoyé: {lastPackage}.")
+        print(f"Nombre de paquets reçus: {lastPackage - len(listPackage)}")
+        print(f"Moyenne globale du SNR: {statistics.mean(listAllSNR)}.")
+        print(f"Moyenne globale du RSSI: {statistics.mean(listAllRSSI)}.")
+        if listPackage:
+            for package in listPackage.sort():
+        	    print(f"Paquet n°{package} a été perdu.")
 
     except Exception as e:
         logger.error(f"Erreur fatale: {e}")
@@ -82,6 +92,10 @@ def main():
 def _onReceive(packet, interface):
     global listPackage
     global lastPackage
+    global listLastSNR
+    global listAllSNR
+    global listLastRSSI
+    global listAllRSSI
 
     logger.info(f"[Test] Paquet brut reçu : {packet}")
 
@@ -92,6 +106,10 @@ def _onReceive(packet, interface):
 
     try:
         data = json.loads(packet["decoded"].get("text", ""))
+        listLastSNR.append(packet.get("rxSnr"))
+        listAllSNR.append(packet.get("rxSnr"))
+        listLastRSSI.append(packet.get("rxRssi"))
+        listAllRSSI.append(packet.get("rxRssi"))
 
     except (json.JSONDecodeError, TypeError):
         logger.warning("[Test] Champ 'text' absent ou non-JSON, paquet ignoré")
@@ -104,7 +122,19 @@ def _onReceive(packet, interface):
     if message == lastPackage + 1:
     	print(f"{Fore.GREEN}[OK]{Style.RESET_ALL} Paquet n°{message} reçus.")
     else:
-    	print(f"{Fore.RED}[ERREUR]{Style.RESET_ALL} Paquet n°{message} reçus, paquet n°{lastPackage} attendu.")
+    	print(f"{Fore.RED}[ERROR]{Style.RESET_ALL} Paquet n°{message} reçus, paquet n°{lastPackage + 1} attendu.")
+    if listLastSNR[-1] <= -5:
+        print(f"{Fore.YELLOW}[WARNING]{Style.RESET_ALL} SNR faible : {listLastSNR[-1]}.")
+    if listLastRSSI[-1] <= -110:
+        print(f"{Fore.YELLOW}[WARNING]{Style.RESET_ALL} RSSI faible : {listLastRSSI[-1]}.")
+
+    print(f"{Fore.CYAN}[INFO]{Style.RESET_ALL} Moyenne du snr sur les dix derniers paquets : {statistics.mean(listLastSNR)}.")
+    print(f"{Fore.CYAN}[INFO]{Style.RESET_ALL} Moyenne du rssi sur les dix derniers paquets : {statistics.mean(listLastRSSI)}.")
+
+    if len(listLastSNR) >= 10:
+        listLastSNR.pop(0)
+    if len(listLastRSSI) >= 10:
+        listLastRSSI.pop(0)
 
     lastPackage = message
 
