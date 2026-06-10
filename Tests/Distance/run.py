@@ -31,7 +31,7 @@ logger = Logger("Tests/Meshtastic")
 # =============================================================================
 
 listPackage  = [] ##< @brief Liste des paquets non reçus.
-lastPackage  = -1 ##< @brief Dernier message reçus.
+lastPackage  = {} ##< @brief Dernier message reçus par identifiant.
 listLastSNR  = [] ##< @brief Dernière mesure du SNR.
 listAllSNR   = [] ##< @brief Liste des mesures du SNR.
 listLastRSSI = [] ##< @brief Dernière mesure du RSSI.
@@ -66,8 +66,9 @@ def main():
         meshtasticClient.close()
 
         printBanner("   Résultat du test de distance des paquets Meshtastic")
-        print(f"Nombre de paquets envoyé: {lastPackage}.")
-        print(f"Nombre de paquets reçus: {lastPackage - len(listPackage)}")
+        for nodeId, nbPackets in lastPackage.items():
+            print(f"Nombre de paquets envoyé par le noeud {nodeId}: {nbPackets}.")
+            print(f"Nombre de paquets reçus depuis le noeud {nodeId}: {nbPackets - len(listPackage)}.")
         print(f"Moyenne globale du SNR: {statistics.mean(listAllSNR)}.")
         print(f"Moyenne globale du RSSI: {statistics.mean(listAllRSSI)}.")
         if listPackage:
@@ -119,10 +120,13 @@ def _onReceive(packet, interface):
     topic        = getMQTTTopic(channelIndex, data.get("id"))
     message      = data.get("msg")
 
-    if message == lastPackage + 1:
-    	print(f"{Fore.GREEN}[OK]{Style.RESET_ALL} Paquet n°{message} reçus.")
+    if data.get("id") not in lastPackage:
+        lastPackage[data.get("id")] = 0
+
+    if message == lastPackage[data.get("id")] + 1:
+    	print(f"{Fore.GREEN}[OK]{Style.RESET_ALL} Paquet n°{message} reçus du noeud n°{data.get('id')}.")
     else:
-    	print(f"{Fore.RED}[ERROR]{Style.RESET_ALL} Paquet n°{message} reçus, paquet n°{lastPackage + 1} attendu.")
+    	print(f"{Fore.RED}[ERROR]{Style.RESET_ALL} Paquet n°{message} reçus du noeud n°{data.get('id')}, paquet n°{lastPackage[data.get('id')] + 1} attendu.")
     if listLastSNR[-1] <= -5:
         print(f"{Fore.YELLOW}[WARNING]{Style.RESET_ALL} SNR faible : {listLastSNR[-1]}.")
     if listLastRSSI[-1] <= -110:
@@ -136,7 +140,7 @@ def _onReceive(packet, interface):
     if len(listLastRSSI) >= 10:
         listLastRSSI.pop(0)
 
-    lastPackage = message
+    lastPackage[data.get("id")] = message
 
     return
 

@@ -106,10 +106,10 @@ void loop()
 	json["msg"] = packageCounter;
 
 #if DATA_SIMULATION == 1
-	const int data[10] = {102, 99, 95, 97, 92, 90, 88, 85, 80, 86};
+	const int dataValue[10] = {102, 99, 95, 97, 92, 90, 88, 85, 80, 86};
 	JsonArray array = json["d"].to<JsonArray>();
     for (int i=0; i < 10; i++)
-        array.add(data[i]);
+        array.add(dataValue[i]);
 #endif
 
 	serializeJson(json, jsonString);
