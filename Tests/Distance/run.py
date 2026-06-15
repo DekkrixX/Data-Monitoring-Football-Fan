@@ -107,10 +107,11 @@ def _onReceive(packet, interface):
 
     try:
         data = json.loads(packet["decoded"].get("text", ""))
-        listLastSNR.append(packet.get("rxSnr"))
-        listAllSNR.append(packet.get("rxSnr"))
-        listLastRSSI.append(packet.get("rxRssi"))
-        listAllRSSI.append(packet.get("rxRssi"))
+        if packet.get("rxSnr") and packet.get("rxRssi"):
+            listLastSNR.append(packet.get("rxSnr"))
+            listAllSNR.append(packet.get("rxSnr"))
+            listLastRSSI.append(packet.get("rxRssi"))
+            listAllRSSI.append(packet.get("rxRssi"))
 
     except (json.JSONDecodeError, TypeError):
         logger.warning("[Test] Champ 'text' absent ou non-JSON, paquet ignoré")
