@@ -12,6 +12,7 @@
 # =============================================================================
 
 source "$(dirname "${BASH_SOURCE[0]}")/out.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/../.env"
 
 # =============================================================================
 #  Code de sortie
@@ -126,7 +127,7 @@ function flashMeshtasticConfiguration()
     meshtastic --reboot
     sleep 11
     debug "Configuration des channels."
-    meshtastic --ch-index 0 --ch-set psk "base64:5BqoFn2cuaQFHcqnRSKANEvnt2naVyf5G51tfFkXIYA="
+    meshtastic --ch-index 0 --ch-set psk "base64:${MESHTASTIC_KEY}"
     meshtastic --ch-index 0 --ch-set name "monitoring"
     meshtastic --reboot
     sleep 11
