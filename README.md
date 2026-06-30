@@ -19,6 +19,7 @@ Lancement des serveurs `make run`.
 ![language3](https://img.shields.io/badge/HTML-E34F26?style=for-the-badge&logo=html5&logoColor=white)
 ![languaage4](https://img.shields.io/badge/CSS-1572B6?style=for-the-badge&logo=css&logoColor=white)
 ![language5](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
+
 ---
 
 ## Description du projet
@@ -31,6 +32,7 @@ Le projet de monitoring pour supporters de football est la réalisation d'une co
 - Collect de données de mouvement
 - Collect de données acoustique
 - Collect d'information système
+- Tracking d'objet
 - Affichage des statistiques des données des utilisateurs
 - Affichage des statistiques des données des tribunes du stade
 - Gestion des évènements du match en direct
