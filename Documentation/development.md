@@ -102,7 +102,7 @@ Platforme de développement:
 
 Firmware:
 - [Meshtastic](https://meshtastic.org/docs/development/docs/)
-- [MeshCore](https://meshtastic.org/docs/development/docs/)
+- [MeshCore](https://docs.meshcore.io)
 
 Logiciel:
 - [J-Link](https://www.segger.com/products/debug-probes/j-link/)
